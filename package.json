@@ -72,7 +72,10 @@
         },
         "reqnrollNavigator.tagFilterMode": {
           "type": "string",
-          "enum": ["include", "exclude"],
+          "enum": [
+            "include",
+            "exclude"
+          ],
           "default": "include",
           "description": "Tag filter mode: 'include' shows only matching tags, 'exclude' hides matching tags"
         },
@@ -91,7 +94,11 @@
           "items": {
             "type": "string"
           },
-          "default": ["**/bin/**", "**/obj/**", "**/node_modules/**"],
+          "default": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/node_modules/**"
+          ],
           "description": "Patterns to exclude from indexing"
         },
         "reqnrollNavigator.enableCodeLens": {
@@ -124,7 +131,10 @@
     "languages": [
       {
         "id": "gherkin",
-        "aliases": ["Gherkin", "Feature"],
+        "aliases": [
+          "Gherkin",
+          "Feature"
+        ],
         "extensions": [
           ".feature"
         ]
@@ -137,7 +147,9 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "package": "vsce package"
   },
   "devDependencies": {
@@ -145,9 +157,11 @@
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vscode/vsce": "^2.22.0",
     "eslint": "^8.54.0",
     "typescript": "^5.3.0",
-    "@vscode/vsce": "^2.22.0"
+    "vitest": "^4.0.18"
   },
   "repository": {
     "type": "git",

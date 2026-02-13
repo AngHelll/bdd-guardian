@@ -67,7 +67,7 @@ export function calculateScore(binding: Binding, keywordMatched: boolean): numbe
  */
 function countLiteralCharacters(pattern: string): number {
     // Remove regex special constructs
-    let literal = pattern
+    const literal = pattern
         .replace(/\^\$?/g, '')           // Remove anchors
         .replace(/\(\.\*\)|\(\.\+\)/g, '')  // Remove wildcards in groups
         .replace(/\.\*|\.\+|\.\?/g, '')     // Remove unanchored wildcards

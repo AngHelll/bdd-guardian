@@ -96,3 +96,14 @@ export function extractPlaceholders(text: string): string[] {
     
     return placeholders;
 }
+
+/**
+ * Normalize step text for matching.
+ * Combines whitespace normalization with other text transformations.
+ * 
+ * @param text Raw step text
+ * @returns Normalized text suitable for binding matching
+ */
+export function normalizeStepText(text: string): string {
+    return normalizeWhitespace(text);
+}
