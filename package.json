@@ -2,7 +2,7 @@
   "name": "reqnroll-navigator",
   "displayName": "Reqnroll Navigator",
   "description": "Navigate between Gherkin .feature steps and Reqnroll C# step bindings with CodeLens, Go to Definition, and diagnostics",
-  "version": "2.3.0",
+  "version": "0.1.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
