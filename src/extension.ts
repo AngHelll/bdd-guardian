@@ -17,6 +17,8 @@ import {
     createNavigationHistoryCommands,
     createNavigationStatusBar,
     getNavigationHistory,
+    copyDebugReportToClipboard,
+    recordIndexDuration,
 } from './features';
 import { getProviderManager } from './providers/bindings';
 import { ResolveResult } from './core/domain';
@@ -131,7 +133,8 @@ function registerCommands(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('reqnroll-navigator.showStatistics', showStatistics),
         vscode.commands.registerCommand('reqnrollNavigator.showStatistics', showStatistics),
-        vscode.commands.registerCommand('reqnroll-navigator.showProviderReport', showProviderDetectionReport)
+        vscode.commands.registerCommand('reqnroll-navigator.showProviderReport', showProviderDetectionReport),
+        vscode.commands.registerCommand('bddGuardian.copyDebugReport', copyDebugReport)
     );
 }
 
@@ -196,6 +199,10 @@ function showStatistics(): void {
     vscode.window.showInformationMessage(msg);
 }
 
+async function copyDebugReport(): Promise<void> {
+    const pm = getProviderManager();
+    await copyDebugReportToClipboard(workspaceIndex, pm);
+}
 function showProviderDetectionReport(): void {
     const pm = getProviderManager();
     outputChannel.appendLine(pm.getDetectionReportString());

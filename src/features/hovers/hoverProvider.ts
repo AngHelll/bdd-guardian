@@ -309,7 +309,7 @@ export class HoverProvider implements vscode.HoverProvider {
      * Suggest a binding pattern from step text.
      */
     private suggestBindingPattern(stepText: string): string {
-        let pattern = stepText
+        const pattern = stepText
             .replace(/"([^"]+)"/g, '"(.*)"')
             .replace(/'([^']+)'/g, "'(.*)'")
             .replace(/\b\d+\b/g, '(\\d+)')

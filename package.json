@@ -75,6 +75,10 @@
       {
         "command": "reqnroll-navigator.clearHistory",
         "title": "BDD Guardian: Clear Navigation History"
+      },
+      {
+        "command": "bddGuardian.copyDebugReport",
+        "title": "BDD Guardian: Copy Debug Report"
       }
     ],
     "keybindings": [

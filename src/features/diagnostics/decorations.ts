@@ -66,7 +66,7 @@ function createDecorationType(
 }
 
 // Decoration type cache
-let decorationTypes: {
+const decorationTypes: {
     bound: vscode.TextEditorDecorationType | null;
     unbound: vscode.TextEditorDecorationType | null;
     ambiguous: vscode.TextEditorDecorationType | null;

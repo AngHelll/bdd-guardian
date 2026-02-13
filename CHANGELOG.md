@@ -47,3 +47,21 @@ All notable changes to the BDD Guardian extension will be documented in this fil
 - Go Godog support
 - Step auto-completion
 - Binding code generation from step text
+
+## [0.3.0] - 2025-06-14
+
+### Added - Testing Infrastructure
+- **Expanded Test Suite**: 109 tests (44 new tests added)
+  - `scoring.test.ts`: Deterministic scoring, specificity scoring, GBM-style pattern tests
+  - `ambiguity.test.ts`: Overlapping pattern detection, best match selection, edge cases
+  - `parsing.test.ts`: Gherkin parsing, C# binding extraction, pattern compilation
+- **GBM-style Fixtures**: Real-world test fixtures from production environments
+  - `gbm-ppr.feature`: PPR portfolio projection scenarios
+  - `GbmPprSteps.cs`: Matching C# step bindings
+- **Coverage Reporting**: v8 coverage integration with Vitest
+
+### Changed
+- Test coverage for core modules:
+  - `bindingRegex.ts`: 100% coverage
+  - `scoring.ts`: 94.73% coverage
+  - `resolver.ts`: 90% coverage

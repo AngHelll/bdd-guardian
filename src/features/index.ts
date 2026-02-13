@@ -27,6 +27,12 @@ export {
     DecorationsManager,
     type DiagnosticsResult,
     type DecorationStats,
+    // Debug Report
+    copyDebugReportToClipboard,
+    generateDebugReport,
+    recordIndexDuration,
+    recordResolveDuration,
+    type DebugReport,
 } from './diagnostics';
 
 // Hover features
