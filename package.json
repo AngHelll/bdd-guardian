@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -36,45 +36,45 @@
     "commands": [
       {
         "command": "reqnrollNavigator.reindex",
-        "title": "Reqnroll: Reindex Workspace"
+        "title": "BDD Guardian: Reindex Workspace"
       },
       {
         "command": "reqnrollNavigator.showBindings",
-        "title": "Reqnroll: Show All Bindings"
+        "title": "BDD Guardian: Show All Bindings"
       },
       {
         "command": "reqnrollNavigator.goToBinding",
-        "title": "Reqnroll: Go to Step Binding"
+        "title": "BDD Guardian: Go to Step Binding"
       },
       {
         "command": "reqnrollNavigator.showStatistics",
-        "title": "Reqnroll: Show Statistics"
+        "title": "BDD Guardian: Show Statistics"
       },
       {
-        "command": "reqnroll-navigator.showStatistics",
-        "title": "Reqnroll Navigator: Show Statistics"
+        "command": "reqnrollNavigator.showAmbiguousMatches",
+        "title": "BDD Guardian: Show Ambiguous Matches"
       },
       {
         "command": "reqnroll-navigator.showProviderReport",
-        "title": "Reqnroll Navigator: Show Provider Detection Report"
+        "title": "BDD Guardian: Show Provider Detection Report"
       },
       {
         "command": "reqnroll-navigator.goBack",
-        "title": "Reqnroll Navigator: Go Back",
+        "title": "BDD Guardian: Go Back",
         "icon": "$(arrow-left)"
       },
       {
         "command": "reqnroll-navigator.goForward",
-        "title": "Reqnroll Navigator: Go Forward",
+        "title": "BDD Guardian: Go Forward",
         "icon": "$(arrow-right)"
       },
       {
         "command": "reqnroll-navigator.showHistory",
-        "title": "Reqnroll Navigator: Show Navigation History"
+        "title": "BDD Guardian: Show Navigation History"
       },
       {
         "command": "reqnroll-navigator.clearHistory",
-        "title": "Reqnroll Navigator: Clear Navigation History"
+        "title": "BDD Guardian: Clear Navigation History"
       }
     ],
     "keybindings": [
@@ -98,8 +98,18 @@
       }
     ],
     "configuration": {
-      "title": "Reqnroll Navigator",
+      "title": "BDD Guardian",
       "properties": {
+        "bddGuardian.gutterIcons.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show gutter icons for step status (✓ bound, ✗ unbound, ! ambiguous)"
+        },
+        "bddGuardian.hoverDetails.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show enriched hover information with binding details and code preview"
+        },
         "reqnrollNavigator.caseInsensitive": {
           "type": "boolean",
           "default": false,
@@ -111,14 +121,11 @@
             "type": "string"
           },
           "default": [],
-          "description": "Filter steps by tags (e.g., ['@P0', '@smoke']). Affects CodeLens and Diagnostics only - navigation always works."
+          "description": "Filter steps by tags (e.g., ['@P0', '@smoke']). Affects CodeLens and Diagnostics only."
         },
         "reqnrollNavigator.tagFilterMode": {
           "type": "string",
-          "enum": [
-            "include",
-            "exclude"
-          ],
+          "enum": ["include", "exclude"],
           "default": "include",
           "description": "Tag filter mode: 'include' shows only matching tags, 'exclude' hides matching tags"
         },
@@ -137,11 +144,7 @@
           "items": {
             "type": "string"
           },
-          "default": [
-            "**/bin/**",
-            "**/obj/**",
-            "**/node_modules/**"
-          ],
+          "default": ["**/bin/**", "**/obj/**", "**/node_modules/**"],
           "description": "Patterns to exclude from indexing"
         },
         "reqnrollNavigator.enableCodeLens": {
@@ -157,7 +160,7 @@
         "reqnrollNavigator.enableDecorations": {
           "type": "boolean",
           "default": true,
-          "description": "Enable visual decorations for steps"
+          "description": "Enable visual decorations for steps (border and overview ruler)"
         },
         "reqnrollNavigator.navigationHistorySize": {
           "type": "number",
@@ -170,24 +173,14 @@
           "type": "boolean",
           "default": false,
           "description": "Enable debug logging"
-        },
-        "reqnrollNavigator.debugProviders": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable debug logging for provider detection"
         }
       }
     },
     "languages": [
       {
         "id": "gherkin",
-        "aliases": [
-          "Gherkin",
-          "Feature"
-        ],
-        "extensions": [
-          ".feature"
-        ]
+        "aliases": ["Gherkin", "Feature"],
+        "extensions": [".feature"]
       }
     ]
   },

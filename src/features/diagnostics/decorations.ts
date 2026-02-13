@@ -1,10 +1,12 @@
 /**
  * Decorations Manager - Visual indicators for step status.
  * 
- * Phase 3: Enhanced with Gutter Icons
- * - Green checkmark for bound steps
- * - Red X for unbound steps
- * - Orange ! for ambiguous steps
+ * Features:
+ * - Gutter icons (checkmark, X, warning)
+ * - Subtle left border by status
+ * - Overview ruler markers
+ * - Debounced updates (200ms)
+ * - Respects user configuration
  */
 
 import * as vscode from 'vscode';
@@ -13,66 +15,79 @@ import { IndexManager } from '../../core/index';
 import { createResolver, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword } from '../../core/domain';
+import { StepStatus, getUIConfig, getStatusEmoji } from '../../ui/stepStatus';
+
+// Placeholder regex for Scenario Outline detection
+const PLACEHOLDER_REGEX = /<([^>]+)>/g;
+
+// Debounce timer
+let debounceTimer: NodeJS.Timeout | null = null;
+const DEBOUNCE_MS = 200;
 
 /**
  * Get the extension's root path for resource loading
  */
 function getExtensionPath(): string {
-    // Try to get from extension context, fallback to __dirname
-    const ext = vscode.extensions.getExtension('anghelll.reqnroll-navigator');
+    const ext = vscode.extensions.getExtension('anghelll.bdd-guardian') 
+        ?? vscode.extensions.getExtension('anghelll.reqnroll-navigator');
     if (ext) {
         return ext.extensionPath;
     }
-    // Fallback: navigate from out/ to root
     return path.resolve(__dirname, '..', '..', '..');
 }
 
 /**
- * Create decoration type with gutter icon
+ * Create decoration type with optional gutter icon.
  */
-function createDecorationWithGutter(
+function createDecorationType(
     iconName: string,
     borderColor: string,
-    overviewColor: string
+    overviewColor: string,
+    useGutterIcon: boolean
 ): vscode.TextEditorDecorationType {
     const extensionPath = getExtensionPath();
     const iconPath = path.join(extensionPath, 'resources', 'icons', `${iconName}.svg`);
     
-    return vscode.window.createTextEditorDecorationType({
-        gutterIconPath: iconPath,
-        gutterIconSize: 'contain',
-        borderWidth: '0 0 0 3px',
+    const options: vscode.DecorationRenderOptions = {
+        borderWidth: '0 0 0 2px',
         borderStyle: 'solid',
         borderColor: new vscode.ThemeColor(borderColor),
         overviewRulerColor: new vscode.ThemeColor(overviewColor),
         overviewRulerLane: vscode.OverviewRulerLane.Left,
-    });
+        isWholeLine: false,
+    };
+    
+    if (useGutterIcon) {
+        options.gutterIconPath = iconPath;
+        options.gutterIconSize = 'contain';
+    }
+    
+    return vscode.window.createTextEditorDecorationType(options);
 }
 
-// Decoration types for different statuses - created lazily
-let boundDecoration: vscode.TextEditorDecorationType | null = null;
-let unboundDecoration: vscode.TextEditorDecorationType | null = null;
-let ambiguousDecoration: vscode.TextEditorDecorationType | null = null;
+// Decoration type cache
+let decorationTypes: {
+    bound: vscode.TextEditorDecorationType | null;
+    unbound: vscode.TextEditorDecorationType | null;
+    ambiguous: vscode.TextEditorDecorationType | null;
+} = {
+    bound: null,
+    unbound: null,
+    ambiguous: null,
+};
 
-function getBoundDecoration(): vscode.TextEditorDecorationType {
-    if (!boundDecoration) {
-        boundDecoration = createDecorationWithGutter('bound', 'charts.green', 'charts.green');
-    }
-    return boundDecoration;
-}
-
-function getUnboundDecoration(): vscode.TextEditorDecorationType {
-    if (!unboundDecoration) {
-        unboundDecoration = createDecorationWithGutter('unbound', 'charts.red', 'charts.red');
-    }
-    return unboundDecoration;
-}
-
-function getAmbiguousDecoration(): vscode.TextEditorDecorationType {
-    if (!ambiguousDecoration) {
-        ambiguousDecoration = createDecorationWithGutter('ambiguous', 'charts.yellow', 'charts.yellow');
-    }
-    return ambiguousDecoration;
+/**
+ * Initialize or reinitialize decoration types based on config.
+ */
+function initDecorationTypes(useGutterIcons: boolean): void {
+    // Dispose existing
+    decorationTypes.bound?.dispose();
+    decorationTypes.unbound?.dispose();
+    decorationTypes.ambiguous?.dispose();
+    
+    decorationTypes.bound = createDecorationType('bound', 'charts.green', 'charts.green', useGutterIcons);
+    decorationTypes.unbound = createDecorationType('unbound', 'charts.red', 'charts.red', useGutterIcons);
+    decorationTypes.ambiguous = createDecorationType('ambiguous', 'charts.yellow', 'charts.yellow', useGutterIcons);
 }
 
 export interface DecorationStats {
@@ -81,18 +96,57 @@ export interface DecorationStats {
     ambiguous: number;
 }
 
-// Placeholder regex for Scenario Outline detection
-const PLACEHOLDER_REGEX = /<([^>]+)>/g;
-
 export class DecorationsManager {
     private disposables: vscode.Disposable[] = [];
+    private lastConfig: { gutterIcons: boolean } | null = null;
     
-    constructor(private indexManager: IndexManager) {}
+    constructor(private indexManager: IndexManager) {
+        // Listen for config changes
+        this.disposables.push(
+            vscode.workspace.onDidChangeConfiguration(e => {
+                if (e.affectsConfiguration('bddGuardian') || e.affectsConfiguration('reqnrollNavigator')) {
+                    this.onConfigChange();
+                }
+            })
+        );
+    }
     
     /**
-     * Update decorations for the active editor.
+     * Handle configuration changes.
      */
-    public updateDecorations(editor: vscode.TextEditor | undefined): DecorationStats {
+    private onConfigChange(): void {
+        const uiConfig = getUIConfig();
+        if (this.lastConfig?.gutterIcons !== uiConfig.gutterIconsEnabled) {
+            initDecorationTypes(uiConfig.gutterIconsEnabled);
+            this.lastConfig = { gutterIcons: uiConfig.gutterIconsEnabled };
+            
+            // Re-apply decorations to active editor
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                this.updateDecorationsImmediate(editor);
+            }
+        }
+    }
+    
+    /**
+     * Update decorations with debounce.
+     */
+    public updateDecorations(editor: vscode.TextEditor | undefined): void {
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        
+        debounceTimer = setTimeout(() => {
+            if (editor && editor === vscode.window.activeTextEditor) {
+                this.updateDecorationsImmediate(editor);
+            }
+        }, DEBOUNCE_MS);
+    }
+    
+    /**
+     * Update decorations immediately (for forced refresh).
+     */
+    public updateDecorationsImmediate(editor: vscode.TextEditor | undefined): DecorationStats {
         const stats: DecorationStats = { bound: 0, unbound: 0, ambiguous: 0 };
         
         if (!editor || !editor.document.fileName.endsWith('.feature')) {
@@ -100,9 +154,17 @@ export class DecorationsManager {
         }
         
         const config = getConfig();
-        if (!config.enableDecorations) {
+        const uiConfig = getUIConfig();
+        
+        if (!uiConfig.decorationsEnabled) {
             this.clearDecorations(editor);
             return stats;
+        }
+        
+        // Initialize decoration types if needed
+        if (!decorationTypes.bound || this.lastConfig?.gutterIcons !== uiConfig.gutterIconsEnabled) {
+            initDecorationTypes(uiConfig.gutterIconsEnabled);
+            this.lastConfig = { gutterIcons: uiConfig.gutterIconsEnabled };
         }
         
         const index = this.indexManager.getIndex();
@@ -129,44 +191,11 @@ export class DecorationsManager {
         let currentTags: string[] = [];
         let prevResolvedKeyword: ResolvedKeyword = 'Given';
         
-        // Track Scenario Outline context for candidate generation
+        // Track Scenario Outline context
         let inScenarioOutline = false;
-        let currentExamples: { headers: string[], rows: string[][] }[] = [];
+        let outlineExamples: { headers: string[], rows: string[][] }[] = [];
         let currentExampleBlock: { headers: string[], rows: string[][] } | null = null;
         
-        // First pass: collect Examples data
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const trimmed = line.trim();
-            
-            if (/^\s*Scenario Outline:/i.test(line)) {
-                inScenarioOutline = true;
-                currentExamples = [];
-                currentExampleBlock = null;
-            } else if (/^\s*(Scenario|Feature|Background):/i.test(line)) {
-                inScenarioOutline = false;
-                currentExamples = [];
-                currentExampleBlock = null;
-            } else if (/^\s*Examples:/i.test(line) && inScenarioOutline) {
-                currentExampleBlock = { headers: [], rows: [] };
-                currentExamples.push(currentExampleBlock);
-            } else if (trimmed.startsWith('|') && currentExampleBlock) {
-                const cells = trimmed.slice(1, -1).split('|').map(c => c.trim());
-                if (currentExampleBlock.headers.length === 0) {
-                    currentExampleBlock.headers = cells;
-                } else {
-                    currentExampleBlock.rows.push(cells);
-                }
-            }
-        }
-        
-        // Reset for second pass
-        inScenarioOutline = false;
-        currentExamples = [];
-        currentExampleBlock = null;
-        let outlineExamples: { headers: string[], rows: string[][] }[] = [];
-        
-        // Second pass: create decorations
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const trimmed = line.trim();
@@ -221,10 +250,8 @@ export class DecorationsManager {
             if (!stepMatch) continue;
             
             // Apply tag filter
-            if (config.tagFilter.length > 0) {
-                if (!shouldShowStep(currentTags)) {
-                    continue;
-                }
+            if (config.tagFilter.length > 0 && !shouldShowStep(currentTags)) {
+                continue;
             }
             
             const keyword = stepMatch[1];
@@ -255,27 +282,45 @@ export class DecorationsManager {
             const result = resolve(step as any);
             const range = new vscode.Range(i, 0, i, line.length);
             
-            // Create decoration option with hover message
-            const decorationOption: vscode.DecorationOptions = {
-                range,
-                hoverMessage: this.createHoverMessage(result.status, result.candidates.length),
-            };
-            
+            // Determine status
+            let status: StepStatus;
             if (result.status === 'unbound') {
-                unboundRanges.push(decorationOption);
+                status = StepStatus.Unbound;
                 stats.unbound++;
             } else if (result.status === 'ambiguous') {
-                ambiguousRanges.push(decorationOption);
+                status = StepStatus.Ambiguous;
                 stats.ambiguous++;
             } else {
-                boundRanges.push(decorationOption);
+                status = StepStatus.Bound;
                 stats.bound++;
+            }
+            
+            // Create decoration option with minimal hover
+            const decorationOption: vscode.DecorationOptions = {
+                range,
+                hoverMessage: this.createMinimalHover(status, result.candidates.length),
+            };
+            
+            // Add to appropriate array
+            if (status === StepStatus.Unbound) {
+                unboundRanges.push(decorationOption);
+            } else if (status === StepStatus.Ambiguous) {
+                ambiguousRanges.push(decorationOption);
+            } else {
+                boundRanges.push(decorationOption);
             }
         }
         
-        editor.setDecorations(getBoundDecoration(), boundRanges);
-        editor.setDecorations(getUnboundDecoration(), unboundRanges);
-        editor.setDecorations(getAmbiguousDecoration(), ambiguousRanges);
+        // Apply decorations
+        if (decorationTypes.bound) {
+            editor.setDecorations(decorationTypes.bound, boundRanges);
+        }
+        if (decorationTypes.unbound) {
+            editor.setDecorations(decorationTypes.unbound, unboundRanges);
+        }
+        if (decorationTypes.ambiguous) {
+            editor.setDecorations(decorationTypes.ambiguous, ambiguousRanges);
+        }
         
         return stats;
     }
@@ -290,11 +335,9 @@ export class DecorationsManager {
         const candidates: string[] = [];
         const normalizedText = stepText.replace(/\s+/g, ' ').trim();
         
-        // Check for placeholders
         const hasPlaceholders = PLACEHOLDER_REGEX.test(normalizedText);
         PLACEHOLDER_REGEX.lastIndex = 0;
         
-        // Fallback: replace placeholders with X
         const fallbackCandidate = normalizedText.replace(PLACEHOLDER_REGEX, 'X');
         candidates.push(fallbackCandidate);
         
@@ -302,7 +345,6 @@ export class DecorationsManager {
             return candidates;
         }
         
-        // Expand with actual Example values
         for (const example of examples) {
             if (example.headers.length === 0) continue;
             
@@ -331,17 +373,23 @@ export class DecorationsManager {
     }
     
     /**
-     * Create hover message for decoration
+     * Create minimal hover message for decoration.
+     * Full details are in the HoverProvider.
      */
-    private createHoverMessage(status: string, candidateCount: number): vscode.MarkdownString {
+    private createMinimalHover(status: StepStatus, candidateCount: number): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
+        const emoji = getStatusEmoji(status);
         
-        if (status === 'bound') {
-            md.appendMarkdown('✅ **Bound** - Step has a matching binding');
-        } else if (status === 'ambiguous') {
-            md.appendMarkdown(`⚠️ **Ambiguous** - ${candidateCount} bindings match this step`);
-        } else {
-            md.appendMarkdown('❌ **Unbound** - No binding found for this step');
+        switch (status) {
+            case StepStatus.Bound:
+                md.appendMarkdown(`${emoji} **Bound**`);
+                break;
+            case StepStatus.Ambiguous:
+                md.appendMarkdown(`${emoji} **Ambiguous** (${candidateCount} matches)`);
+                break;
+            case StepStatus.Unbound:
+                md.appendMarkdown(`${emoji} **Unbound**`);
+                break;
         }
         
         return md;
@@ -351,9 +399,15 @@ export class DecorationsManager {
      * Clear all decorations from editor.
      */
     public clearDecorations(editor: vscode.TextEditor): void {
-        editor.setDecorations(getBoundDecoration(), []);
-        editor.setDecorations(getUnboundDecoration(), []);
-        editor.setDecorations(getAmbiguousDecoration(), []);
+        if (decorationTypes.bound) {
+            editor.setDecorations(decorationTypes.bound, []);
+        }
+        if (decorationTypes.unbound) {
+            editor.setDecorations(decorationTypes.unbound, []);
+        }
+        if (decorationTypes.ambiguous) {
+            editor.setDecorations(decorationTypes.ambiguous, []);
+        }
     }
     
     /**
@@ -368,9 +422,12 @@ export class DecorationsManager {
     }
     
     dispose(): void {
-        boundDecoration?.dispose();
-        unboundDecoration?.dispose();
-        ambiguousDecoration?.dispose();
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        decorationTypes.bound?.dispose();
+        decorationTypes.unbound?.dispose();
+        decorationTypes.ambiguous?.dispose();
         this.disposables.forEach(d => d.dispose());
     }
 }

@@ -2,14 +2,14 @@
 
 > Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
-> ⚠️ **Alpha Release** - This extension is in early development (v0.1.0).  
+> ⚠️ **Alpha Release** - This extension is in early development (v0.2.0).  
 > Breaking changes may occur between versions. Please report issues on [GitHub](https://github.com/AngHelll/bdd-guardian/issues).
 
-A VS Code extension that provides intelligent navigation, CodeLens indicators, diagnostics, navigation history, and visual feedback for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
+A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
 
 ## ✨ Features
 
@@ -22,11 +22,42 @@ See binding status directly above each step:
 - ⚠️ **Unbound**: Warning when no binding is found
 - ⚡ **Ambiguous**: Multiple bindings match - click to select
 
-### 🎯 Gutter Icons
-Visual indicators in the editor gutter:
-- ✓ Green checkmark for bound steps
-- ✗ Red X for unbound steps
-- ! Orange warning for ambiguous steps
+### 🎯 Visual Feedback
+
+BDD Guardian provides subtle, non-intrusive visual feedback:
+
+#### Gutter Icons
+Small icons in the editor gutter show step status at a glance:
+- ✓ Green checkmark — bound step
+- ✗ Red X — unbound step
+- ! Orange warning — ambiguous step
+
+#### Left Border
+A subtle colored border on step lines reinforces status.
+
+#### Overview Ruler
+Status markers appear in the minimap/overview ruler for quick file scanning.
+
+> 💡 **Tip**: All visual feedback can be disabled via settings.
+
+### 💬 Enriched Hover
+
+Hover over any step for detailed information:
+
+**For Bound steps:**
+- Binding class and method
+- Regex pattern
+- File location (clickable)
+- Captured parameters
+- Code preview (expandable)
+
+**For Unbound steps:**
+- Suggested binding pattern
+
+**For Ambiguous steps:**
+- Top 3 matching bindings
+- Best match highlighted
+- Link to show all matches
 
 ### 🧭 Navigation History
 Navigate back and forward between steps and bindings:
@@ -37,22 +68,10 @@ Navigate back and forward between steps and bindings:
 | `Alt+→` | Go Forward | Go to next location |
 | `Alt+H` | Show History | Pick from navigation history |
 
-A status bar indicator shows your current position: `← 3/5 →`
-
-### 💬 Enriched Hover
-Hover over any step to see:
-- 📄 Code preview of the binding method
-- 📊 Captured parameters table
-- 🔗 Clickable navigation links
-- 💡 Suggested binding patterns for unbound steps
-
 ### 🔍 Diagnostics
 Real-time warnings in the Problems panel for:
 - Unbound steps (no matching binding)
 - Ambiguous steps (multiple bindings match)
-
-### 🏷️ Tag Filtering
-Filter steps by tags (`@P0`, `@smoke`, etc.) to focus on specific scenarios.
 
 ### 📋 Scenario Outline Support
 Full support for Scenario Outlines with Examples tables:
@@ -65,9 +84,8 @@ Automatic detection of BDD frameworks:
 - ✅ **C# SpecFlow** - Fully implemented  
 - 🔜 JavaScript Cucumber (planned)
 - 🔜 Python Behave (planned)
-- 🔜 Go Godog (planned)
 
-## �� Installation
+## 📦 Installation
 
 ### From VSIX (Current)
 1. Download the `.vsix` file
@@ -79,14 +97,28 @@ Search for "BDD Guardian" in VS Code Extensions.
 
 ## ⚙️ Configuration
 
+### Visual Feedback
+
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `bddGuardian.enableCodeLens` | `true` | Show CodeLens above steps |
-| `bddGuardian.enableDiagnostics` | `true` | Show problems for unbound steps |
-| `bddGuardian.enableDecorations` | `true` | Show gutter icons and decorations |
-| `bddGuardian.navigationHistorySize` | `50` | Max items in navigation history |
-| `bddGuardian.bindingSearchPaths` | `["**/*.cs"]` | Paths to search for bindings |
-| `bddGuardian.excludePaths` | `["**/bin/**", "**/obj/**"]` | Paths to exclude |
+| `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
+| `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
+
+### Core Features
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `reqnrollNavigator.enableCodeLens` | `true` | Show CodeLens above steps |
+| `reqnrollNavigator.enableDiagnostics` | `true` | Show problems for unbound steps |
+| `reqnrollNavigator.enableDecorations` | `true` | Show border and overview ruler |
+| `reqnrollNavigator.navigationHistorySize` | `50` | Max items in navigation history |
+
+### Indexing
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `reqnrollNavigator.bindingsGlob` | `**/*.cs` | Paths to search for bindings |
+| `reqnrollNavigator.excludePatterns` | `[**/bin/**, **/obj/**]` | Paths to exclude |
 
 ## 🐛 Known Issues
 
@@ -100,12 +132,6 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue first to discuss proposed changes.
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `npm test`
-5. Submit a pull request
 
 ## 📄 License
 

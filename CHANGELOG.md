@@ -2,8 +2,24 @@
 
 All notable changes to the BDD Guardian extension will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.2.0] - 2025-02-13 (Alpha)
+
+### Added
+- **UI State Module**: Centralized `ui/stepStatus.ts` for consistent status handling
+- **New Settings**:
+  - `bddGuardian.gutterIcons.enabled` - Toggle gutter icons
+  - `bddGuardian.hoverDetails.enabled` - Toggle enriched hover
+
+### Changed
+- **Decorations**: Now debounced (200ms) to avoid blocking typing
+- **Hover Provider**: Cleaner design with collapsible code preview
+- **QuickPick**: Shows "Best match" label for top candidate
+- **Performance**: Decorations only update for active editor
+
+### Improved
+- Visual feedback is now subtle and native to VS Code
+- All visual features are configurable
+- Better separation of concerns with UI module
 
 ## [0.1.0] - 2025-02-13 (Alpha)
 
@@ -18,12 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Multi-Framework Architecture**: Extensible for multiple BDD frameworks
   - C# Reqnroll (fully implemented)
   - C# SpecFlow (fully implemented)
-  - Other providers (stubs for future)
 
 ### Notes
 - Initial alpha release for testing
 - 65 unit tests passing
-- Tested with real BDD project (684 steps, 404 bindings)
 
 ## [Unreleased]
 
