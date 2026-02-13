@@ -1,6 +1,10 @@
 /**
  * Feature File Indexer
  * Parses .feature files to extract steps, tags, scenarios, and examples
+ * 
+ * IMPORTANT: This indexer now generates candidateTexts for each step,
+ * which includes expanded Examples values for Scenario Outline steps.
+ * This enables proper matching of steps with placeholders like <value>.
  */
 
 import * as vscode from 'vscode';
@@ -24,6 +28,14 @@ const SCENARIO_REGEX = /^\s*Scenario:\s*(.+)$/i;
 const SCENARIO_OUTLINE_REGEX = /^\s*Scenario Outline:\s*(.+)$/i;
 const EXAMPLES_REGEX = /^\s*Examples:\s*(.*)$/i;
 const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;
+
+// Placeholder pattern: <placeholder>
+const PLACEHOLDER_REGEX = /<([^>]+)>/g;
+
+// Maximum example rows to expand (configurable)
+const MAX_EXAMPLE_ROWS = 20;
+// Maximum candidates per step
+const MAX_CANDIDATES_PER_STEP = 25;
 
 export class FeatureIndexer {
     private index: FeatureIndex = {
@@ -95,17 +107,17 @@ export class FeatureIndexer {
         const backgroundSteps: FeatureStep[] = [];
         const scenarios: ScenarioBlock[] = [];
         const allSteps: FeatureStep[] = [];
-
+        
         let pendingTags: string[] = [];
         let currentScenario: ScenarioBlock | null = null;
         let currentExamples: ExampleTable | null = null;
         let inBackground = false;
         let lastResolvedKeyword: ResolvedKeyword = 'Given';
-
+        
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const trimmedLine = line.trim();
-
+            
             // Skip empty lines and comments
             if (!trimmedLine || trimmedLine.startsWith('#')) {
                 continue;
@@ -201,7 +213,7 @@ export class FeatureIndexer {
                     currentExamples.headers = cells;
                 } else {
                     const config = getConfig();
-                    if (currentExamples.rows.length < config.maxExampleRows) {
+                    if (currentExamples.rows.length < (config.maxExampleRows || MAX_EXAMPLE_ROWS)) {
                         currentExamples.rows.push(cells);
                     }
                 }
@@ -213,7 +225,7 @@ export class FeatureIndexer {
             if (stepMatch) {
                 const keywordOriginal = this.normalizeKeyword(stepMatch[1]);
                 const stepText = stepMatch[2].trim();
-
+                
                 // Resolve And/But to previous keyword
                 let keywordResolved: ResolvedKeyword;
                 if (keywordOriginal === 'And' || keywordOriginal === 'But') {
@@ -229,6 +241,11 @@ export class FeatureIndexer {
                     tagsInScope.push(...currentScenario.tags);
                 }
 
+                // Get examples for Scenario Outline
+                const stepExamples = currentScenario?.type === 'Scenario Outline' 
+                    ? currentScenario.examples 
+                    : undefined;
+
                 const step: FeatureStep = {
                     keywordOriginal,
                     keywordResolved,
@@ -239,7 +256,7 @@ export class FeatureIndexer {
                     range: new vscode.Range(i, 0, i, line.length),
                     lineNumber: i,
                     scenarioName: currentScenario?.name,
-                    examples: currentScenario?.type === 'Scenario Outline' ? currentScenario.examples : undefined,
+                    examples: stepExamples,
                 };
 
                 if (inBackground) {
@@ -308,8 +325,112 @@ export class FeatureIndexer {
             return undefined;
         }
 
-        return feature.allSteps.find(step => 
+        return feature.allSteps.find(step =>
             step.lineNumber === position.line
         );
     }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CANDIDATE TEXT GENERATION (for resolving steps with Examples)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Generate candidate texts for a step for matching.
+ * 
+ * For Scenario Outline steps with <placeholders>:
+ * - Generates expanded texts using values from Examples tables
+ * - Limited to MAX_CANDIDATES_PER_STEP to prevent memory bloat
+ * - Always includes a fallback candidate with placeholders replaced by "X"
+ * 
+ * For regular steps:
+ * - Returns a single candidate with normalized whitespace
+ * 
+ * @example
+ * Step: When I enter <amount> into the calculator
+ * Examples: | amount | → | 50 |, | 100 |
+ * Candidates: ["When I enter X into the calculator", "When I enter 50 into the calculator", "When I enter 100 into the calculator"]
+ */
+export function generateCandidateTexts(step: FeatureStep): string[] {
+    const candidates: string[] = [];
+    const normalizedText = normalizeWhitespace(step.stepText);
+    
+    // Check if text contains placeholders
+    const hasPlaceholders = /<[^>]+>/.test(normalizedText);
+    
+    // Fallback candidate: replace <placeholder> with "X"
+    const fallbackCandidate = normalizedText.replace(/<[^>]+>/g, 'X');
+    candidates.push(fallbackCandidate);
+    
+    // If no placeholders or no examples, return just the fallback
+    if (!hasPlaceholders || !step.examples || step.examples.length === 0) {
+        return candidates;
+    }
+    
+    // Expand placeholders with actual values from Examples
+    for (const example of step.examples) {
+        if (example.headers.length === 0) continue;
+        
+        // Calculate how many rows we can process
+        const remainingSlots = MAX_CANDIDATES_PER_STEP - candidates.length;
+        if (remainingSlots <= 0) break;
+        
+        const maxRows = Math.min(example.rows.length, remainingSlots);
+        
+        for (let rowIdx = 0; rowIdx < maxRows; rowIdx++) {
+            const row = example.rows[rowIdx];
+            let expandedText = normalizedText;
+            
+            // Replace each placeholder with the corresponding value
+            for (let colIdx = 0; colIdx < example.headers.length; colIdx++) {
+                const placeholder = `<${example.headers[colIdx]}>`;
+                const value = row[colIdx] ?? 'X';
+                
+                // Replace all occurrences of this placeholder
+                // Use a regex to handle case where placeholder might have special chars
+                expandedText = expandedText.split(placeholder).join(value);
+            }
+            
+            // Normalize the expanded text
+            expandedText = normalizeWhitespace(expandedText);
+            
+            // Add if unique and not same as fallback
+            if (!candidates.includes(expandedText)) {
+                candidates.push(expandedText);
+            }
+        }
+    }
+    
+    return candidates;
+}
+
+/**
+ * Normalize whitespace in text: trim and collapse multiple spaces/tabs to single space.
+ * Does not alter quotes or other characters.
+ */
+export function normalizeWhitespace(text: string): string {
+    return text.trim().replace(/\s+/g, ' ');
+}
+
+/**
+ * Check if a step has placeholders (is from Scenario Outline)
+ */
+export function hasPlaceholders(stepText: string): boolean {
+    return /<[^>]+>/.test(stepText);
+}
+
+/**
+ * Extract placeholder names from step text
+ * @returns Array of placeholder names (without < >)
+ */
+export function extractPlaceholders(text: string): string[] {
+    const placeholders: string[] = [];
+    let match;
+    const regex = /<([^>]+)>/g;
+    
+    while ((match = regex.exec(text)) !== null) {
+        placeholders.push(match[1]);
+    }
+    
+    return placeholders;
 }

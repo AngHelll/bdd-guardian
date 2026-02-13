@@ -91,3 +91,97 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - [Reqnroll](https://reqnroll.net/) - The open-source Cucumber implementation for .NET
 - [Gherkin](https://cucumber.io/docs/gherkin/) - Business readable language for BDD
+
+---
+
+## 🔧 Developer Notes
+
+### Scenario Outline + Examples Matching
+
+The extension handles `Scenario Outline` steps with `<placeholders>` by expanding them with actual values from `Examples` tables. This dramatically reduces false negatives.
+
+#### How it works:
+
+1. **Parsing Phase** (`featureIndexer.ts`):
+   - When parsing a `.feature` file, the indexer detects `Scenario Outline:` blocks
+   - It captures the `Examples:` tables with headers and data rows
+   - Steps within the outline receive a reference to their Examples
+
+2. **Candidate Generation** (`generateCandidateTexts()`):
+   - For each step with `<placeholders>`, we generate multiple candidate strings:
+     - **Fallback**: `<placeholder>` → `X` (e.g., "I enter X into the calculator")
+     - **Expanded**: Replace with actual values from Examples rows
+   - Limited to `MAX_CANDIDATES_PER_STEP` (25) for performance
+
+3. **Matching Phase** (`matcher.ts` / `resolver.ts`):
+   - The binding's compiled regex is tested against ALL candidates
+   - If ANY candidate matches → **BOUND**
+   - The `matchedCandidate` is stored for debugging/hover
+
+#### Example:
+
+```gherkin
+Scenario Outline: Calculator addition
+  When I enter <amount> into the calculator
+  
+  Examples:
+    | amount |
+    | 50     |
+    | 100    |
+```
+
+Binding: `[When(@"I enter (\d+) into the calculator")]`
+
+Generated candidates:
+1. `"I enter X into the calculator"` (fallback)
+2. `"I enter 50 into the calculator"` ← matches `\d+` ✓
+3. `"I enter 100 into the calculator"` ← matches `\d+` ✓
+
+Result: **BOUND** (matched via candidate #2 or #3)
+
+### Whitespace Normalization
+
+All step text is normalized before matching:
+- Multiple spaces/tabs collapsed to single space
+- Leading/trailing whitespace trimmed
+- Original text preserved for display
+
+```typescript
+normalizeWhitespace("  hello   world  ") // → "hello world"
+```
+
+### C# Verbatim String Handling
+
+The C# parser (`csBindingParser.ts`) correctly handles verbatim strings:
+
+```csharp
+// Regular string - backslash escapes
+[When("value is \"quoted\"")]
+
+// Verbatim string (@"...") - double quotes escape
+[When(@"value is ""quoted""")]
+// Both produce pattern: value is "quoted"
+```
+
+### Scoring Algorithm
+
+When multiple bindings match, we score them by specificity:
+
+| Factor | Score Impact |
+|--------|--------------|
+| Keyword match (Given/When/Then) | +120 |
+| Anchored pattern (`^...$`) | +30 |
+| Specific capture (`\d+`, `\w+`) | +20 per group |
+| Literal characters | +1 per char |
+| Generic wildcard (`.*`) | -15 per occurrence |
+| Keyword fallback | -40 |
+
+Higher score wins. If top two scores are equal → **AMBIGUOUS**
+
+### Performance Considerations
+
+- Example expansion limited to first 20 rows per table
+- Total candidates capped at 25 per step
+- File watchers use 300ms debounce
+- UI updates use 200ms debounce
+- Only active editor gets decorations
