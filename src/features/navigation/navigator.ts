@@ -1,22 +1,38 @@
 /**
  * Navigator - Handles navigation from Feature steps to C# bindings
- * Uses vscode.open command for proper back/forward history support.
+ * 
+ * Phase 2: Now integrates with NavigationHistory for back/forward support.
  */
 
 import * as vscode from 'vscode';
 import { MatchCandidate, ResolveResult } from '../../core/domain';
+import { getNavigationHistory } from './navigationHistory';
 
 /**
  * Navigate to a specific binding location.
- * Uses vscode.open command instead of openTextDocument to preserve navigation history.
+ * Records current position in history before navigating.
  */
 export async function navigateToBinding(candidate: MatchCandidate): Promise<void> {
+    const history = getNavigationHistory();
+    
+    // Record current position before navigating
+    history.recordCurrentPosition();
+    
     const uri = candidate.binding.uri;
     const position = new vscode.Position(candidate.binding.lineNumber, 0);
     
     await vscode.commands.executeCommand('vscode.open', uri, {
         selection: new vscode.Range(position, position),
-        preview: true,
+        preview: false, // Don't use preview to ensure proper history
+    });
+    
+    // Record the destination
+    history.push({
+        uri,
+        line: candidate.binding.lineNumber,
+        character: 0,
+        type: 'binding',
+        label: candidate.binding.methodName,
     });
 }
 
@@ -41,19 +57,39 @@ export async function navigateFromResolveResult(result: ResolveResult): Promise<
 
 /**
  * Navigate to a binding location by URI and line number.
- * Convenience method for direct navigation.
+ * Records current position in history before navigating.
  */
-export async function navigateToLocation(uri: vscode.Uri, line: number): Promise<void> {
+export async function navigateToLocation(
+    uri: vscode.Uri, 
+    line: number,
+    label?: string
+): Promise<void> {
+    const history = getNavigationHistory();
+    
+    // Record current position before navigating
+    history.recordCurrentPosition();
+    
     const position = new vscode.Position(line, 0);
     
     await vscode.commands.executeCommand('vscode.open', uri, {
         selection: new vscode.Range(position, position),
-        preview: true,
+        preview: false,
+    });
+    
+    // Record the destination
+    const type = uri.fsPath.endsWith('.feature') ? 'feature' : 'binding';
+    history.push({
+        uri,
+        line,
+        character: 0,
+        type,
+        label,
     });
 }
 
 /**
  * Reveal a location in the editor without navigating (peek).
+ * Does not affect navigation history.
  */
 export async function peekLocation(uri: vscode.Uri, line: number): Promise<void> {
     const position = new vscode.Position(line, 0);

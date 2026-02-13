@@ -1,8 +1,12 @@
 # Reqnroll Navigator
 
-> Navigate between Gherkin `.feature` steps and Reqnroll C# step bindings with ease!
+> Navigate between Gherkin `.feature` steps and Reqnroll/SpecFlow C# step bindings with ease!
 
-A VS Code extension that provides intelligent navigation, CodeLens indicators, diagnostics, and tag filtering for Reqnroll/SpecFlow BDD projects.
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.reqnroll-navigator)
+[![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+A VS Code extension that provides intelligent navigation, CodeLens indicators, diagnostics, navigation history, and tag filtering for Reqnroll/SpecFlow BDD projects.
 
 ## ✨ Features
 
@@ -11,9 +15,20 @@ Click on any step in a `.feature` file and jump directly to its C# binding using
 
 ### 📊 CodeLens
 See binding status directly above each step:
-- ✓ **Bound**: Shows `ClassName.MethodName` - click to navigate
-- ⚠ **Unbound**: Warning when no binding is found
+- ✅ **Bound**: Shows `ClassName.MethodName` - click to navigate
+- ⚠️ **Unbound**: Warning when no binding is found
 - ⚡ **Ambiguous**: Multiple bindings match - click to select
+
+### 🧭 Navigation History (New in v2.1)
+Navigate back and forward between steps and bindings:
+
+| Shortcut | Command | Description |
+|----------|---------|-------------|
+| `Alt+←` | Go Back | Return to previous location |
+| `Alt+→` | Go Forward | Go to next location |
+| `Alt+H` | Show History | Pick from navigation history |
+
+A status bar indicator shows your current position: `← 3/5 →`
 
 ### 🔍 Diagnostics
 Real-time warnings in the Problems panel for:
@@ -23,21 +38,31 @@ Real-time warnings in the Problems panel for:
 ### 🏷️ Tag Filtering
 Filter steps by tags (`@P0`, `@smoke`, etc.) to focus on specific scenarios.
 
+### 📋 Scenario Outline Support
+Full support for Scenario Outlines with Examples tables:
+- Automatically expands `<placeholders>` with Example values
+- Accurate binding resolution for parameterized steps
+
 ### 🔌 Multi-Provider Architecture
 Automatic detection of BDD frameworks:
 - ✅ **C# Reqnroll** - Fully implemented
-- 🔜 C# SpecFlow (stub)
-- 🔜 JavaScript Cucumber (stub)
-- 🔜 Java Cucumber (stub)
-- 🔜 Python Behave (stub)
-- 🔜 Python pytest-bdd (stub)
-- 🔜 Go Godog (stub)
+- ✅ **C# SpecFlow** - Fully implemented
+- 🔜 JavaScript Cucumber
+- 🔜 Java Cucumber
+- 🔜 Python Behave/pytest-bdd
+- 🔜 Go Godog
 
 ## 📦 Installation
 
+### From VS Code Marketplace
+1. Open VS Code
+2. Go to Extensions (Cmd+Shift+X)
+3. Search for "Reqnroll Navigator"
+4. Click Install
+
 ### From VSIX file
 ```bash
-code --install-extension reqnroll-navigator-2.0.0.vsix
+code --install-extension reqnroll-navigator-2.1.0.vsix
 ```
 
 ### Manual Build
@@ -64,124 +89,50 @@ Access settings via **File > Preferences > Settings** and search for "Reqnroll N
 | `enableCodeLens` | `true` | Show CodeLens indicators |
 | `enableDiagnostics` | `true` | Show diagnostic warnings |
 | `enableDecorations` | `true` | Show visual decorations |
+| `navigationHistorySize` | `50` | Max locations in navigation history |
 
 ## 🛠️ Commands
 
-| Command | Description |
-|---------|-------------|
-| `Reqnroll: Reindex Workspace` | Re-scan all feature and binding files |
-| `Reqnroll: Show All Bindings` | Display all indexed bindings |
-| `Reqnroll: Go to Step Binding` | Navigate to binding for current step |
-| `Reqnroll Navigator: Show Provider Detection Report` | Debug provider detection |
+| Command | Shortcut | Description |
+|---------|----------|-------------|
+| `Reqnroll: Reindex Workspace` | - | Re-scan all feature and binding files |
+| `Reqnroll: Show All Bindings` | - | Display all indexed bindings |
+| `Reqnroll Navigator: Go Back` | `Alt+←` | Navigate to previous location |
+| `Reqnroll Navigator: Go Forward` | `Alt+→` | Navigate to next location |
+| `Reqnroll Navigator: Show History` | `Alt+H` | Show navigation history picker |
+| `Reqnroll Navigator: Show Statistics` | - | Display indexing statistics |
 
 ## 📋 Requirements
 
 - VS Code 1.85.0 or higher
-- A workspace with `.feature` files and C# Reqnroll bindings
+- A workspace with `.feature` files and C# Reqnroll/SpecFlow bindings
+
+## 🐛 Known Issues
+
+- Navigation history shortcuts only work when editing `.feature` files
+- Some complex regex patterns in bindings may not match correctly
+
+## 📝 Release Notes
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+
+### 2.1.0
+- Navigation History with back/forward support
+- Improved Scenario Outline matching
+
+### 2.0.0
+- Multi-provider architecture
+- 65 unit tests
+- Enhanced matching accuracy
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see our [GitHub repository](https://github.com/AngHelll/bdd-guardian).
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgments
-
-- [Reqnroll](https://reqnroll.net/) - The open-source Cucumber implementation for .NET
-- [Gherkin](https://cucumber.io/docs/gherkin/) - Business readable language for BDD
+[MIT](LICENSE)
 
 ---
 
-## 🔧 Developer Notes
-
-### Scenario Outline + Examples Matching
-
-The extension handles `Scenario Outline` steps with `<placeholders>` by expanding them with actual values from `Examples` tables. This dramatically reduces false negatives.
-
-#### How it works:
-
-1. **Parsing Phase** (`featureIndexer.ts`):
-   - When parsing a `.feature` file, the indexer detects `Scenario Outline:` blocks
-   - It captures the `Examples:` tables with headers and data rows
-   - Steps within the outline receive a reference to their Examples
-
-2. **Candidate Generation** (`generateCandidateTexts()`):
-   - For each step with `<placeholders>`, we generate multiple candidate strings:
-     - **Fallback**: `<placeholder>` → `X` (e.g., "I enter X into the calculator")
-     - **Expanded**: Replace with actual values from Examples rows
-   - Limited to `MAX_CANDIDATES_PER_STEP` (25) for performance
-
-3. **Matching Phase** (`matcher.ts` / `resolver.ts`):
-   - The binding's compiled regex is tested against ALL candidates
-   - If ANY candidate matches → **BOUND**
-   - The `matchedCandidate` is stored for debugging/hover
-
-#### Example:
-
-```gherkin
-Scenario Outline: Calculator addition
-  When I enter <amount> into the calculator
-  
-  Examples:
-    | amount |
-    | 50     |
-    | 100    |
-```
-
-Binding: `[When(@"I enter (\d+) into the calculator")]`
-
-Generated candidates:
-1. `"I enter X into the calculator"` (fallback)
-2. `"I enter 50 into the calculator"` ← matches `\d+` ✓
-3. `"I enter 100 into the calculator"` ← matches `\d+` ✓
-
-Result: **BOUND** (matched via candidate #2 or #3)
-
-### Whitespace Normalization
-
-All step text is normalized before matching:
-- Multiple spaces/tabs collapsed to single space
-- Leading/trailing whitespace trimmed
-- Original text preserved for display
-
-```typescript
-normalizeWhitespace("  hello   world  ") // → "hello world"
-```
-
-### C# Verbatim String Handling
-
-The C# parser (`csBindingParser.ts`) correctly handles verbatim strings:
-
-```csharp
-// Regular string - backslash escapes
-[When("value is \"quoted\"")]
-
-// Verbatim string (@"...") - double quotes escape
-[When(@"value is ""quoted""")]
-// Both produce pattern: value is "quoted"
-```
-
-### Scoring Algorithm
-
-When multiple bindings match, we score them by specificity:
-
-| Factor | Score Impact |
-|--------|--------------|
-| Keyword match (Given/When/Then) | +120 |
-| Anchored pattern (`^...$`) | +30 |
-| Specific capture (`\d+`, `\w+`) | +20 per group |
-| Literal characters | +1 per char |
-| Generic wildcard (`.*`) | -15 per occurrence |
-| Keyword fallback | -40 |
-
-Higher score wins. If top two scores are equal → **AMBIGUOUS**
-
-### Performance Considerations
-
-- Example expansion limited to first 20 rows per table
-- Total candidates capped at 25 per step
-- File watchers use 300ms debounce
-- UI updates use 200ms debounce
-- Only active editor gets decorations
+**Enjoy navigating your BDD tests"✅ CHANGELOG.md creado"* 🥒

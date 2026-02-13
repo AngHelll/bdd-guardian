@@ -13,6 +13,10 @@ import {
     DecorationsManager,
     showBindingQuickPick,
     navigateToBinding,
+    // Phase 2: Navigation History
+    createNavigationHistoryCommands,
+    createNavigationStatusBar,
+    getNavigationHistory,
 } from './features';
 import { getProviderManager } from './providers/bindings';
 import { ResolveResult } from './core/domain';
@@ -24,6 +28,7 @@ let decorationsManager: DecorationsManager;
 let fileWatchers: FileWatchers;
 let outputChannel: vscode.OutputChannel;
 let codeLensProvider: ReturnType<typeof createCodeLensProvider>['provider'];
+let navigationStatusBar: vscode.StatusBarItem;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     outputChannel = vscode.window.createOutputChannel('Reqnroll Navigator');
@@ -48,10 +53,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     codeLensProvider = codeLensResult.provider;
     context.subscriptions.push(codeLensResult.disposable);
 
+    // Phase 2: Register Navigation History commands
+    const historyCommands = createNavigationHistoryCommands(context);
+    historyCommands.forEach(cmd => context.subscriptions.push(cmd));
+    
+    // Phase 2: Create Navigation Status Bar
+    navigationStatusBar = createNavigationStatusBar();
+    context.subscriptions.push(navigationStatusBar);
+
     registerCommands(context);
     registerEventHandlers(context);
 
-    context.subscriptions.push(outputChannel, diagnosticsEngine, decorationsManager, fileWatchers);
+    context.subscriptions.push(
+        outputChannel, 
+        diagnosticsEngine, 
+        decorationsManager, 
+        fileWatchers,
+        getNavigationHistory()
+    );
 
     await performInitialIndexing();
     fileWatchers.start();
@@ -191,4 +210,5 @@ export function deactivate(): void {
     fileWatchers?.dispose();
     diagnosticsEngine?.dispose();
     decorationsManager?.dispose();
+    navigationStatusBar?.dispose();
 }

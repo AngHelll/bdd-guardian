@@ -14,6 +14,11 @@ export {
     createDefinitionProvider,
     CodeLensProvider,
     createCodeLensProvider,
+    // Phase 2: Navigation History
+    NavigationHistoryManager,
+    getNavigationHistory,
+    createNavigationHistoryCommands,
+    createNavigationStatusBar,
 } from './navigation';
 
 // Diagnostics features

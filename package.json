@@ -2,8 +2,13 @@
   "name": "reqnroll-navigator",
   "displayName": "Reqnroll Navigator",
   "description": "Navigate between Gherkin .feature steps and Reqnroll C# step bindings with CodeLens, Go to Definition, and diagnostics",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "publisher": "anghelll",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#667eea",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -52,6 +57,44 @@
       {
         "command": "reqnroll-navigator.showProviderReport",
         "title": "Reqnroll Navigator: Show Provider Detection Report"
+      },
+      {
+        "command": "reqnroll-navigator.goBack",
+        "title": "Reqnroll Navigator: Go Back",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "reqnroll-navigator.goForward",
+        "title": "Reqnroll Navigator: Go Forward",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "reqnroll-navigator.showHistory",
+        "title": "Reqnroll Navigator: Show Navigation History"
+      },
+      {
+        "command": "reqnroll-navigator.clearHistory",
+        "title": "Reqnroll Navigator: Clear Navigation History"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "reqnroll-navigator.goBack",
+        "key": "alt+left",
+        "mac": "alt+left",
+        "when": "editorTextFocus && resourceExtname == .feature"
+      },
+      {
+        "command": "reqnroll-navigator.goForward",
+        "key": "alt+right",
+        "mac": "alt+right",
+        "when": "editorTextFocus && resourceExtname == .feature"
+      },
+      {
+        "command": "reqnroll-navigator.showHistory",
+        "key": "alt+h",
+        "mac": "alt+h",
+        "when": "editorTextFocus && resourceExtname == .feature"
       }
     ],
     "configuration": {
@@ -115,6 +158,13 @@
           "type": "boolean",
           "default": true,
           "description": "Enable visual decorations for steps"
+        },
+        "reqnrollNavigator.navigationHistorySize": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 200,
+          "description": "Maximum number of locations to keep in navigation history"
         },
         "reqnrollNavigator.debug": {
           "type": "boolean",
