@@ -5,7 +5,37 @@ All notable changes to the Reqnroll Navigator extension will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - 2026-02-13
+## [2.3.0] - 2025-02-13
+
+### Added
+- **Enriched Hover Provider**: Comprehensive hover information on steps
+  - Code preview of the binding method implementation
+  - Captured parameters table showing what the regex extracts
+  - Clickable navigation links (Peek Definition, Go to File)
+  - Examples table context for Scenario Outline steps
+  - Suggested binding patterns for unbound steps
+  - Caching for performance (30 second TTL)
+- Support for And/But keyword resolution using context
+
+### Changed
+- Hover content now uses VS Code Markdown with proper formatting
+- Improved parameter extraction using binding regex
+
+## [2.2.0] - 2025-02-13
+
+### Added
+- **Gutter Icons**: Visual indicators in the editor gutter
+  - Green checkmark (✓) for bound steps
+  - Red X (✗) for unbound steps  
+  - Orange warning (!) for ambiguous steps
+- Custom SVG icons in `resources/icons/`
+- New extension icon
+
+### Changed
+- Updated decoration provider to use gutter icons
+- Improved visual feedback for step binding states
+
+## [2.1.0] - 2025-02-13
 
 ### Added
 - **Navigation History**: Back/Forward navigation between steps and bindings
@@ -22,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CodeLens now correctly shows bindings for Scenario Outline steps
 - Fixed duplicate CodeLens messages issue
 
-## [2.0.0] - 2026-02-12
+## [2.0.0] - 2025-02-12
 
 ### Added
 - **Multi-Provider Architecture**: Automatic detection of BDD frameworks
@@ -44,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better handling of special characters in step patterns
 - Improved whitespace normalization in matching
 
-## [1.0.0] - 2026-02-01
+## [1.0.0] - 2025-02-01
 
 ### Added
 - Initial release
@@ -58,6 +88,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Phase 3: Gutter icons by binding state (✅ bound, ⚠️ ambiguous, ❌ unbound)
-- Phase 4: Enriched hover with code preview and captured parameters
-- Full implementation of additional language providers
+- Full implementation of additional language providers (SpecFlow, Cucumber, Behave, Godog)
+- Step auto-completion
+- Binding code generation from step text
