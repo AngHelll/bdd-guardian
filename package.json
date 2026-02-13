@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -95,6 +95,10 @@
       {
         "command": "reqnrollNavigator.showBindingUsages",
         "title": "BDD Guardian: Show Binding Usages"
+      },
+      {
+        "command": "bddGuardian.coach.showHealthScore",
+        "title": "BDD Guardian: Show Health Score"
       }
     ],
     "keybindings": [

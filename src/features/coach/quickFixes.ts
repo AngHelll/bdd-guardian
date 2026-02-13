@@ -1,10 +1,14 @@
 /**
  * Coach Quick Fixes Provider
  * Provides code actions for Coach findings.
+ * 
+ * v2: Added Health Score command
  */
 
 import * as vscode from 'vscode';
 import { CoachDiagnosticsProvider } from './coachDiagnostics';
+import { calculateHealthScore, formatHealthReport } from './healthScore';
+import { getAllRuleInfo } from './rules';
 
 export class CoachQuickFixProvider implements vscode.CodeActionProvider {
     static readonly providedCodeActionKinds = [
@@ -128,13 +132,7 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
     // Show all rules
     context.subscriptions.push(
         vscode.commands.registerCommand('bddGuardian.coach.showRules', async () => {
-            const rules = [
-                { id: 'coach/scenario-name', name: 'Scenario Name Smell', description: 'Scenario titles should be descriptive (at least 3 words).' },
-                { id: 'coach/gwt-structure', name: 'GWT Structure', description: 'Scenarios should follow Given → When → Then order.' },
-                { id: 'coach/step-length', name: 'Step Length', description: 'Step text should not exceed configured length.' },
-                { id: 'coach/ui-leakage', name: 'UI Leakage', description: 'Steps should describe behavior, not UI implementation details.' },
-                { id: 'coach/outline-examples', name: 'Outline Without Examples', description: 'Scenario Outline must have at least one Examples table with data rows.' },
-            ];
+            const rules = getAllRuleInfo();
             
             const items = rules.map(r => ({
                 label: r.name,
@@ -143,14 +141,66 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
             }));
             
             const selected = await vscode.window.showQuickPick(items, {
-                title: 'BDD Coach Rules',
+                title: 'BDD Coach Rules (v2: 8 rules)',
                 placeHolder: 'Select a rule to view documentation',
             });
             
             if (selected) {
-                // Could open documentation in the future
                 vscode.window.showInformationMessage(`${selected.label}: ${selected.detail}`);
             }
+        })
+    );
+    
+    // Show Health Score (NEW in v2)
+    context.subscriptions.push(
+        vscode.commands.registerCommand('bddGuardian.coach.showHealthScore', async () => {
+            // Collect all Coach diagnostics
+            const diagnosticsByFile = new Map<vscode.Uri, readonly vscode.Diagnostic[]>();
+            
+            // Get diagnostics from all feature files
+            for (const doc of vscode.workspace.textDocuments) {
+                if (doc.languageId === 'feature' || doc.fileName.endsWith('.feature')) {
+                    const diagnostics = vscode.languages.getDiagnostics(doc.uri)
+                        .filter(d => d.source === CoachDiagnosticsProvider.SOURCE);
+                    
+                    if (diagnostics.length > 0) {
+                        diagnosticsByFile.set(doc.uri, diagnostics);
+                    }
+                }
+            }
+            
+            // Also scan workspace for feature files not currently open
+            const featureFiles = await vscode.workspace.findFiles('**/*.feature', '**/node_modules/**');
+            
+            for (const uri of featureFiles) {
+                if (!diagnosticsByFile.has(uri)) {
+                    const diagnostics = vscode.languages.getDiagnostics(uri)
+                        .filter(d => d.source === CoachDiagnosticsProvider.SOURCE);
+                    
+                    if (diagnostics.length > 0) {
+                        diagnosticsByFile.set(uri, diagnostics);
+                    }
+                }
+            }
+            
+            // Calculate health score
+            const result = calculateHealthScore(diagnosticsByFile);
+            
+            // Format and show report
+            const report = formatHealthReport(result);
+            
+            // Show in a new document
+            const doc = await vscode.workspace.openTextDocument({
+                content: report,
+                language: 'markdown',
+            });
+            
+            await vscode.window.showTextDocument(doc, { preview: true });
+            
+            // Also show a quick notification
+            vscode.window.showInformationMessage(
+                `BDD Health Score: ${result.emoji} ${result.score}/100 (Grade: ${result.grade})`
+            );
         })
     );
 }
