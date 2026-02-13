@@ -22,6 +22,12 @@ import {
 } from './features';
 import { getProviderManager } from './providers/bindings';
 import { ResolveResult } from './core/domain';
+// Coach Mode
+import {
+    CoachDiagnosticsProvider,
+    CoachQuickFixProvider,
+    registerCoachCommands,
+} from './features/coach';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -31,6 +37,7 @@ let fileWatchers: FileWatchers;
 let outputChannel: vscode.OutputChannel;
 let codeLensProvider: ReturnType<typeof createCodeLensProvider>['provider'];
 let navigationStatusBar: vscode.StatusBarItem;
+let coachDiagnosticsProvider: CoachDiagnosticsProvider;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     outputChannel = vscode.window.createOutputChannel('Reqnroll Navigator');
@@ -62,6 +69,29 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Phase 2: Create Navigation Status Bar
     navigationStatusBar = createNavigationStatusBar();
     context.subscriptions.push(navigationStatusBar);
+
+    // Coach Mode: Register diagnostics and quick fixes
+    coachDiagnosticsProvider = new CoachDiagnosticsProvider();
+    context.subscriptions.push(coachDiagnosticsProvider);
+    
+    // Coach Mode: Register code actions provider (quick fixes)
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { language: 'gherkin', scheme: 'file' },
+            new CoachQuickFixProvider(),
+            { providedCodeActionKinds: CoachQuickFixProvider.providedCodeActionKinds }
+        )
+    );
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { language: 'feature', scheme: 'file' },
+            new CoachQuickFixProvider(),
+            { providedCodeActionKinds: CoachQuickFixProvider.providedCodeActionKinds }
+        )
+    );
+    
+    // Coach Mode: Register commands
+    registerCoachCommands(context);
 
     registerCommands(context);
     registerEventHandlers(context);
@@ -218,4 +248,5 @@ export function deactivate(): void {
     diagnosticsEngine?.dispose();
     decorationsManager?.dispose();
     navigationStatusBar?.dispose();
+    coachDiagnosticsProvider?.dispose();
 }

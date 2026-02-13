@@ -4,7 +4,7 @@
 
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > ⚠️ **Alpha Release** - This extension is in early development (v0.2.0).  
 > Breaking changes may occur between versions. Please report issues on [GitHub](https://github.com/AngHelll/bdd-guardian/issues).
@@ -135,7 +135,7 @@ Contributions are welcome! Please open an issue first to discuss proposed change
 
 ## 📄 License
 
-MIT License - see [LICENSE.txt](LICENSE.txt) for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🙏 Acknowledgments
 

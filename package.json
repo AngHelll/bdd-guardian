@@ -79,6 +79,14 @@
       {
         "command": "bddGuardian.copyDebugReport",
         "title": "BDD Guardian: Copy Debug Report"
+      },
+      {
+        "command": "bddGuardian.coach.toggle",
+        "title": "BDD Guardian: Toggle Coach Mode"
+      },
+      {
+        "command": "bddGuardian.coach.showRules",
+        "title": "BDD Guardian: Show Coach Rules"
       }
     ],
     "keybindings": [
@@ -129,7 +137,10 @@
         },
         "reqnrollNavigator.tagFilterMode": {
           "type": "string",
-          "enum": ["include", "exclude"],
+          "enum": [
+            "include",
+            "exclude"
+          ],
           "default": "include",
           "description": "Tag filter mode: 'include' shows only matching tags, 'exclude' hides matching tags"
         },
@@ -148,7 +159,11 @@
           "items": {
             "type": "string"
           },
-          "default": ["**/bin/**", "**/obj/**", "**/node_modules/**"],
+          "default": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/node_modules/**"
+          ],
           "description": "Patterns to exclude from indexing"
         },
         "reqnrollNavigator.enableCodeLens": {
@@ -177,14 +192,67 @@
           "type": "boolean",
           "default": false,
           "description": "Enable debug logging"
+        },
+        "bddGuardian.coach.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable BDD Coach - best practices validator for .feature files"
+        },
+        "bddGuardian.coach.severityOverrides": {
+          "type": "object",
+          "default": {},
+          "description": "Override severity for specific rules. Keys are rule IDs (e.g., \"coach/scenario-name\"), values are \"error\", \"warning\", \"hint\", \"info\", or \"off\"",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning",
+              "hint",
+              "info",
+              "off"
+            ]
+          }
+        },
+        "bddGuardian.coach.disabled": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of rule IDs to disable entirely"
+        },
+        "bddGuardian.coach.uiLeakage.keywords": {
+          "type": "array",
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "description": "Custom keywords to detect UI implementation details in steps. If null, uses default keywords (click, button, link, etc.)"
+        },
+        "bddGuardian.coach.stepLength.max": {
+          "type": "number",
+          "default": 120,
+          "minimum": 50,
+          "maximum": 300,
+          "description": "Maximum step length before warning"
+        },
+        "bddGuardian.coach.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Coach status in status bar when viewing .feature files"
         }
       }
     },
     "languages": [
       {
         "id": "gherkin",
-        "aliases": ["Gherkin", "Feature"],
-        "extensions": [".feature"]
+        "aliases": [
+          "Gherkin",
+          "Feature"
+        ],
+        "extensions": [
+          ".feature"
+        ]
       }
     ]
   },
