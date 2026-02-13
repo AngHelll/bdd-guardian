@@ -1,18 +1,25 @@
 /**
  * CodeLens Provider - Shows binding information above each step.
+ * 
+ * FIXED: Now properly generates candidate texts for Scenario Outline steps
+ * by expanding <placeholders> with Examples values.
  */
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { createResolver, ResolveResult, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
-import { ResolvedKeyword } from '../../core/domain';
+import { ResolvedKeyword, FeatureStep } from '../../core/domain';
 
 interface StepCodeLens extends vscode.CodeLens {
     stepText: string;
     keyword: string;
+    lineIndex: number;
     result?: ResolveResult;
 }
+
+// Placeholder pattern
+const PLACEHOLDER_REGEX = /<([^>]+)>/g;
 
 export class CodeLensProvider implements vscode.CodeLensProvider {
     private _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
@@ -46,8 +53,47 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         // Track current tags for filtering
         let currentTags: string[] = [];
         
+        // Track if we're in a Scenario Outline and capture Examples
+        let inScenarioOutline = false;
+        let currentExamples: { headers: string[], rows: string[][] }[] = [];
+        let currentExampleBlock: { headers: string[], rows: string[][] } | null = null;
+        
+        // First pass: collect Examples data
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
+            const trimmed = line.trim();
+            
+            if (/^\s*Scenario Outline:/i.test(line)) {
+                inScenarioOutline = true;
+                currentExamples = [];
+                currentExampleBlock = null;
+            } else if (/^\s*(Scenario|Feature|Background):/i.test(line)) {
+                inScenarioOutline = false;
+                currentExamples = [];
+                currentExampleBlock = null;
+            } else if (/^\s*Examples:/i.test(line) && inScenarioOutline) {
+                currentExampleBlock = { headers: [], rows: [] };
+                currentExamples.push(currentExampleBlock);
+            } else if (trimmed.startsWith('|') && currentExampleBlock) {
+                const cells = trimmed.slice(1, -1).split('|').map(c => c.trim());
+                if (currentExampleBlock.headers.length === 0) {
+                    currentExampleBlock.headers = cells;
+                } else {
+                    currentExampleBlock.rows.push(cells);
+                }
+            }
+        }
+        
+        // Reset tracking
+        inScenarioOutline = false;
+        currentExamples = [];
+        currentExampleBlock = null;
+        let outlineExamples: { headers: string[], rows: string[][] }[] = [];
+        
+        // Second pass: create CodeLenses with proper context
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
             
             // Track tags
             const tagMatch = line.match(/^\s*(@\S+(?:\s+@\S+)*)\s*$/);
@@ -56,10 +102,39 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 continue;
             }
             
-            // Reset tags on scenario/feature line
-            if (/^\s*(Feature|Scenario|Scenario Outline|Background):/i.test(line)) {
-                // Tags before this line apply to this block
+            // Track Scenario Outline
+            if (/^\s*Scenario Outline:/i.test(line)) {
+                inScenarioOutline = true;
+                outlineExamples = [];
+                currentExampleBlock = null;
                 currentTags = [];
+                continue;
+            }
+            
+            // Track regular Scenario/Feature/Background (ends outline)
+            if (/^\s*(Scenario|Feature|Background):/i.test(line)) {
+                inScenarioOutline = false;
+                outlineExamples = [];
+                currentExampleBlock = null;
+                currentTags = [];
+                continue;
+            }
+            
+            // Track Examples blocks
+            if (/^\s*Examples:/i.test(line) && inScenarioOutline) {
+                currentExampleBlock = { headers: [], rows: [] };
+                outlineExamples.push(currentExampleBlock);
+                continue;
+            }
+            
+            // Track table rows
+            if (trimmed.startsWith('|') && currentExampleBlock) {
+                const cells = trimmed.slice(1, -1).split('|').map(c => c.trim());
+                if (currentExampleBlock.headers.length === 0) {
+                    currentExampleBlock.headers = cells;
+                } else if (currentExampleBlock.rows.length < 20) {
+                    currentExampleBlock.rows.push(cells);
+                }
                 continue;
             }
             
@@ -79,7 +154,13 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 
                 const lens: StepCodeLens = Object.assign(
                     new vscode.CodeLens(range),
-                    { stepText: text, keyword }
+                    { 
+                        stepText: text, 
+                        keyword,
+                        lineIndex: i,
+                        // Store examples for use in resolveCodeLens
+                        _examples: inScenarioOutline ? [...outlineExamples] : undefined
+                    }
                 );
                 
                 codeLenses.push(lens);
@@ -93,7 +174,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         codeLens: vscode.CodeLens,
         _token: vscode.CancellationToken
     ): vscode.CodeLens | Thenable<vscode.CodeLens> {
-        const stepLens = codeLens as StepCodeLens;
+        const stepLens = codeLens as StepCodeLens & { _examples?: { headers: string[], rows: string[][] }[] };
         const index = this.indexManager.getIndex();
         
         // Get bindings for all keyword types (for And/But compatibility)
@@ -101,8 +182,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         if (allBindings.length === 0) {
             codeLens.command = {
-                title: '$(warning) No bindings indexed',
-                command: 'reqnroll-navigator.showStatistics',
+                title: '$(warning) No bindings indexed - click to reindex',
+                command: 'reqnroll-navigator.reindexWorkspace',
             };
             return codeLens;
         }
@@ -114,9 +195,12 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         };
         const resolve = createResolver(deps);
         
-        // Build minimal step for resolution
+        // Build candidate texts for matching
+        const candidateTexts = this.generateCandidateTexts(stepLens.stepText, stepLens._examples);
+        
+        // Build step for resolution
         const resolvedKeyword = this.normalizeKeyword(stepLens.keyword);
-        const step = {
+        const step: FeatureStep = {
             keywordOriginal: stepLens.keyword as any,
             keywordResolved: resolvedKeyword,
             rawText: stepLens.stepText,
@@ -126,11 +210,11 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             uri: vscode.Uri.file(''),
             range: codeLens.range,
             lineNumber: codeLens.range.start.line,
-            isOutline: false,
-            candidateTexts: [stepLens.stepText],
+            isOutline: Boolean(stepLens._examples && stepLens._examples.length > 0),
+            candidateTexts: candidateTexts,
         };
         
-        const result = resolve(step as any);
+        const result = resolve(step);
         stepLens.result = result;
         
         if (result.candidates.length === 0) {
@@ -139,23 +223,80 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
-        } else if (result.candidates.length === 1) {
+        } else if (result.candidates.length === 1 || result.status === 'bound') {
             const candidate = result.candidates[0];
+            const icon = result.status === 'ambiguous' ? '$(warning)' : '$(symbol-method)';
             codeLens.command = {
-                title: `$(symbol-method) ${candidate.binding.methodName} (${candidate.score})`,
+                title: `${icon} ${candidate.binding.className}.${candidate.binding.methodName} (${candidate.score})`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
         } else {
             const best = result.candidates[0];
             codeLens.command = {
-                title: `$(symbol-method) ${best.binding.methodName} +${result.candidates.length - 1} more`,
+                title: `$(symbol-method) ${best.binding.methodName} +${result.candidates.length - 1} more (ambiguous)`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
         }
         
         return codeLens;
+    }
+    
+    /**
+     * Generate candidate texts for matching.
+     * For Scenario Outline steps, expands <placeholders> with Examples values.
+     */
+    private generateCandidateTexts(
+        stepText: string, 
+        examples?: { headers: string[], rows: string[][] }[]
+    ): string[] {
+        const candidates: string[] = [];
+        const normalizedText = stepText.replace(/\s+/g, ' ').trim();
+        
+        // Check if text contains placeholders
+        const hasPlaceholders = PLACEHOLDER_REGEX.test(normalizedText);
+        PLACEHOLDER_REGEX.lastIndex = 0;
+        
+        // Fallback candidate: replace <placeholder> with X
+        const fallbackCandidate = normalizedText.replace(PLACEHOLDER_REGEX, 'X');
+        candidates.push(fallbackCandidate);
+        
+        // If no placeholders or no examples, return just the fallback
+        if (!hasPlaceholders || !examples || examples.length === 0) {
+            return candidates;
+        }
+        
+        // Expand placeholders with actual values from Examples
+        for (const example of examples) {
+            if (example.headers.length === 0) continue;
+            
+            const maxRows = Math.min(example.rows.length, 20);
+            
+            for (let rowIdx = 0; rowIdx < maxRows; rowIdx++) {
+                if (candidates.length >= 25) break;
+                
+                const row = example.rows[rowIdx];
+                let expandedText = normalizedText;
+                
+                // Replace each placeholder with the corresponding value
+                for (let colIdx = 0; colIdx < example.headers.length; colIdx++) {
+                    const placeholder = `<${example.headers[colIdx]}>`;
+                    const value = row[colIdx] ?? 'X';
+                    expandedText = expandedText.split(placeholder).join(value);
+                }
+                
+                // Normalize
+                expandedText = expandedText.replace(/\s+/g, ' ').trim();
+                
+                // Add if unique
+                if (!candidates.includes(expandedText)) {
+                    candidates.push(expandedText);
+                }
+            }
+        }
+        
+        return candidates;
     }
     
     private normalizeKeyword(keyword: string): ResolvedKeyword {
