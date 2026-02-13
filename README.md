@@ -1,20 +1,20 @@
-# Reqnroll Navigator
+# BDD Guardian 🛡️
 
-> Navigate between Gherkin `.feature` steps and Reqnroll/SpecFlow C# step bindings with ease!
+> Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.reqnroll-navigator)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
 > ⚠️ **Alpha Release** - This extension is in early development (v0.1.0).  
 > Breaking changes may occur between versions. Please report issues on [GitHub](https://github.com/AngHelll/bdd-guardian/issues).
 
-A VS Code extension that provides intelligent navigation, CodeLens indicators, diagnostics, navigation history, and tag filtering for Reqnroll/SpecFlow BDD projects.
+A VS Code extension that provides intelligent navigation, CodeLens indicators, diagnostics, navigation history, and visual feedback for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
 
 ## ✨ Features
 
 ### 🔗 Go to Definition
-Click on any step in a `.feature` file and jump directly to its C# binding using **F12** or **Cmd+Click** (Ctrl+Click on Windows).
+Click on any step in a `.feature` file and jump directly to its binding using **F12** or **Cmd+Click** (Ctrl+Click on Windows).
 
 ### 📊 CodeLens
 See binding status directly above each step:
@@ -41,7 +41,7 @@ A status bar indicator shows your current position: `← 3/5 →`
 
 ### 💬 Enriched Hover
 Hover over any step to see:
-- �� Code preview of the binding method
+- 📄 Code preview of the binding method
 - 📊 Captured parameters table
 - 🔗 Clickable navigation links
 - 💡 Suggested binding patterns for unbound steps
@@ -59,14 +59,15 @@ Full support for Scenario Outlines with Examples tables:
 - Automatically expands `<placeholders>` with Example values
 - Accurate binding resolution for parameterized steps
 
-### 🔌 Multi-Provider Architecture
+### 🔌 Multi-Framework Support
 Automatic detection of BDD frameworks:
 - ✅ **C# Reqnroll** - Fully implemented
 - ✅ **C# SpecFlow** - Fully implemented  
 - 🔜 JavaScript Cucumber (planned)
 - 🔜 Python Behave (planned)
+- 🔜 Go Godog (planned)
 
-## 📦 Installation
+## �� Installation
 
 ### From VSIX (Current)
 1. Download the `.vsix` file
@@ -74,18 +75,18 @@ Automatic detection of BDD frameworks:
 3. Select the downloaded file
 
 ### From Marketplace (Coming Soon)
-Search for "Reqnroll Navigator" in VS Code Extensions.
+Search for "BDD Guardian" in VS Code Extensions.
 
 ## ⚙️ Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `reqnrollNavigator.enableCodeLens` | `true` | Show CodeLens above steps |
-| `reqnrollNavigator.enableDiagnostics` | `true` | Show problems for unbound steps |
-| `reqnrollNavigator.enableDecorations` | `true` | Show gutter icons and decorations |
-| `reqnrollNavigator.navigationHistorySize` | `50` | Max items in navigation history |
-| `reqnrollNavigator.bindingSearchPaths` | `["**/*.cs"]` | Paths to search for bindings |
-| `reqnrollNavigator.excludePaths` | `["**/bin/**", "**/obj/**"]` | Paths to exclude |
+| `bddGuardian.enableCodeLens` | `true` | Show CodeLens above steps |
+| `bddGuardian.enableDiagnostics` | `true` | Show problems for unbound steps |
+| `bddGuardian.enableDecorations` | `true` | Show gutter icons and decorations |
+| `bddGuardian.navigationHistorySize` | `50` | Max items in navigation history |
+| `bddGuardian.bindingSearchPaths` | `["**/*.cs"]` | Paths to search for bindings |
+| `bddGuardian.excludePaths` | `["**/bin/**", "**/obj/**"]` | Paths to exclude |
 
 ## 🐛 Known Issues
 
@@ -112,5 +113,5 @@ MIT License - see [LICENSE.txt](LICENSE.txt) for details.
 
 ## 🙏 Acknowledgments
 
-- Inspired by the Reqnroll and SpecFlow communities
+- Inspired by the Reqnroll, SpecFlow, and Cucumber communities
 - Built with ❤️ for BDD practitioners

@@ -1,7 +1,7 @@
 {
-  "name": "reqnroll-navigator",
-  "displayName": "Reqnroll Navigator",
-  "description": "Navigate between Gherkin .feature steps and Reqnroll C# step bindings with CodeLens, Go to Definition, and diagnostics",
+  "name": "bdd-guardian",
+  "displayName": "BDD Guardian",
+  "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
   "version": "0.1.0",
   "publisher": "anghelll",
   "icon": "icon.png",

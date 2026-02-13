@@ -1,11 +1,11 @@
 # Changelog
 
-All notable changes to the Reqnroll Navigator extension will be documented in this file.
+All notable changes to the BDD Guardian extension will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2025-02-13 (Beta)
+## [0.1.0] - 2025-02-13 (Alpha)
 
 ### Added
 - **Go to Definition**: F12 or Cmd+Click to navigate from step to binding
@@ -15,18 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Navigation History**: Back/Forward navigation (Alt+←/→, Alt+H)
 - **Enriched Hover**: Code preview, captured parameters, clickable links
 - **Scenario Outline Support**: Examples table expansion for accurate matching
-- **Multi-Provider Architecture**: Extensible for multiple BDD frameworks
+- **Multi-Framework Architecture**: Extensible for multiple BDD frameworks
   - C# Reqnroll (fully implemented)
+  - C# SpecFlow (fully implemented)
   - Other providers (stubs for future)
 
 ### Notes
-- Initial beta release for internal testing
+- Initial alpha release for testing
 - 65 unit tests passing
-- Tested with GBM Automation project (684 steps, 404 bindings)
+- Tested with real BDD project (684 steps, 404 bindings)
 
 ## [Unreleased]
 
 ### Planned
-- Full implementation of additional language providers
+- JavaScript Cucumber support
+- Python Behave/pytest-bdd support
+- Go Godog support
 - Step auto-completion
 - Binding code generation from step text
