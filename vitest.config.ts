@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -11,9 +12,8 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules', 'out', '**/*.test.ts', '**/*.spec.ts'],
     },
-    // Mock vscode module since we're testing pure logic
     alias: {
-      vscode: new URL('./src/__tests__/mocks/vscode.ts', import.meta.url).pathname,
+      vscode: path.resolve(__dirname, './src/__tests__/mocks/vscode.ts'),
     },
   },
 });
