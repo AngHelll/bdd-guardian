@@ -217,6 +217,7 @@ export interface ExtensionConfig {
     readonly enableDiagnostics: boolean;
     readonly enableDecorations: boolean;
     readonly debug: boolean;
+    readonly maxFilesIndexed?: number;
 }
 
 /**

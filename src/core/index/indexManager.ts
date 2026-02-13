@@ -4,6 +4,12 @@
  * 
  * Uses the multi-provider architecture to detect and index bindings
  * from different BDD frameworks automatically.
+ * 
+ * Enterprise Features (v0.3.0):
+ * - Performance guardrails (max files limit, batch processing)
+ * - Non-blocking UI (yields to event loop)
+ * - Safe fallbacks with try/catch wrappers
+ * - Cancellation token support
  */
 
 import * as vscode from 'vscode';
@@ -16,6 +22,28 @@ import {
     IBindingProvider,
     ProviderSelection,
 } from '../../providers/bindings';
+
+// ============================================================================
+// Enterprise Constants
+// ============================================================================
+
+/** Default maximum files to index (performance guardrail) */
+const DEFAULT_MAX_FILES = 5000;
+
+/** Batch size for processing files (prevents UI blocking) */
+const BATCH_SIZE = 50;
+
+// ============================================================================
+// Enterprise Utilities
+// ============================================================================
+
+/**
+ * Yields to the UI event loop to prevent blocking
+ * Critical for large workspace responsiveness
+ */
+async function yieldToUI(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0));
+}
 
 /**
  * Index Manager - Orchestrates indexing operations
@@ -34,9 +62,12 @@ export class IndexManager {
     }
 
     /**
-     * Perform full workspace indexing
+     * Perform full workspace indexing with enterprise guardrails
      */
-    public async indexAll(config: ExtensionConfig): Promise<void> {
+    public async indexAll(
+        config: ExtensionConfig, 
+        token?: vscode.CancellationToken
+    ): Promise<void> {
         if (this.indexing) {
             this.outputChannel.appendLine('[IndexManager] Indexing already in progress, skipping...');
             return;
@@ -44,20 +75,40 @@ export class IndexManager {
 
         this.indexing = true;
         const startTime = Date.now();
+        const maxFiles = config.maxFilesIndexed ?? DEFAULT_MAX_FILES;
 
         try {
             this.outputChannel.appendLine('[IndexManager] Starting full workspace indexing...');
+            this.outputChannel.appendLine(`[IndexManager] Max files limit: ${maxFiles}`);
             this.index.clear();
 
-            // Step 1: Index feature files
-            await this.indexAllFeatures(config);
+            // Check cancellation
+            if (token?.isCancellationRequested) {
+                this.outputChannel.appendLine('[IndexManager] Indexing cancelled by user');
+                return;
+            }
 
-            // Step 2: Detect and select providers
+            // Step 1: Index feature files with batching
+            await this.indexAllFeatures(config, maxFiles, token);
+
+            // Check cancellation
+            if (token?.isCancellationRequested) {
+                this.outputChannel.appendLine('[IndexManager] Indexing cancelled by user');
+                return;
+            }
+
+            // Step 2: Detect and select providers (with safe fallback)
             this.outputChannel.appendLine('[IndexManager] Detecting binding providers...');
-            this.cachedProviderSelection = await this.providerManager.detectProviders();
+            this.cachedProviderSelection = await this.safeDetectProviders();
+
+            // Check cancellation
+            if (token?.isCancellationRequested) {
+                this.outputChannel.appendLine('[IndexManager] Indexing cancelled by user');
+                return;
+            }
 
             // Step 3: Index bindings using active providers
-            await this.indexBindingsWithProviders(config);
+            await this.indexBindingsWithProviders(config, maxFiles, token);
 
             this.index.markIndexed();
 
@@ -68,36 +119,90 @@ export class IndexManager {
                 `${stats.featureCount} features, ${stats.stepCount} steps, ${stats.bindingCount} bindings ` +
                 `(${stats.providerCount} providers active)`
             );
+        } catch (error) {
+            this.outputChannel.appendLine(`[IndexManager] Indexing failed with error: ${error}`);
+            // Don't rethrow - allow graceful degradation
         } finally {
             this.indexing = false;
         }
     }
 
     /**
-     * Index all feature files
+     * Safe provider detection with fallback
      */
-    private async indexAllFeatures(config: ExtensionConfig): Promise<void> {
+    private async safeDetectProviders(): Promise<ProviderSelection> {
+        try {
+            return await this.providerManager.detectProviders();
+        } catch (error) {
+            this.outputChannel.appendLine(`[IndexManager] Provider detection failed: ${error}`);
+            // Return empty selection as safe fallback
+            return {
+                active: [],
+                primary: null,
+                report: [],
+                detectedAt: new Date(),
+            };
+        }
+    }
+
+    /**
+     * Index all feature files with batching and max limit
+     */
+    private async indexAllFeatures(
+        config: ExtensionConfig, 
+        maxFiles: number,
+        token?: vscode.CancellationToken
+    ): Promise<void> {
         const featureFiles = await vscode.workspace.findFiles(
             config.featureGlob,
             `{${config.excludePatterns.join(',')}}`
         );
 
-        this.outputChannel.appendLine(`[IndexManager] Found ${featureFiles.length} feature files`);
+        const totalFound = featureFiles.length;
+        const filesToProcess = featureFiles.slice(0, maxFiles);
+        
+        if (totalFound > maxFiles) {
+            this.outputChannel.appendLine(
+                `[IndexManager] WARNING: Found ${totalFound} feature files, limiting to ${maxFiles}. ` +
+                `Increase reqnrollNavigator.maxFilesIndexed to index more.`
+            );
+        }
 
-        for (const uri of featureFiles) {
-            await this.indexFeatureFile(uri);
+        this.outputChannel.appendLine(`[IndexManager] Indexing ${filesToProcess.length} feature files`);
+
+        // Process in batches with UI yields
+        for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
+            // Check cancellation at each batch
+            if (token?.isCancellationRequested) {
+                return;
+            }
+
+            const batch = filesToProcess.slice(i, i + BATCH_SIZE);
+            
+            for (const uri of batch) {
+                await this.indexFeatureFile(uri);
+            }
+
+            // Yield to UI after each batch
+            if (i + BATCH_SIZE < filesToProcess.length) {
+                await yieldToUI();
+            }
         }
     }
 
     /**
-     * Index bindings using active providers
+     * Index bindings using active providers with batching
      */
-    private async indexBindingsWithProviders(config: ExtensionConfig): Promise<void> {
+    private async indexBindingsWithProviders(
+        config: ExtensionConfig,
+        maxFiles: number,
+        token?: vscode.CancellationToken
+    ): Promise<void> {
         const selection = this.cachedProviderSelection;
         if (!selection || selection.active.length === 0) {
             // Fallback: no active providers, try primary
             if (selection?.primary) {
-                await this.indexWithProvider(selection.primary, config);
+                await this.indexWithProvider(selection.primary, config, maxFiles, token);
             } else {
                 this.outputChannel.appendLine('[IndexManager] No active binding providers detected');
             }
@@ -111,52 +216,85 @@ export class IndexManager {
 
         // Index with each active provider
         for (const provider of selection.active) {
-            await this.indexWithProvider(provider, config);
+            if (token?.isCancellationRequested) {
+                return;
+            }
+            await this.indexWithProvider(provider, config, maxFiles, token);
         }
     }
 
     /**
-     * Index bindings with a specific provider
+     * Index bindings with a specific provider (with batching)
      */
-    private async indexWithProvider(provider: IBindingProvider, config: ExtensionConfig): Promise<void> {
+    private async indexWithProvider(
+        provider: IBindingProvider, 
+        config: ExtensionConfig,
+        maxFiles: number,
+        token?: vscode.CancellationToken
+    ): Promise<void> {
         try {
             this.outputChannel.appendLine(`[IndexManager] Indexing with ${provider.displayName}...`);
-            
+
             // Find files matching provider's glob
-            const files = await vscode.workspace.findFiles(
+            const allFiles = await vscode.workspace.findFiles(
                 provider.bindingGlob,
                 `{${config.excludePatterns.join(',')}}`
             );
 
+            const files = allFiles.slice(0, maxFiles);
+            
+            if (allFiles.length > maxFiles) {
+                this.outputChannel.appendLine(
+                    `[IndexManager] WARNING: Found ${allFiles.length} binding files for ${provider.displayName}, ` +
+                    `limiting to ${maxFiles}`
+                );
+            }
+
             this.outputChannel.appendLine(`[IndexManager] Found ${files.length} files for ${provider.displayName}`);
 
-            // Index bindings
-            const bindings = await provider.indexBindings(files, {
-                caseInsensitive: config.caseInsensitive,
-                debug: config.debug,
-            });
+            // Process in batches for large file sets
+            let allBindings: Awaited<ReturnType<typeof provider.indexBindings>> = [];
+            
+            for (let i = 0; i < files.length; i += BATCH_SIZE) {
+                if (token?.isCancellationRequested) {
+                    return;
+                }
+
+                const batch = files.slice(i, i + BATCH_SIZE);
+                const bindings = await provider.indexBindings(batch, {
+                    caseInsensitive: config.caseInsensitive,
+                    debug: config.debug,
+                });
+                allBindings = allBindings.concat(bindings);
+
+                // Yield to UI after each batch
+                if (i + BATCH_SIZE < files.length) {
+                    await yieldToUI();
+                }
+            }
 
             // Add to index with provider ID
-            this.index.addBindings(bindings, provider.id);
+            this.index.addBindings(allBindings, provider.id);
 
             this.outputChannel.appendLine(
-                `[IndexManager] ${provider.displayName}: indexed ${bindings.length} bindings`
+                `[IndexManager] ${provider.displayName}: indexed ${allBindings.length} bindings`
             );
         } catch (error) {
             this.outputChannel.appendLine(
                 `[IndexManager] Error indexing with ${provider.displayName}: ${error}`
             );
+            // Don't rethrow - allow other providers to continue
         }
     }
 
     /**
-     * Index a single feature file
+     * Index a single feature file (with error handling)
      */
     public async indexFeatureFile(uri: vscode.Uri): Promise<boolean> {
         try {
             const document = await vscode.workspace.openTextDocument(uri);
             const featureDoc = parseFeatureDocument(document);
-            
+
             if (featureDoc) {
                 this.index.setFeature(featureDoc);
                 return true;
@@ -173,16 +311,16 @@ export class IndexManager {
      */
     public async indexBindingFile(uri: vscode.Uri, caseInsensitive: boolean = false): Promise<boolean> {
         try {
-            const selection = this.cachedProviderSelection ?? await this.providerManager.detectProviders();
+            const selection = this.cachedProviderSelection ?? await this.safeDetectProviders();
             const provider = selection.primary;
-            
+
             if (!provider) {
                 return false;
             }
 
             const document = await vscode.workspace.openTextDocument(uri);
             const bindings = provider.parseFile(document, { caseInsensitive });
-            
+
             if (bindings.length > 0) {
                 // Clear old bindings from this file first
                 this.index.removeBindingFile(uri);
@@ -243,7 +381,7 @@ export class IndexManager {
      */
     public async redetectProviders(): Promise<ProviderSelection> {
         this.providerManager.invalidateCache();
-        this.cachedProviderSelection = await this.providerManager.detectProviders();
+        this.cachedProviderSelection = await this.safeDetectProviders();
         return this.cachedProviderSelection;
     }
 }

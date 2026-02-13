@@ -33,6 +33,7 @@ export function getConfig(): ExtensionConfig {
         enableDiagnostics: config.get('enableDiagnostics', DEFAULT_CONFIG.enableDiagnostics),
         enableDecorations: config.get('enableDecorations', DEFAULT_CONFIG.enableDecorations),
         debug: config.get('debug', DEFAULT_CONFIG.debug),
+        maxFilesIndexed: config.get('maxFilesIndexed', 5000),
     };
     
     return cachedConfig;

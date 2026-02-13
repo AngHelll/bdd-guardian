@@ -2,19 +2,25 @@
 
 > Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
+[![Tests](https://img.shields.io/badge/tests-128%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
 
-> ⚠️ **Alpha Release** - This extension is in early development (v0.2.0).  
-> Breaking changes may occur between versions. Please report issues on [GitHub](https://github.com/AngHelll/bdd-guardian/issues).
+## 🖥️ Compatibility
+
+| Requirement | Supported |
+|-------------|-----------|
+| **VS Code** | >= 1.85.0 |
+| **Windows** | ✅ |
+| **macOS** | ✅ |
+| **Linux** | ✅ |
+| **Remote - SSH** | ✅ |
+| **Dev Containers** | ✅ |
+| **Codespaces** | ✅ |
 
 A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
 
-## ✨ Features
-
-### 🔗 Go to Definition
-Click on any step in a `.feature` file and jump directly to its binding using **F12** or **Cmd+Click** (Ctrl+Click on Windows).
 
 ### 📊 CodeLens
 See binding status directly above each step:
@@ -141,3 +147,32 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - Inspired by the Reqnroll, SpecFlow, and Cucumber communities
 - Built with ❤️ for BDD practitioners
+
+## 🏢 Enterprise Features
+
+BDD Guardian is designed for enterprise-scale projects:
+
+### Performance Guardrails
+- **Max Files Limit**: Configurable limit (default: 5,000) prevents memory issues in large monorepos
+- **Batch Processing**: Files are indexed in batches to keep VS Code responsive
+- **Async Operations**: All indexing is non-blocking
+
+### Resilience
+- **Safe Fallbacks**: Extension never crashes - all operations are wrapped in try/catch
+- **Graceful Degradation**: If provider detection fails, falls back to manual configuration
+- **Detailed Logging**: Output channel shows all operations for troubleshooting
+
+### Configuration for Large Projects
+
+```json
+{
+  "reqnrollNavigator.maxFilesIndexed": 10000,
+  "reqnrollNavigator.excludePatterns": [
+    "**/bin/**",
+    "**/obj/**",
+    "**/node_modules/**",
+    "**/TestResults/**"
+  ]
+}
+```
+

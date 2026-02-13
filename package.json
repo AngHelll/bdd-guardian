@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -240,6 +240,13 @@
           "type": "boolean",
           "default": true,
           "description": "Show Coach status in status bar when viewing .feature files"
+        },
+        "reqnrollNavigator.maxFilesIndexed": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 100,
+          "maximum": 50000,
+          "description": "Maximum number of files to index. Increase for large monorepos, decrease for better performance."
         }
       }
     },
