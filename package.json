@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -87,6 +87,14 @@
       {
         "command": "bddGuardian.coach.showRules",
         "title": "BDD Guardian: Show Coach Rules"
+      },
+      {
+        "command": "reqnrollNavigator.goToStepUsage",
+        "title": "BDD Guardian: Go to Step Usage"
+      },
+      {
+        "command": "reqnrollNavigator.showBindingUsages",
+        "title": "BDD Guardian: Show Binding Usages"
       }
     ],
     "keybindings": [
@@ -115,7 +123,7 @@
         "bddGuardian.gutterIcons.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Show gutter icons for step status (✓ bound, ✗ unbound, ! ambiguous)"
+          "description": "Show gutter icons for step status (\u2713 bound, \u2717 unbound, ! ambiguous)"
         },
         "bddGuardian.hoverDetails.enabled": {
           "type": "boolean",

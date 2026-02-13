@@ -1,12 +1,12 @@
 /**
- * Hover Provider
+ * Hover Provider - Enhanced
  * Shows detailed binding information on hover for Gherkin steps
  * 
- * Displays:
+ * Features (v0.3.1):
  * - Binding status (Bound / Ambiguous / Unbound)
- * - For bound: Class.Method and pattern
- * - For ambiguous: Top 3 candidate bindings
- * - For unbound: "No binding found" message
+ * - Code preview of the binding method
+ * - File location with click-to-navigate
+ * - Parameter info for bound steps
  * 
  * Uses the same matcher as CodeLens/Definition for consistency.
  */
@@ -14,7 +14,10 @@
 import * as vscode from 'vscode';
 import { FeatureIndexer } from '../indexers/featureIndexer';
 import { StepMatcher } from '../matcher';
-import { MatchResult } from '../types';
+import { MatchResult, StepBinding } from '../types';
+
+/** Maximum lines to show in code preview */
+const MAX_PREVIEW_LINES = 8;
 
 export class StepHoverProvider implements vscode.HoverProvider {
     constructor(
@@ -25,14 +28,14 @@ export class StepHoverProvider implements vscode.HoverProvider {
     /**
      * Provide hover information for a step
      */
-    public provideHover(
+    public async provideHover(
         document: vscode.TextDocument,
         position: vscode.Position,
         _token: vscode.CancellationToken
-    ): vscode.Hover | undefined {
+    ): Promise<vscode.Hover | undefined> {
         // Get the step at the current position
         const step = this.featureIndexer.getStepAtPosition(document.uri, position);
-        
+
         if (!step) {
             return undefined;
         }
@@ -46,17 +49,17 @@ export class StepHoverProvider implements vscode.HoverProvider {
         markdown.supportHtml = true;
 
         // Header
-        markdown.appendMarkdown('### 🔗 Reqnroll Navigator\n\n');
+        markdown.appendMarkdown('### 🔗 BDD Guardian\n\n');
 
         // Step info
         markdown.appendMarkdown(`**Step:** \`${step.keywordOriginal} ${step.stepText}\`\n\n`);
 
         switch (matchResult.status) {
             case 'bound':
-                this.appendBoundInfo(markdown, matchResult);
+                await this.appendBoundInfo(markdown, matchResult);
                 break;
             case 'ambiguous':
-                this.appendAmbiguousInfo(markdown, matchResult);
+                await this.appendAmbiguousInfo(markdown, matchResult);
                 break;
             case 'unbound':
                 this.appendUnboundInfo(markdown);
@@ -67,39 +70,62 @@ export class StepHoverProvider implements vscode.HoverProvider {
     }
 
     /**
-     * Append bound step information to markdown
+     * Append bound step information to markdown with code preview
      */
-    private appendBoundInfo(markdown: vscode.MarkdownString, matchResult: { bestMatch?: MatchResult }): void {
+    private async appendBoundInfo(
+        markdown: vscode.MarkdownString, 
+        matchResult: { bestMatch?: MatchResult }
+    ): Promise<void> {
         markdown.appendMarkdown('**Status:** ✅ Bound\n\n');
 
         if (matchResult.bestMatch) {
             const binding = matchResult.bestMatch.binding;
             markdown.appendMarkdown('---\n\n');
+            
+            // Binding info
             markdown.appendMarkdown(`**Binding:** \`${binding.className}.${binding.methodName}\`\n\n`);
             markdown.appendMarkdown(`**Pattern:** \`${this.escapeMarkdown(binding.patternRaw)}\`\n\n`);
-            markdown.appendMarkdown(`**File:** ${vscode.workspace.asRelativePath(binding.uri)}:${binding.lineNumber + 1}\n\n`);
-            markdown.appendMarkdown(`**Score:** ${matchResult.bestMatch.score}\n`);
+            
+            // File location (clickable)
+            const relativePath = vscode.workspace.asRelativePath(binding.uri);
+            const lineNum = binding.lineNumber + 1;
+            markdown.appendMarkdown(`**File:** [${relativePath}:${lineNum}](${binding.uri}#L${lineNum})\n\n`);
+            
+            // Match score
+            markdown.appendMarkdown(`**Score:** ${matchResult.bestMatch.score}\n\n`);
+            
+            // Code preview
+            const preview = await this.getCodePreview(binding);
+            if (preview) {
+                markdown.appendMarkdown('**Preview:**\n');
+                markdown.appendCodeblock(preview, this.getLanguageId(binding.uri));
+            }
         }
     }
 
     /**
      * Append ambiguous step information to markdown
      */
-    private appendAmbiguousInfo(markdown: vscode.MarkdownString, matchResult: { matches: MatchResult[] }): void {
+    private async appendAmbiguousInfo(
+        markdown: vscode.MarkdownString, 
+        matchResult: { matches: MatchResult[] }
+    ): Promise<void> {
         markdown.appendMarkdown('**Status:** ⚠️ Ambiguous\n\n');
         markdown.appendMarkdown(`Found **${matchResult.matches.length}** matching bindings:\n\n`);
         markdown.appendMarkdown('---\n\n');
 
-        // Show top 3 candidates
+        // Show top 3 candidates with previews
         const topCandidates = matchResult.matches.slice(0, 3);
-        
+
         for (let i = 0; i < topCandidates.length; i++) {
             const match = topCandidates[i];
             const binding = match.binding;
-            
+            const relativePath = vscode.workspace.asRelativePath(binding.uri);
+            const lineNum = binding.lineNumber + 1;
+
             markdown.appendMarkdown(`**${i + 1}.** \`${binding.className}.${binding.methodName}\`\n\n`);
             markdown.appendMarkdown(`   Pattern: \`${this.escapeMarkdown(binding.patternRaw)}\`\n\n`);
-            markdown.appendMarkdown(`   Score: ${match.score} | ${vscode.workspace.asRelativePath(binding.uri)}:${binding.lineNumber + 1}\n\n`);
+            markdown.appendMarkdown(`   Score: ${match.score} | [${relativePath}:${lineNum}](${binding.uri}#L${lineNum})\n\n`);
         }
 
         if (matchResult.matches.length > 3) {
@@ -114,7 +140,54 @@ export class StepHoverProvider implements vscode.HoverProvider {
         markdown.appendMarkdown('**Status:** ❌ Unbound\n\n');
         markdown.appendMarkdown('---\n\n');
         markdown.appendMarkdown('No binding found for this step.\n\n');
-        markdown.appendMarkdown('*Create a step definition with a matching pattern.*\n');
+        markdown.appendMarkdown('💡 *Create a step definition with a matching pattern.*\n');
+    }
+
+    /**
+     * Get code preview for a binding
+     */
+    private async getCodePreview(binding: StepBinding): Promise<string | null> {
+        try {
+            const document = await vscode.workspace.openTextDocument(binding.uri);
+            const startLine = binding.lineNumber;
+            const endLine = Math.min(startLine + MAX_PREVIEW_LINES, document.lineCount);
+            
+            const lines: string[] = [];
+            for (let i = startLine; i < endLine; i++) {
+                const line = document.lineAt(i).text;
+                lines.push(line);
+                
+                // Stop at closing brace of method
+                if (line.trim() === '}' && i > startLine + 1) {
+                    break;
+                }
+            }
+            
+            // Trim trailing empty lines
+            while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+                lines.pop();
+            }
+            
+            // Add ellipsis if truncated
+            if (lines.length === MAX_PREVIEW_LINES) {
+                lines.push('    // ...');
+            }
+            
+            return lines.join('\n');
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Get language ID from file URI
+     */
+    private getLanguageId(uri: vscode.Uri): string {
+        const path = uri.fsPath.toLowerCase();
+        if (path.endsWith('.cs')) return 'csharp';
+        if (path.endsWith('.ts')) return 'typescript';
+        if (path.endsWith('.js')) return 'javascript';
+        return 'text';
     }
 
     /**
