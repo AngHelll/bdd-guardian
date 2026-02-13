@@ -1,0 +1,161 @@
+{
+  "name": "reqnroll-navigator",
+  "displayName": "Reqnroll Navigator",
+  "description": "Navigate between Gherkin .feature steps and Reqnroll C# step bindings with CodeLens, Go to Definition, and diagnostics",
+  "version": "2.0.0",
+  "publisher": "anghelll",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "reqnroll",
+    "specflow",
+    "gherkin",
+    "cucumber",
+    "bdd",
+    "feature",
+    "step definitions",
+    "bindings"
+  ],
+  "activationEvents": [
+    "onLanguage:gherkin",
+    "onLanguage:feature",
+    "workspaceContains:**/*.feature"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "reqnrollNavigator.reindex",
+        "title": "Reqnroll: Reindex Workspace"
+      },
+      {
+        "command": "reqnrollNavigator.showBindings",
+        "title": "Reqnroll: Show All Bindings"
+      },
+      {
+        "command": "reqnrollNavigator.goToBinding",
+        "title": "Reqnroll: Go to Step Binding"
+      },
+      {
+        "command": "reqnrollNavigator.showStatistics",
+        "title": "Reqnroll: Show Statistics"
+      },
+      {
+        "command": "reqnroll-navigator.showStatistics",
+        "title": "Reqnroll Navigator: Show Statistics"
+      },
+      {
+        "command": "reqnroll-navigator.showProviderReport",
+        "title": "Reqnroll Navigator: Show Provider Detection Report"
+      }
+    ],
+    "configuration": {
+      "title": "Reqnroll Navigator",
+      "properties": {
+        "reqnrollNavigator.caseInsensitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable case-insensitive step matching"
+        },
+        "reqnrollNavigator.tagFilter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Filter steps by tags (e.g., ['@P0', '@smoke']). Affects CodeLens and Diagnostics only - navigation always works."
+        },
+        "reqnrollNavigator.tagFilterMode": {
+          "type": "string",
+          "enum": ["include", "exclude"],
+          "default": "include",
+          "description": "Tag filter mode: 'include' shows only matching tags, 'exclude' hides matching tags"
+        },
+        "reqnrollNavigator.featureGlob": {
+          "type": "string",
+          "default": "**/*.feature",
+          "description": "Glob pattern for feature files"
+        },
+        "reqnrollNavigator.bindingsGlob": {
+          "type": "string",
+          "default": "**/*.cs",
+          "description": "Glob pattern for binding files"
+        },
+        "reqnrollNavigator.excludePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["**/bin/**", "**/obj/**", "**/node_modules/**"],
+          "description": "Patterns to exclude from indexing"
+        },
+        "reqnrollNavigator.enableCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable CodeLens indicators for step bindings"
+        },
+        "reqnrollNavigator.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable diagnostics for unbound/ambiguous steps"
+        },
+        "reqnrollNavigator.enableDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable visual decorations for steps"
+        },
+        "reqnrollNavigator.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging"
+        },
+        "reqnrollNavigator.debugProviders": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging for provider detection"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "gherkin",
+        "aliases": ["Gherkin", "Feature"],
+        "extensions": [
+          ".feature"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AngHelll/bdd-guardian"
+  },
+  "homepage": "https://github.com/AngHelll/bdd-guardian#readme",
+  "bugs": {
+    "url": "https://github.com/AngHelll/bdd-guardian/issues"
+  },
+  "license": "MIT"
+}
