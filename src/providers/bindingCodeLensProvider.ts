@@ -1,67 +1,59 @@
 /**
  * Binding CodeLens Provider
- * Shows reference counts above step bindings in C#/TypeScript files
- * 
- * Displays clickable "→ N scenarios" that navigates to all usages
- * This is a Quick UX Win that helps developers understand binding usage
+ * Shows usage counts above step bindings in any indexed binding file (C#, TypeScript, Python, etc.)
+ *
+ * Multi-framework: uses WorkspaceIndex + Resolver from core, so it works for every
+ * provider that has indexed bindings (Reqnroll, SpecFlow, Cucumber.js, Behave, etc.)
  */
 
 import * as vscode from 'vscode';
-import { WorkspaceIndex } from '../core/index/workspaceIndex';
-import { StepMatcher } from '../matcher';
-import { FeatureStep, MatchResult, StepBinding, getConfig } from '../types';
+import { IndexManager } from '../core/index';
+import { createResolver, ResolverDependencies } from '../core/matching';
+import type { Binding, FeatureStep, ResolvedKeyword, ResolveResult } from '../core/domain/types';
+import { getConfig } from '../config';
+import { t } from '../i18n';
 
 /**
- * CodeLens provider for binding files (C#, TypeScript)
- * Shows how many scenarios use each binding
+ * CodeLens provider for binding files (any language indexed by a BDD provider).
+ * Shows how many scenarios use each binding; click to navigate to step usages.
  */
 export class BindingCodeLensProvider implements vscode.CodeLensProvider {
     private _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
 
-    constructor(
-        private workspaceIndex: WorkspaceIndex,
-        private stepMatcher: StepMatcher
-    ) {}
+    constructor(private indexManager: IndexManager) {}
 
-    /**
-     * Refresh CodeLens when index changes
-     */
-    public refresh(): void {
+    refresh(): void {
         this._onDidChangeCodeLenses.fire();
     }
 
-    /**
-     * Provide CodeLens for binding files
-     */
-    public provideCodeLenses(
+    provideCodeLenses(
         document: vscode.TextDocument,
         _token: vscode.CancellationToken
     ): vscode.CodeLens[] {
         const config = getConfig();
-        
         if (!config.enableCodeLens) {
             return [];
         }
 
-        // Only process binding files (C# and TypeScript)
-        const lang = document.languageId;
-        if (lang !== 'csharp' && lang !== 'typescript' && lang !== 'javascript') {
-            return [];
-        }
-
-        // Get bindings from this file
-        const bindingDoc = this.workspaceIndex.getBindingFileByUri(document.uri);
+        const index = this.indexManager.getIndex();
+        const bindingDoc = index.getBindingFileByUri(document.uri);
         if (!bindingDoc || bindingDoc.bindings.length === 0) {
             return [];
         }
 
-        // Calculate references for each binding
+        const allBindings = index.getAllBindings();
+        const deps: ResolverDependencies = {
+            getAllBindings: () => allBindings,
+            getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
+        };
+        const resolve = createResolver(deps);
+
+        const allSteps = this.getAllStepsFromIndex(index);
         const codeLenses: vscode.CodeLens[] = [];
-        const allSteps = this.getAllStepsFromIndex();
 
         for (const binding of bindingDoc.bindings) {
-            const usages = this.findBindingUsages(binding, allSteps);
+            const usages = this.findBindingUsages(binding, allSteps, resolve);
             const lens = this.createReferenceLens(binding, usages);
             codeLenses.push(lens);
         }
@@ -69,137 +61,89 @@ export class BindingCodeLensProvider implements vscode.CodeLensProvider {
         return codeLenses;
     }
 
-    /**
-     * Resolve CodeLens (already resolved in provide)
-     */
-    public resolveCodeLens(
-        codeLens: vscode.CodeLens,
-        _token: vscode.CancellationToken
-    ): vscode.CodeLens {
+    resolveCodeLens(codeLens: vscode.CodeLens, _token: vscode.CancellationToken): vscode.CodeLens {
         return codeLens;
     }
 
-    /**
-     * Get all steps from all indexed features
-     */
-    private getAllStepsFromIndex(): FeatureStep[] {
-        const allSteps: FeatureStep[] = [];
-        const data = this.workspaceIndex.getData();
-        
-        for (const feature of data.features.values()) {
-            // Convert domain FeatureStep to types FeatureStep
-            for (const step of feature.allSteps) {
-                allSteps.push({
-                    keywordOriginal: step.keywordOriginal,
-                    keywordResolved: step.keywordResolved,
-                    stepText: step.rawText,
-                    fullText: step.fullText,
-                    tagsInScope: [...step.tagsEffective],
-                    uri: step.uri,
-                    range: step.range,
-                    lineNumber: step.lineNumber,
-                    scenarioName: step.scenarioName,
-                });
-            }
+    private getAllStepsFromIndex(index: ReturnType<IndexManager['getIndex']>): FeatureStep[] {
+        const steps: FeatureStep[] = [];
+        for (const feature of index.getAllFeatures()) {
+            steps.push(...feature.allSteps);
         }
-        
-        return allSteps;
+        return steps;
     }
 
-    /**
-     * Find all steps that use a specific binding
-     */
-    private findBindingUsages(binding: StepBinding, allSteps: FeatureStep[]): FeatureStep[] {
+    private findBindingUsages(
+        binding: Binding,
+        allSteps: FeatureStep[],
+        resolve: (step: FeatureStep) => ResolveResult
+    ): FeatureStep[] {
         const usages: FeatureStep[] = [];
-        
         for (const step of allSteps) {
-            // Only match steps with the same keyword
-            if (step.keywordResolved !== binding.keyword) {
-                continue;
-            }
-
-            // Check if this binding matches the step
-            const matchResult = this.stepMatcher.matchStep(step);
-            
-            if (matchResult.status === 'bound' && matchResult.bestMatch) {
-                // Check if this specific binding is the match
-                if (this.isSameBinding(matchResult.bestMatch.binding, binding)) {
-                    usages.push(step);
-                }
-            } else if (matchResult.status === 'ambiguous') {
-                // Check if this binding is among the matches
-                const isMatch = matchResult.matches.some(m => 
-                    this.isSameBinding(m.binding, binding)
-                );
-                if (isMatch) {
-                    usages.push(step);
-                }
+            const result = resolve(step);
+            const best = result.candidates[0];
+            if (!best) continue;
+            if (this.sameBinding(best.binding, binding)) {
+                usages.push(step);
+            } else if (result.status === 'ambiguous') {
+                const isMatch = result.candidates.some((c) => this.sameBinding(c.binding, binding));
+                if (isMatch) usages.push(step);
             }
         }
-
         return usages;
     }
 
-    /**
-     * Check if two bindings are the same
-     */
-    private isSameBinding(a: StepBinding, b: StepBinding): boolean {
-        return a.uri.toString() === b.uri.toString() && 
-               a.lineNumber === b.lineNumber;
+    private sameBinding(a: Binding, b: Binding): boolean {
+        return a.uri.toString() === b.uri.toString() && a.lineNumber === b.lineNumber;
     }
 
-    /**
-     * Create a CodeLens showing reference count
-     */
-    private createReferenceLens(binding: StepBinding, usages: FeatureStep[]): vscode.CodeLens {
+    private createReferenceLens(binding: Binding, usages: FeatureStep[]): vscode.CodeLens {
         const count = usages.length;
         const uniqueScenarios = this.getUniqueScenarios(usages);
-        
-        let title: string;
-        let tooltip: string;
-        let command: vscode.Command | undefined;
-
-        if (count === 0) {
-            title = '○ No usages';
-            tooltip = 'This binding is not used by any step';
-            command = undefined;
-        } else if (count === 1) {
-            const scenario = usages[0].scenarioName ?? 'Unknown scenario';
-            title = `→ 1 usage (${scenario})`;
-            tooltip = `Used in: ${scenario}`;
-            command = {
-                title,
-                command: 'reqnrollNavigator.goToStepUsage',
-                arguments: [usages[0]],
-                tooltip,
-            };
-        } else {
-            title = `→ ${count} usages (${uniqueScenarios} scenarios)`;
-            tooltip = `Click to see all ${count} usages in ${uniqueScenarios} scenarios`;
-            command = {
-                title,
-                command: 'reqnrollNavigator.showBindingUsages',
-                arguments: [binding, usages],
-                tooltip,
-            };
-        }
-
         const range = new vscode.Range(binding.lineNumber, 0, binding.lineNumber, 0);
 
-        return new vscode.CodeLens(range, command ?? { title, command: '' });
+        if (count === 0) {
+            return new vscode.CodeLens(range, {
+                title: '○ ' + t('bindingUsagesNoUsages'),
+                command: '',
+                tooltip: t('bindingUsagesNoUsages'),
+            });
+        }
+
+        const serializedUsages = usages.map((s) => ({
+            uri: s.uri.toString(),
+            lineNumber: s.lineNumber,
+            scenarioName: s.scenarioName,
+            rawText: s.rawText,
+        }));
+
+        if (count === 1) {
+            const u = serializedUsages[0];
+            const scenarioLabel = u.scenarioName ?? t('bindingUsagesUnknown');
+            return new vscode.CodeLens(range, {
+                title: `→ ${t('bindingUsagesOneUsage')} (${scenarioLabel})`,
+                command: 'reqnrollNavigator.goToStepUsage',
+                arguments: [{ uri: u.uri, lineNumber: u.lineNumber }],
+                tooltip: t('bindingUsagesUsedIn', scenarioLabel),
+            });
+        }
+
+        return new vscode.CodeLens(range, {
+            title: `→ ${t('bindingUsagesNUsages', String(count))} (${t('bindingUsagesScenarios', String(uniqueScenarios))})`,
+            command: 'reqnrollNavigator.showBindingUsages',
+            arguments: [
+                { uri: binding.uri.toString(), lineNumber: binding.lineNumber },
+                serializedUsages,
+            ],
+            tooltip: t('bindingUsagesClickToSee', String(count), String(uniqueScenarios)),
+        });
     }
 
-    /**
-     * Count unique scenarios from usages
-     */
     private getUniqueScenarios(usages: FeatureStep[]): number {
-        const scenarios = new Set<string>();
-        
-        for (const usage of usages) {
-            const key = `${usage.uri.toString()}:${usage.scenarioName ?? 'unknown'}`;
-            scenarios.add(key);
+        const set = new Set<string>();
+        for (const u of usages) {
+            set.add(`${u.uri.toString()}:${u.scenarioName ?? 'unknown'}`);
         }
-        
-        return scenarios.size;
+        return set.size;
     }
 }

@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { MatchCandidate, ResolveResult } from '../../core/domain';
 import { navigateToBinding } from './navigator';
+import { t } from '../../i18n';
 
 interface BindingQuickPickItem extends vscode.QuickPickItem {
     candidate: MatchCandidate;
@@ -36,7 +37,7 @@ export async function showBindingQuickPick(
     title?: string
 ): Promise<boolean> {
     if (result.candidates.length === 0) {
-        vscode.window.showWarningMessage(`No bindings found for: "${result.step.rawText}"`);
+        vscode.window.showWarningMessage(t('noBindingsForStep', result.step.rawText));
         return false;
     }
     
@@ -73,7 +74,7 @@ export async function showAllBindingsQuickPick(
     title?: string
 ): Promise<boolean> {
     if (candidates.length === 0) {
-        vscode.window.showWarningMessage('No bindings found in workspace');
+        vscode.window.showWarningMessage(t('noBindingsInWorkspace'));
         return false;
     }
     

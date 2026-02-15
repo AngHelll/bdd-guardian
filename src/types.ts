@@ -1,5 +1,5 @@
 /**
- * Reqnroll Navigator - Type Definitions
+ * BDD Guardian - Type Definitions
  * Core types for feature steps, bindings, and matching results
  */
 

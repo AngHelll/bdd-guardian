@@ -11,6 +11,7 @@
  */
 
 import * as vscode from 'vscode';
+import { t } from '../../i18n';
 
 /**
  * Represents a location in the navigation history
@@ -305,7 +306,7 @@ export function createNavigationHistoryCommands(
             const recentHistory = history.getRecentHistory(20);
             
             if (recentHistory.length === 0) {
-                vscode.window.showInformationMessage('No navigation history');
+                vscode.window.showInformationMessage(t('noNavigationHistory'));
                 return;
             }
             
@@ -334,7 +335,7 @@ export function createNavigationHistoryCommands(
     disposables.push(
         vscode.commands.registerCommand('reqnroll-navigator.clearHistory', () => {
             history.clear();
-            vscode.window.showInformationMessage('Navigation history cleared');
+            vscode.window.showInformationMessage(t('navigationHistoryCleared'));
         })
     );
     

@@ -7,6 +7,7 @@ import { IndexManager } from '../../core/index';
 import { createResolver, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep, MatchStatus } from '../../core/domain';
+import { t } from '../../i18n';
 
 export interface DiagnosticsResult {
     readonly uri: vscode.Uri;
@@ -124,15 +125,16 @@ export class DiagnosticsEngine {
                 unbound++;
                 diagnostics.push(new vscode.Diagnostic(
                     step.range,
-                    `No binding found for step: ${text}`,
+                    t('diagnosticUnboundStep', text),
                     vscode.DiagnosticSeverity.Warning
                 ));
             } else if (result.status === 'ambiguous') {
                 ambiguous++;
                 const names = result.candidates.slice(0, 3).map(c => c.binding.methodName).join(', ');
+                const moreSuffix = result.candidates.length > 3 ? t('diagnosticAmbiguousStepMore', String(result.candidates.length - 3)) : '';
                 diagnostics.push(new vscode.Diagnostic(
                     step.range,
-                    `Ambiguous step - matches: ${names}${result.candidates.length > 3 ? ` +${result.candidates.length - 3} more` : ''}`,
+                    t('diagnosticAmbiguousStep', names) + moreSuffix,
                     vscode.DiagnosticSeverity.Information
                 ));
             } else {

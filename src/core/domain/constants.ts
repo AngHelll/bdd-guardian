@@ -66,8 +66,8 @@ export const EXAMPLES_REGEX = /^\s*Examples:\s*(.*)$/i;
 /** Matches table row: | cell1 | cell2 | */
 export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;
 
-/** Matches C# binding attributes: [Given(@"pattern")], [When("pattern")], etc. */
-export const BINDING_ATTRIBUTE_REGEX = /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.)*")\s*\)\]/g;
+/** Matches C# binding attributes: [Given(@"pattern")], [When("pattern")], etc. Inner string allows "" (verbatim literal quote). */
+export const BINDING_ATTRIBUTE_REGEX = /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)\]/g;
 
 /** Matches C# class declaration */
 export const CLASS_DECLARATION_REGEX = /(?:public|internal|private)?\s*(?:partial\s+)?class\s+(\w+)/g;

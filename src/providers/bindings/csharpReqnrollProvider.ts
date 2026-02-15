@@ -26,7 +26,8 @@ const PATTERNS = {
     USING_REQNROLL: /using\s+Reqnroll/,
     
     // Parsing patterns
-    STEP_ATTRIBUTE: /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.)*")\s*\)\]/g,
+    // Inner string: [^"\\] | \. | "" (verbatim "" is one literal quote; allow so we capture full pattern)
+    STEP_ATTRIBUTE: /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)\]/g,
     CLASS_NAME: /(?:public\s+)?(?:partial\s+)?class\s+(\w+)/,
     METHOD_NAME: /(?:public|private|protected|internal)\s+(?:async\s+)?(?:\w+(?:<[^>]+>)?)\s+(\w+)\s*\(/,
 };

@@ -2,8 +2,8 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.4.0",
-  "publisher": "anghelll",
+  "version": "0.4.1",
+  "publisher": "anghelll-bdd-guardian",
   "icon": "icon.png",
   "galleryBanner": {
     "color": "#667eea",
@@ -124,6 +124,12 @@
     "configuration": {
       "title": "BDD Guardian",
       "properties": {
+        "bddGuardian.displayLanguage": {
+          "type": "string",
+          "enum": ["en", "es"],
+          "default": "en",
+          "description": "%config.displayLanguage.description%"
+        },
         "bddGuardian.gutterIcons.enabled": {
           "type": "boolean",
           "default": true,

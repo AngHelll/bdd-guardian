@@ -224,6 +224,34 @@ describe('C# Binding Parsing', () => {
     });
 });
 
+describe('C# verbatim attribute extraction', () => {
+    // Same pattern as csharpReqnrollProvider STEP_ATTRIBUTE: must allow "" inside string
+    const STEP_ATTRIBUTE = /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)\]/g;
+    function extractPattern(quotedString: string): string {
+        let pattern = quotedString;
+        if (pattern.startsWith('@"')) {
+            pattern = pattern.slice(2, -1).replace(/""/g, '"');
+        } else if (pattern.startsWith('"')) {
+            pattern = pattern.slice(1, -1)
+                .replace(/\\"/g, '"')
+                .replace(/\\\\/g, '\\');
+        }
+        return pattern;
+    }
+    it('should capture full verbatim string when pattern contains "" (literal quote)', () => {
+        const line = '[When(@"they click on ""(.*)"" in the menu")]';
+        const match = line.match(STEP_ATTRIBUTE);
+        expect(match).not.toBeNull();
+        const inner = line.match(/\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)/);
+        expect(inner).not.toBeNull();
+        const quoted = inner![1];
+        expect(quoted).toBe('@"they click on ""(.*)"" in the menu"');
+        const patternRaw = extractPattern(quoted);
+        expect(patternRaw).toBe('they click on "(.*)" in the menu');
+        expect(compileBindingRegex(patternRaw)!.test('they click on "Projects" in the menu')).toBe(true);
+    });
+});
+
 describe('Pattern Compilation', () => {
     describe('GBM-style patterns', () => {
         it('should compile salary update pattern', () => {

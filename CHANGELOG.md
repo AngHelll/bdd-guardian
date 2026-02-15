@@ -2,6 +2,28 @@
 
 All notable changes to the BDD Guardian extension will be documented in this file.
 
+## [0.4.1] - 2025-02-14
+
+**Highlights:** README "What's improved" section; test badge (140).
+
+### Changed
+- **Documentation**: README "What's improved" section; test count badge updated to 140.
+
+## [0.4.0] - 2025-02-14
+
+**Highlights:** C# verbatim patterns with quotes now match correctly; single architecture (IndexManager + providers); unified Gherkin parser; UI language (en/es).
+
+### Changed
+- **Branding**: All user-facing text and logs now use "BDD Guardian" (replacing "Reqnroll Navigator")
+- **Single Gherkin parser**: Coach mode now uses the core Gherkin parser; duplicate coach parser removed. One source of truth for .feature parsing.
+- **Documentation**: Added `src/providers/README.md` explaining editor providers vs binding providers
+- **Architecture**: Removed legacy binding path (BindingIndexer, StepMatcher, old providers). Single flow: IndexManager + binding providers + core resolver. Reduced duplication and one regex compiler in core.
+
+### Fixed
+- Diagnostic source in Problems panel shows "BDD Guardian"
+- Output channel and status messages show consistent extension name
+- **C# verbatim patterns with quotes**: Patterns like `[When(@"they click on ""(.*)"" in the menu")]` now match steps such as `When they click on "Projects" in the menu`. The attribute regex now allows `""` inside verbatim strings (C# grammar).
+
 ## [0.2.0] - 2025-02-13 (Alpha)
 
 ### Added

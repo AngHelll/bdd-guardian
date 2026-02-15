@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { WorkspaceIndex } from '../../core/index';
 import { ProviderManager } from '../../providers/bindings/providerManager';
+import { t } from '../../i18n';
 
 // Extension version - imported from package.json at build time
 const EXTENSION_VERSION = '0.3.0';
@@ -167,6 +168,6 @@ export async function copyDebugReportToClipboard(
     await vscode.env.clipboard.writeText(json);
     
     vscode.window.showInformationMessage(
-        `Debug report copied to clipboard (${report.index.bindingCount} bindings, ${report.index.stepCount} steps)`
+        t('debugReportCopiedDetail', String(report.index.bindingCount), String(report.index.stepCount))
     );
 }

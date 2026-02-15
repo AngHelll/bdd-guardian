@@ -32,10 +32,10 @@ This document provides a detailed overview of the BDD Guardian extension archite
 │  │   (C#)   │ │   (C#)   │ │  (Java)  │ │ (Python) │          │
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘          │
 ├─────────────────────────────────────────────────────────────────┤
-│                        Indexers Layer                            │
+│                    IndexManager + FileWatchers                   │
 │  ┌─────────────────────┐  ┌─────────────────────┐              │
-│  │   Feature Indexer   │  │   Binding Indexer   │              │
-│  │   (.feature files)  │  │   (.cs, .java, etc) │              │
+│  │  IndexManager       │  │  Binding Providers  │              │
+│  │  (.feature + .cs)   │  │  (Reqnroll, etc.)  │              │
 │  └─────────────────────┘  └─────────────────────┘              │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -64,7 +64,7 @@ class WorkspaceIndex {
 
 **Data Flow:**
 ```
-File System → Indexers → WorkspaceIndex → Resolver → Features
+File System → IndexManager (providers) → WorkspaceIndex → Resolver → Features
 ```
 
 ### 2. Resolver

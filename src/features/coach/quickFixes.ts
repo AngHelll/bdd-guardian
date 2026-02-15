@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import { CoachDiagnosticsProvider } from './coachDiagnostics';
 import { calculateHealthScore, formatHealthReport } from './healthScore';
 import { getAllRuleInfo } from './rules';
+import { t } from '../../i18n';
 
 export class CoachQuickFixProvider implements vscode.CodeActionProvider {
     static readonly providedCodeActionKinds = [
@@ -111,8 +112,8 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
             const current = config.get<boolean>('enabled', false);
             await config.update('enabled', !current, vscode.ConfigurationTarget.Global);
             
-            const status = !current ? 'enabled' : 'disabled';
-            vscode.window.showInformationMessage(`BDD Coach ${status}`);
+            const status = !current ? t('coachEnabled') : t('coachDisabled');
+            vscode.window.showInformationMessage(status);
         })
     );
     
@@ -125,7 +126,7 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
             overrides[ruleId] = 'off';
             await config.update('severityOverrides', overrides, vscode.ConfigurationTarget.Global);
             
-            vscode.window.showInformationMessage(`Disabled Coach rule: ${ruleId}`);
+            vscode.window.showInformationMessage(t('coachRuleDisabled', ruleId));
         })
     );
     

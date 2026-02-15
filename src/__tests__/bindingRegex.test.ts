@@ -66,6 +66,17 @@ describe('compileBindingRegex', () => {
       expect(regex!.test('the message is "Hello World"')).toBe(true);
       expect(regex!.test('the message is "test"')).toBe(true);
     });
+
+    it('should match step with quoted value when pattern has "(.*)" (e.g. C# they click on ""(.*)"" in the menu)', () => {
+      // After C# verbatim "" -> ", pattern becomes: they click on "(.*)" in the menu
+      const regex = compileBindingRegex('they click on "(.*)" in the menu');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('they click on "Projects" in the menu')).toBe(true);
+      expect(regex!.test('they click on "Notes" in the menu')).toBe(true);
+      const m = regex!.exec('they click on "Projects" in the menu');
+      expect(m).not.toBeNull();
+      expect(m![1]).toBe('Projects');
+    });
   });
 
   describe('case sensitivity', () => {
@@ -87,12 +98,30 @@ describe('compileBindingRegex', () => {
 
   describe('special regex characters', () => {
     it('should handle regex metacharacters that are part of the pattern', () => {
-      // Note: compileBindingRegex expects the pattern to already be valid regex
-      // Special characters like $ and . have regex meaning
-      // If you need to match literal $, it should be escaped before calling this function
       const regex = compileBindingRegex('value is \\$100\\.00');
       expect(regex).not.toBeNull();
       expect(regex!.test('value is $100.00')).toBe(true);
+    });
+
+    it('should treat literal $ in pattern as dollar sign (e.g. C# verbatim)', () => {
+      const regex = compileBindingRegex('Cost is $5');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('Cost is $5')).toBe(true);
+      expect(regex!.test('Cost is 5')).toBe(false);
+    });
+
+    it('should treat literal $ in middle only (end $ remains anchor)', () => {
+      const regex = compileBindingRegex('Price: $10.50');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('Price: $10.50')).toBe(true);
+    });
+
+    it('should preserve ^ at start and $ at end as anchors', () => {
+      const regex = compileBindingRegex('^exact$');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('exact')).toBe(true);
+      expect(regex!.test(' exact')).toBe(false);
+      expect(regex!.test('exact ')).toBe(false);
     });
 
     it('should work with patterns containing dots as any character', () => {
@@ -103,10 +132,21 @@ describe('compileBindingRegex', () => {
     });
   });
 
-  describe('invalid patterns', () => {
-    it('should return null for invalid regex', () => {
+  describe('Unicode (flag u)', () => {
+    it('should match step text with accented characters', () => {
+      const regex = compileBindingRegex('I have (\\d+) café');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 2 café')).toBe(true);
+      expect(regex!.test('I have 1 cafe')).toBe(false);
+    });
+  });
+
+  describe('invalid patterns and fallback', () => {
+    it('should use literal fallback when regex is invalid so binding is not dropped', () => {
       const regex = compileBindingRegex('[invalid(');
-      expect(regex).toBeNull();
+      expect(regex).not.toBeNull();
+      expect(regex!.test('[invalid(')).toBe(true);
+      expect(regex!.test('other')).toBe(false);
     });
   });
 });

@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 import { CoachFinding, toVSCodeSeverity } from './rules/types';
-import { parseGherkinDocument } from './gherkinParser';
+import { parseFeatureDocumentToGherkinModel } from './featureToGherkinModel';
 import { RuleEngine, RuleEngineResult } from './ruleEngine';
 import { getCoachConfig } from './config';
 
@@ -109,7 +109,7 @@ export class CoachDiagnosticsProvider implements vscode.Disposable {
         }
         
         try {
-            const model = parseGherkinDocument(document);
+            const model = parseFeatureDocumentToGherkinModel(document);
             const result = this.ruleEngine.run(model);
             
             const diagnostics = result.findings.map(finding => this.findingToDiagnostic(finding));

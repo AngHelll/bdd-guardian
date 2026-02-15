@@ -1,6 +1,6 @@
 /**
  * Domain Types
- * Core type definitions for the Reqnroll Navigator extension
+ * Core type definitions for the BDD Guardian extension
  * 
  * These types are the stable contracts used throughout the codebase.
  * Changes to these types should be carefully considered as they

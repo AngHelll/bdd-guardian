@@ -1,5 +1,5 @@
 /**
- * Reqnroll Navigator - VS Code Extension
+ * BDD Guardian - VS Code Extension
  */
 
 import * as vscode from 'vscode';
@@ -21,13 +21,16 @@ import {
     recordIndexDuration,
 } from './features';
 import { getProviderManager } from './providers/bindings';
-import { ResolveResult } from './core/domain';
+import { BindingCodeLensProvider } from './providers/bindingCodeLensProvider';
+import { ResolveResult, ResolvedKeyword } from './core/domain';
+import { createResolver, ResolverDependencies } from './core/matching';
 // Coach Mode
 import {
     CoachDiagnosticsProvider,
     CoachQuickFixProvider,
     registerCoachCommands,
 } from './features/coach';
+import { t, refreshLanguage } from './i18n';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -36,12 +39,14 @@ let decorationsManager: DecorationsManager;
 let fileWatchers: FileWatchers;
 let outputChannel: vscode.OutputChannel;
 let codeLensProvider: ReturnType<typeof createCodeLensProvider>['provider'];
+let bindingCodeLensProvider: BindingCodeLensProvider;
 let navigationStatusBar: vscode.StatusBarItem;
+let indexingStatusBarItem: vscode.StatusBarItem;
 let coachDiagnosticsProvider: CoachDiagnosticsProvider;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    outputChannel = vscode.window.createOutputChannel('Reqnroll Navigator');
-    outputChannel.appendLine('Reqnroll Navigator is activating...');
+    outputChannel = vscode.window.createOutputChannel('BDD Guardian');
+    outputChannel.appendLine(t('activation'));
 
     workspaceIndex = new WorkspaceIndex();
     indexManager = new IndexManager(workspaceIndex, outputChannel);
@@ -61,6 +66,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const codeLensResult = createCodeLensProvider(indexManager);
     codeLensProvider = codeLensResult.provider;
     context.subscriptions.push(codeLensResult.disposable);
+
+    // Binding CodeLens (usages above step definitions) – multi-language
+    bindingCodeLensProvider = new BindingCodeLensProvider(indexManager);
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(
+            [
+                { language: 'csharp', scheme: 'file' },
+                { language: 'typescript', scheme: 'file' },
+                { language: 'javascript', scheme: 'file' },
+                { language: 'python', scheme: 'file' },
+                { language: 'go', scheme: 'file' },
+            ],
+            bindingCodeLensProvider
+        )
+    );
+
+    // Indexing progress (status bar)
+    indexingStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 90);
+    context.subscriptions.push(indexingStatusBarItem);
 
     // Phase 2: Register Navigation History commands
     const historyCommands = createNavigationHistoryCommands(context);
@@ -111,8 +135,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         decorationsManager.updateDecorations(vscode.window.activeTextEditor);
     }
 
-    outputChannel.appendLine('Reqnroll Navigator activated!');
-    vscode.window.showInformationMessage('Reqnroll Navigator is ready!');
+    outputChannel.appendLine(t('activated'));
+    vscode.window.showInformationMessage(t('ready'));
 }
 
 function registerCommands(context: vscode.ExtensionContext): void {
@@ -120,7 +144,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('reqnrollNavigator.reindex', async () => {
             await performInitialIndexing();
             refreshAllUI();
-            vscode.window.showInformationMessage('Reindex complete!');
+            vscode.window.showInformationMessage(t('reindexComplete'));
         })
     );
 
@@ -128,7 +152,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('reqnrollNavigator.showBindings', async () => {
             const bindings = workspaceIndex.getAllBindings();
             if (bindings.length === 0) {
-                vscode.window.showInformationMessage('No bindings found.');
+                vscode.window.showInformationMessage(t('noBindingsFound'));
                 return;
             }
             const items = bindings.map(b => ({
@@ -149,7 +173,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('reqnroll-navigator.goToStep', async (result: ResolveResult) => {
             if (!result || result.candidates.length === 0) {
-                vscode.window.showWarningMessage('No binding found');
+                vscode.window.showWarningMessage(t('noBindingFound'));
                 return;
             }
             if (result.candidates.length === 1) {
@@ -164,8 +188,113 @@ function registerCommands(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('reqnroll-navigator.showStatistics', showStatistics),
         vscode.commands.registerCommand('reqnrollNavigator.showStatistics', showStatistics),
         vscode.commands.registerCommand('reqnroll-navigator.showProviderReport', showProviderDetectionReport),
-        vscode.commands.registerCommand('bddGuardian.copyDebugReport', copyDebugReport)
+        vscode.commands.registerCommand('bddGuardian.copyDebugReport', copyDebugReport),
+        vscode.commands.registerCommand('reqnrollNavigator.goToStepUsage', goToStepUsage),
+        vscode.commands.registerCommand('reqnrollNavigator.showBindingUsages', showBindingUsages),
+        vscode.commands.registerCommand('reqnrollNavigator.showAmbiguousMatches', showAmbiguousMatches)
     );
+}
+
+async function showAmbiguousMatches(): Promise<void> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || !editor.document.fileName.endsWith('.feature')) {
+        vscode.window.showInformationMessage(t('noBindingFound'));
+        return;
+    }
+    const document = editor.document;
+    const position = editor.selection.active;
+    const line = document.lineAt(position.line).text;
+    const stepMatch = line.match(/^\s*(Given|When|Then|And|But)\s+(.+)$/i);
+    if (!stepMatch) {
+        vscode.window.showInformationMessage(t('noBindingFound'));
+        return;
+    }
+    const keyword = stepMatch[1];
+    const text = stepMatch[2].trim();
+    const index = indexManager.getIndex();
+    const allBindings = index.getAllBindings();
+    if (allBindings.length === 0) {
+        vscode.window.showInformationMessage(t('noBindingsFound'));
+        return;
+    }
+    const resolvedKeyword = (kw: string): ResolvedKeyword => {
+        const lower = kw.toLowerCase();
+        if (lower === 'given') return 'Given';
+        if (lower === 'when') return 'When';
+        if (lower === 'then') return 'Then';
+        return 'Given';
+    };
+    const deps: ResolverDependencies = {
+        getAllBindings: () => allBindings,
+        getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
+    };
+    const resolve = createResolver(deps);
+    const step = {
+        keywordOriginal: keyword as 'Given' | 'When' | 'Then' | 'And' | 'But',
+        keywordResolved: resolvedKeyword(keyword),
+        rawText: text,
+        normalizedText: text.replace(/\s+/g, ' ').trim(),
+        fullText: line.trim(),
+        tagsEffective: [] as string[],
+        uri: document.uri,
+        range: new vscode.Range(position.line, 0, position.line, line.length),
+        lineNumber: position.line,
+        isOutline: false,
+        candidateTexts: [text],
+    };
+    const result = resolve(step as any);
+    if (result.candidates.length <= 1) {
+        vscode.window.showInformationMessage(t('noBindingFound'));
+        return;
+    }
+    await showBindingQuickPick(result);
+}
+
+interface StepUsagePayload {
+    uri: string;
+    lineNumber: number;
+}
+
+interface BindingUsagePayload {
+    uri: string;
+    lineNumber: number;
+    scenarioName?: string;
+    rawText?: string;
+}
+
+async function goToStepUsage(payload: StepUsagePayload): Promise<void> {
+    if (!payload?.uri) return;
+    const uri = typeof payload.uri === 'string' ? vscode.Uri.parse(payload.uri) : payload.uri;
+    const line = Number(payload.lineNumber) ?? 0;
+    await vscode.window.showTextDocument(uri, {
+        selection: new vscode.Range(line, 0, line, 0),
+        preview: false,
+    });
+}
+
+async function showBindingUsages(
+    _bindingRef: StepUsagePayload,
+    usages: BindingUsagePayload[]
+): Promise<void> {
+    if (!usages?.length) return;
+    const items = usages.map((u) => ({
+        label: (u.rawText ?? 'step').slice(0, 60) + (u.rawText && u.rawText.length > 60 ? '…' : ''),
+        description: u.scenarioName ?? 'Unknown',
+        detail: vscode.workspace.asRelativePath(u.uri),
+        uri: u.uri,
+        lineNumber: u.lineNumber,
+    }));
+    const picked = await vscode.window.showQuickPick(items, {
+        placeHolder: t('selectUsagePlaceholder'),
+        matchOnDescription: true,
+        matchOnDetail: true,
+    });
+    if (picked) {
+        await vscode.window.showTextDocument(vscode.Uri.parse(picked.uri), {
+            selection: new vscode.Range(picked.lineNumber, 0, picked.lineNumber, 0),
+            preview: false,
+        });
+    }
 }
 
 function registerEventHandlers(context: vscode.ExtensionContext): void {
@@ -186,7 +315,11 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
             if (e.affectsConfiguration('reqnrollNavigator')) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();
+                bindingCodeLensProvider.refresh();
                 updateAllDiagnostics();
+            }
+            if (e.affectsConfiguration('bddGuardian.displayLanguage')) {
+                refreshLanguage();
             }
         })
     );
@@ -195,8 +328,19 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
 async function performInitialIndexing(): Promise<void> {
     const config = getConfig();
     getProviderManager().updateConfig({ debug: config.debug });
-    await indexManager.indexAll(config);
-    updateAllDiagnostics();
+    indexingStatusBarItem.text = '$(loading~spin) ' + t('statusIndexing');
+    indexingStatusBarItem.show();
+    try {
+        await indexManager.indexAll(config);
+        updateAllDiagnostics();
+        indexingStatusBarItem.text = '$(check) ' + t('statusReady');
+        indexingStatusBarItem.show();
+        setTimeout(() => { indexingStatusBarItem.text = ''; indexingStatusBarItem.hide(); }, 2500);
+    } catch {
+        indexingStatusBarItem.text = '$(warning) ' + t('statusIndexingFailed');
+        indexingStatusBarItem.show();
+        setTimeout(() => { indexingStatusBarItem.text = ''; indexingStatusBarItem.hide(); }, 3000);
+    }
 }
 
 function updateAllDiagnostics(): void {
@@ -207,6 +351,7 @@ function updateAllDiagnostics(): void {
 
 function refreshAllUI(): void {
     codeLensProvider.refresh();
+    bindingCodeLensProvider.refresh();
     updateAllDiagnostics();
     if (vscode.window.activeTextEditor) {
         decorationsManager.updateDecorations(vscode.window.activeTextEditor);
@@ -223,7 +368,7 @@ function showStatistics(): void {
     const kw = { Given: 0, When: 0, Then: 0 };
     bindings.forEach((b) => { if (b.keyword in kw) kw[b.keyword as keyof typeof kw]++; });
     
-    const msg = 'Features: ' + stats.featureCount + ', Steps: ' + stats.stepCount + ', Bindings: ' + stats.bindingCount;
+    const msg = t('statsMessage', String(stats.featureCount), String(stats.stepCount), String(stats.bindingCount));
     outputChannel.appendLine(msg);
     outputChannel.show();
     vscode.window.showInformationMessage(msg);
@@ -239,7 +384,7 @@ function showProviderDetectionReport(): void {
     outputChannel.show();
     const sel = pm.getCachedSelection();
     if (sel) {
-        vscode.window.showInformationMessage('Active: ' + (sel.active.map(p => p.displayName).join(', ') || 'None'));
+        vscode.window.showInformationMessage(t('activeProviders', sel.active.map(p => p.displayName).join(', ') || 'None'));
     }
 }
 
@@ -248,5 +393,6 @@ export function deactivate(): void {
     diagnosticsEngine?.dispose();
     decorationsManager?.dispose();
     navigationStatusBar?.dispose();
+    indexingStatusBarItem?.dispose();
     coachDiagnosticsProvider?.dispose();
 }

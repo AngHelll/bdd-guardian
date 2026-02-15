@@ -17,7 +17,11 @@
  * - Too Many Steps: Warns about overly long scenarios
  */
 
-export { parseGherkinDocument } from './gherkinParser';
+export {
+    parseFeatureDocumentToGherkinModel,
+    featureDocumentToGherkinModel,
+    parseFeatureDocumentToGherkinModel as parseGherkinDocument,
+} from './featureToGherkinModel';
 export { RuleEngine, RuleEngineResult } from './ruleEngine';
 export { CoachDiagnosticsProvider } from './coachDiagnostics';
 export { CoachQuickFixProvider, registerCoachCommands } from './quickFixes';

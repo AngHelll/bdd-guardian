@@ -22,6 +22,7 @@ import {
     formatBinding,
     sortCandidatesByScore 
 } from '../../ui/stepStatus';
+import { t } from '../../i18n';
 
 // Placeholder regex for Scenario Outline detection
 const PLACEHOLDER_REGEX = /<([^>]+)>/g;
@@ -109,8 +110,9 @@ export class HoverProvider implements vscode.HoverProvider {
         }
         
         // Header with branding
-        contents.appendMarkdown('#### BDD Guardian\n\n');
-        contents.appendMarkdown(`**Status:** ${getStatusEmoji(status)} ${getStatusLabel(status)}\n\n`);
+        const statusLabel = status === StepStatus.Bound ? t('hoverBound') : status === StepStatus.Unbound ? t('hoverUnbound') : t('hoverAmbiguous');
+        contents.appendMarkdown(`#### ${t('hoverTitle')}\n\n`);
+        contents.appendMarkdown(`**${t('hoverStatus')}:** ${getStatusEmoji(status)} ${statusLabel}\n\n`);
         contents.appendMarkdown('---\n\n');
         
         // Build content based on status
@@ -132,11 +134,11 @@ export class HoverProvider implements vscode.HoverProvider {
         contents: vscode.MarkdownString,
         stepText: string
     ): Promise<void> {
-        contents.appendMarkdown('No binding found for this step.\n\n');
+        contents.appendMarkdown(t('hoverNoBindingFound') + '\n\n');
         
         // Suggest creating a binding
         const suggestedPattern = this.suggestBindingPattern(stepText);
-        contents.appendMarkdown('**Suggested binding:**\n');
+        contents.appendMarkdown(`**${t('hoverSuggestedBinding')}**\n`);
         contents.appendMarkdown('```csharp\n');
         contents.appendMarkdown(`[When(@"${suggestedPattern}")]\n`);
         contents.appendMarkdown('public void Step() { }\n');
@@ -154,7 +156,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const sorted = sortCandidatesByScore(candidates);
         const topCandidates = sorted.slice(0, 3);
         
-        contents.appendMarkdown(`**${candidates.length} bindings** match this step:\n\n`);
+        contents.appendMarkdown(`**${t('hoverBindingsMatch', String(candidates.length))}**\n\n`);
         
         for (let i = 0; i < topCandidates.length; i++) {
             const candidate = topCandidates[i];
@@ -163,7 +165,7 @@ export class HoverProvider implements vscode.HoverProvider {
             const isBest = i === 0;
             
             if (isBest) {
-                contents.appendMarkdown(`🏆 **Best match:**\n`);
+                contents.appendMarkdown(`🏆 **${t('hoverBestMatch')}**\n`);
             }
             
             contents.appendMarkdown(`- \`${binding.className}.${binding.methodName}\`\n`);
@@ -176,7 +178,7 @@ export class HoverProvider implements vscode.HoverProvider {
         }
         
         // Command link to show all
-        contents.appendMarkdown('[Show all matches](command:reqnrollNavigator.showAmbiguousMatches)');
+        contents.appendMarkdown(`[${t('hoverShowAllMatches')}](command:reqnrollNavigator.showAmbiguousMatches)`);
     }
     
     /**
@@ -191,28 +193,28 @@ export class HoverProvider implements vscode.HoverProvider {
         const relativePath = vscode.workspace.asRelativePath(binding.uri);
         
         // Binding info
-        contents.appendMarkdown(`**Binding:** \`${binding.className}.${binding.methodName}\`\n\n`);
-        contents.appendMarkdown(`**Pattern:** \`${binding.patternRaw}\`\n\n`);
-        contents.appendMarkdown(`**File:** [${relativePath}:${binding.lineNumber + 1}](${binding.uri.toString()}#L${binding.lineNumber + 1})\n\n`);
+        contents.appendMarkdown(`**${t('hoverBinding')}:** \`${binding.className}.${binding.methodName}\`\n\n`);
+        contents.appendMarkdown(`**${t('hoverPattern')}:** \`${binding.patternRaw}\`\n\n`);
+        contents.appendMarkdown(`**${t('hoverFile')}:** [${relativePath}:${binding.lineNumber + 1}](${binding.uri.toString()}#L${binding.lineNumber + 1})\n\n`);
         
         // Captured parameters
         const captures = this.extractCaptures(stepText, binding);
         if (captures.length > 0) {
-            contents.appendMarkdown('**Captured:**\n');
+            contents.appendMarkdown(`**${t('hoverCaptured')}:**\n`);
             captures.forEach((cap, idx) => {
                 contents.appendMarkdown(`- \`$${idx + 1}\` = \`${cap}\`\n`);
             });
             contents.appendMarkdown('\n');
         }
         
-        // Code preview (compact)
+        // Code preview: short snippet so the hover fits without scroll; user can open file for full method
         const codePreview = await this.getCodePreview(binding);
         if (codePreview) {
-            contents.appendMarkdown('<details>\n<summary>Code preview</summary>\n\n');
+            contents.appendMarkdown(`**${t('hoverPreview')}:**\n`);
             contents.appendMarkdown('```csharp\n');
             contents.appendMarkdown(codePreview);
-            contents.appendMarkdown('\n```\n\n');
-            contents.appendMarkdown('</details>\n');
+            contents.appendMarkdown('\n```\n');
+            contents.appendMarkdown('_' + t('hoverClickFileLink') + '_\n');
         }
     }
     
@@ -222,11 +224,11 @@ export class HoverProvider implements vscode.HoverProvider {
     private createIndexingHover(position: vscode.Position, line: string): vscode.Hover {
         const contents = new vscode.MarkdownString();
         contents.isTrusted = true;
-        contents.appendMarkdown('#### BDD Guardian\n\n');
-        contents.appendMarkdown(`**Status:** ${getStatusEmoji(StepStatus.Indexing)} ${getStatusLabel(StepStatus.Indexing)}\n\n`);
+        contents.appendMarkdown(`#### ${t('hoverTitle')}\n\n`);
+        contents.appendMarkdown(`**${t('hoverStatus')}:** ${getStatusEmoji(StepStatus.Indexing)} ${getStatusLabel(StepStatus.Indexing)}\n\n`);
         contents.appendMarkdown('---\n\n');
-        contents.appendMarkdown('Bindings are being indexed...\n\n');
-        contents.appendMarkdown('[Reindex Now](command:reqnrollNavigator.reindex)');
+        contents.appendMarkdown(t('hoverIndexing') + '\n\n');
+        contents.appendMarkdown(`[${t('hoverReindexNow')}](command:reqnrollNavigator.reindex)`);
         return new vscode.Hover(contents, new vscode.Range(position.line, 0, position.line, line.length));
     }
     
@@ -254,8 +256,12 @@ export class HoverProvider implements vscode.HoverProvider {
         return captures;
     }
     
+    /** Max lines in hover code preview so the hover stays scrollable / fits on screen */
+    private static readonly MAX_PREVIEW_LINES = 5;
+
     /**
      * Get code preview for a binding method (cached).
+     * Kept short so the hover popup fits without requiring scroll inside the preview.
      */
     private async getCodePreview(binding: Binding): Promise<string | null> {
         const cacheKey = `${binding.uri.toString()}:${binding.lineNumber}`;
@@ -268,13 +274,14 @@ export class HoverProvider implements vscode.HoverProvider {
         try {
             const doc = await vscode.workspace.openTextDocument(binding.uri);
             const startLine = binding.lineNumber;
-            const endLine = Math.min(startLine + 10, doc.lineCount - 1);
+            const maxLines = HoverProvider.MAX_PREVIEW_LINES;
+            const endLine = Math.min(startLine + maxLines + 2, doc.lineCount - 1);
             
             const lines: string[] = [];
             let braceCount = 0;
             let foundStart = false;
             
-            for (let i = startLine; i <= endLine && lines.length < 8; i++) {
+            for (let i = startLine; i <= endLine && lines.length < maxLines; i++) {
                 const lineText = doc.lineAt(i).text;
                 lines.push(lineText);
                 
@@ -294,7 +301,7 @@ export class HoverProvider implements vscode.HoverProvider {
             }
             
             if (lines.length > 0) {
-                const code = lines.join('\n') + '\n// ...';
+                const code = lines.join('\n') + '\n// …';
                 codePreviewCache.set(cacheKey, { code, timestamp: Date.now() });
                 return code;
             }

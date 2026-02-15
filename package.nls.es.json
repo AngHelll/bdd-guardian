@@ -1,0 +1,3 @@
+{
+  "config.displayLanguage.description": "Idioma de los mensajes de BDD Guardian (notificaciones, barra de estado, hover). 'en' inglés, 'es' español. Si no se define, se usa el idioma de visualización de VS Code."
+}

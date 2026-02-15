@@ -16,6 +16,7 @@ import { createResolver, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword } from '../../core/domain';
 import { StepStatus, getUIConfig, getStatusEmoji } from '../../ui/stepStatus';
+import { t } from '../../i18n';
 
 // Placeholder regex for Scenario Outline detection
 const PLACEHOLDER_REGEX = /<([^>]+)>/g;
@@ -28,7 +29,7 @@ const DEBOUNCE_MS = 200;
  * Get the extension's root path for resource loading
  */
 function getExtensionPath(): string {
-    const ext = vscode.extensions.getExtension('anghelll.bdd-guardian') 
+    const ext = vscode.extensions.getExtension('anghelll-bdd-guardian.bdd-guardian') 
         ?? vscode.extensions.getExtension('anghelll.reqnroll-navigator');
     if (ext) {
         return ext.extensionPath;
@@ -379,19 +380,17 @@ export class DecorationsManager {
     private createMinimalHover(status: StepStatus, candidateCount: number): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         const emoji = getStatusEmoji(status);
-        
         switch (status) {
             case StepStatus.Bound:
-                md.appendMarkdown(`${emoji} **Bound**`);
+                md.appendMarkdown(`${emoji} **${t('decorationBound')}**`);
                 break;
             case StepStatus.Ambiguous:
-                md.appendMarkdown(`${emoji} **Ambiguous** (${candidateCount} matches)`);
+                md.appendMarkdown(`${emoji} **${t('decorationAmbiguous', String(candidateCount))}**`);
                 break;
             case StepStatus.Unbound:
-                md.appendMarkdown(`${emoji} **Unbound**`);
+                md.appendMarkdown(`${emoji} **${t('decorationUnbound')}**`);
                 break;
         }
-        
         return md;
     }
     

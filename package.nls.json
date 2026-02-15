@@ -1,0 +1,3 @@
+{
+  "config.displayLanguage.description": "Language for BDD Guardian messages (toasts, status bar, hover). Use 'en' for English, 'es' for Spanish. If not set, follows VS Code display language."
+}

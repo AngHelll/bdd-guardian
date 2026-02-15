@@ -34,5 +34,5 @@ Add any other context about the problem here.
 
 ## 📄 Relevant Log Output
 ```
-Paste relevant output from "Reqnroll Navigator" output channel here
+Paste relevant output from "BDD Guardian" output channel here
 ```

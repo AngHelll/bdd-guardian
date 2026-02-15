@@ -10,6 +10,7 @@ import { IndexManager } from '../../core/index';
 import { createResolver, ResolveResult, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
+import { t } from '../../i18n';
 
 interface StepCodeLens extends vscode.CodeLens {
     stepText: string;
@@ -182,7 +183,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         if (allBindings.length === 0) {
             codeLens.command = {
-                title: '$(warning) No bindings indexed - click to reindex',
+                title: `$(warning) ${t('codelensNoBindingsIndexed')}`,
                 command: 'reqnroll-navigator.reindexWorkspace',
             };
             return codeLens;
@@ -219,7 +220,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         if (result.candidates.length === 0) {
             codeLens.command = {
-                title: '$(error) No binding found',
+                title: `$(error) ${t('codelensNoBindingFound')}`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
@@ -234,7 +235,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         } else {
             const best = result.candidates[0];
             codeLens.command = {
-                title: `$(symbol-method) ${best.binding.methodName} +${result.candidates.length - 1} more (ambiguous)`,
+                title: `$(symbol-method) ${best.binding.methodName} ${t('codelensAmbiguousMore', String(result.candidates.length - 1))}`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
