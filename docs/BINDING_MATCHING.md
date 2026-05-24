@@ -23,8 +23,11 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 ## Optional improvements (good practice, no relaxation of BDD)
 
 - **`countCaptureGroups`** — Ignore `(` inside character classes `[...]` so the count is correct for display or validation.
-- **Document limitations** — In README Known Issues: patterns that rely on alternations `|`, lookaheads, or other advanced regex may behave differently; prefer simple capture groups and literal text where possible.
 - **No second fallback in resolver** — We do not try “match step as literal text against all bindings” when status would be unbound; that could increase false positives. Keeping a single matching path (regex only) preserves predictable behavior.
+
+## Documented limitations
+
+README **Known Issues** states that advanced regex (alternations `|`, lookaheads, complex groups) may behave differently from the test runner. Prefer simple capture groups and literal text when possible.
 
 ## Where the code lives
 

@@ -3,7 +3,7 @@
 > Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
 [![Version](https://img.shields.io/badge/version-0.4.1-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-140%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![Tests](https://img.shields.io/badge/tests-144%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
 
@@ -24,10 +24,12 @@ A VS Code extension that provides intelligent navigation, visual feedback, and d
 ### ✨ What's improved (0.4.x)
 
 - **C# verbatim patterns with quotes** — Bindings like `[When(@"they click on ""(.*)"" in the menu")]` now correctly match steps such as `When they click on "Projects" in the menu`.
-- **Single architecture** — One indexing and resolution path (IndexManager + binding providers + core resolver); no duplicate logic, one regex compiler.
-- **Unified Gherkin parsing** — Coach mode and the rest of the extension use the same core parser for `.feature` files.
-- **UI language** — Optional English/Spanish for messages (status bar, hover, diagnostics) via `bddGuardian.displayLanguage`.
-- **140 tests** — Broader coverage for matching, parsing, and Scenario Outline expansion.
+- **Pattern whitespace** — Binding patterns are normalized like step text (fewer false “unbound”). See [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
+- **Index while you edit** — Open `.feature` files reindex from the editor buffer (debounced); binding files replace per-file entries on save (no duplicate index entries).
+- **Single architecture** — One indexing and resolution path (IndexManager + binding providers + core resolver); one regex compiler in core.
+- **Unified Gherkin parsing** — Coach and navigation/diagnostics share the same core parser for `.feature` files.
+- **UI language** — Optional English/Spanish via `bddGuardian.displayLanguage`.
+- **144 tests** — Matching, parsing, index, Coach, and Scenario Outline coverage.
 
 ### 📊 CodeLens
 See binding status directly above each step:
@@ -87,10 +89,23 @@ In step definition files (.cs, .ts, .py, etc.), CodeLens above each binding show
 - **→ N usages (M scenarios)** — click to pick a usage from a list and jump to it  
 Works with any indexed framework (Reqnroll, SpecFlow, and future Cucumber.js, Behave, etc.).
 
+### 🏥 BDD Coach (optional)
+
+Best-practice hints for `.feature` files (duplicate steps, GWT structure, vague Then, step length, UI leakage, etc.).
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `bddGuardian.coach.enabled` | `false` | Enable Coach diagnostics in the Problems panel |
+| `bddGuardian.coach.statusBar.enabled` | `true` | Health score in the status bar when Coach is on |
+
+Commands: **BDD Guardian: Toggle Coach Mode**, **Show Coach Rules**, **Show Health Score**.
+
 ### 🔍 Diagnostics
-Real-time warnings in the Problems panel for:
+Warnings in the Problems panel for:
 - Unbound steps (no matching binding)
 - Ambiguous steps (multiple bindings match)
+
+Updates while typing in `.feature` files (debounced), aligned with the workspace index.
 
 ### 📋 Scenario Outline Support
 Full support for Scenario Outlines with Examples tables:
@@ -149,7 +164,17 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 ## 🐛 Known Issues
 
 - Large projects may experience initial indexing delay (status bar shows “Indexing…” while running)
-- Some complex regex patterns may not match correctly
+- Advanced regex in bindings (alternations `|`, lookaheads, complex groups) may not match as in the test runner; prefer simple capture groups and literals where possible ([details](docs/BINDING_MATCHING.md))
+
+## 📚 Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [docs/README.md](docs/README.md) | Doc index and product direction |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Extension architecture |
+| [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md) | Step-to-binding matching |
+| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Adding a framework provider |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Done vs planned features |
 
 ## 📝 Changelog
 

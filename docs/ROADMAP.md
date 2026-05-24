@@ -1,74 +1,94 @@
 # BDD Guardian – Roadmap
 
-Mejoras y features alineados con la esencia del proyecto: **navegar y validar pasos BDD** entre Gherkin y step definitions (Reqnroll, SpecFlow, Cucumber, etc.).
+Mejoras alineadas con la esencia del producto: **navegar y validar pasos BDD** entre Gherkin y step definitions (Reqnroll, SpecFlow, Cucumber, etc.).
+
+Para visión y enlaces a toda la documentación, ver [docs/README.md](./README.md).
 
 ---
 
-## Hecho (multi-framework)
+## Dirección del producto
 
-- **Go to Step Usage / Show Binding Usages:** CodeLens en archivos de bindings (C#, TypeScript, JavaScript, Python, Go) muestra “→ N usages”. Un clic abre el step en el .feature o un QuickPick con todos los usos. Usa el índice y el resolver del core, así que funciona con cualquier provider (Reqnroll, SpecFlow, y futuros Cucumber.js, Behave, etc.).
-- **Feedback de indexado:** Status bar muestra “BDD Guardian: Indexing…” durante el indexado y “BDD Guardian: Ready” al terminar.
+| Capa | Objetivo |
+|------|----------|
+| **Core** | Índice + matching (regex, scoring) agnóstico del framework |
+| **Providers** | Detección e indexado de bindings por lenguaje/framework |
+| **VS Code UX** | CodeLens, go to definition, diagnósticos, decoraciones, historial |
+| **Coach** | Calidad de `.feature` (reglas opcionales, no bloquea el flujo principal) |
 
----
-
-## Prioridad alta (cerrar gaps y pulir)
-
-### 3. Mejorar manejo de regex complejos ✅ (parcial)
-- **Hecho:** Literal `$`/`^` escapados (sin romper `[^"]`), flag `u`, fallback a match exacto si el patrón no compila. C# verbatim con `""` en el patrón (p. ej. `they click on ""(.*)"" in the menu`) se extrae correctamente. **Normalización de espacios en patrón:** trim + colapso igual que el step text; reduce falsos "unbound". Ver `src/core/parsing/bindingRegex.ts` y `docs/BINDING_MATCHING.md`.
-- **Opcional:** `countCaptureGroups` que ignore `(` dentro de `[...]`.
-- **Estado (resto):** “Some complex regex patterns may not match correctly” en Known Issues.
-- **Acción:** Revisar casos límite en `bindingRegex.ts` y tests con patrones reales (alternativas `|`, grupos, cuantificadores). Documentar limitaciones o añadir fallback (p. ej. match por texto normalizado si el regex falla).
-- **Beneficio:** Menos pasos “unbound” falsos y más confianza en el matching.
+**No es MVP actual** (backlog explícito): autocompletado de pasos, generar binding desde step, “copy as pattern”. Están en [CHANGELOG](../CHANGELOG.md) [Unreleased] y abajo como prioridad baja.
 
 ---
 
-## Prioridad media (más valor, misma esencia)
+## Hecho
 
-### 4. Más frameworks (Cucumber JS, Behave, etc.)
-- **Estado:** Stubs en `jsCucumberProvider`, `pythonBehaveProvider`, `goGodogProvider`, etc. con TODOs; C# Reqnroll y SpecFlow completos.
-- **Orden sugerido:** Cucumber JS (muy usado) → Behave (Python) → Godog (Go). Ver `docs/PROVIDERS.md` para implementar cada uno (detección + parsing de bindings).
-- **Beneficio:** Misma experiencia de navegación y diagnósticos para proyectos JS/TS, Python y Go.
-
-### 5. Find All References
-- **Sobre un step** en un .feature: “Find All References” → lista de archivos .feature y escenarios que usan el mismo texto (o el mismo binding).
-- **Sobre un binding** en .cs: ya lo cubre “Show Binding Usages”; se puede exponer también como ReferenceProvider para que Shift+F12 muestre los mismos resultados.
-- **Beneficio:** Refactor seguro y exploración de uso de pasos.
-
-### 6. Coach: más reglas y quick fixes
-- **Reglas posibles:** “Un Then por escenario” (o marcar cuando hay varios), “Pasos en imperativo” (evitar “User clicks” → “User click” o redacción en tercera persona), “Tag vacío o redundante”.
-- **Quick fixes:** Ampliar los existentes (p. ej. sugerir reemplazo de texto para “vague then”, o dividir escenario cuando hay “too many steps”).
-- **Beneficio:** Mejor calidad de .feature sin salir del editor.
-
-### 7. Autocompletado de pasos
-- **En archivos .feature:** Al escribir después de Given/When/Then, sugerir textos de pasos que ya existen (desde bindings indexados) para reutilizar y mantener consistencia.
-- **Beneficio:** Menos pasos duplicados y menos typos; encaja con “guardar” la consistencia BDD.
+- **Navegación step ↔ binding:** Go to Definition, CodeLens en `.feature`, hover, historial Alt+←/→.
+- **Binding usages:** CodeLens en archivos de bindings (C#, TS, JS, Python, Go registrados) con “→ N usages”; multi-provider vía índice + resolver.
+- **Indexado:** status bar “Indexing…” / “Ready”; reindex en guardado y en disco (file watcher).
+- **Indexado al editar:** buffer abierto del `.feature` (sin esperar solo al guardar); bindings reemplazados por archivo (sin acumular duplicados en reindex incremental).
+- **Matching:** literal `$`/`^`, verbatim C# `""`, normalización de espacios en patrón = step; doc en [BINDING_MATCHING.md](./BINDING_MATCHING.md).
+- **Coach v2:** reglas (GWT, duplicate steps, vague then, etc.), Health Score, quick fixes; parser único con `core`; idiomas `feature` y `gherkin`.
+- **i18n:** mensajes UI en inglés/español (`bddGuardian.displayLanguage`).
+- **DX:** `AGENTS.md`, rule/skill Cursor para matching.
 
 ---
 
-## Prioridad baja / futuro
+## Pulido (cerrar gaps pequeños)
 
-### 8. Generar binding desde el step
-- **Idea:** Acción tipo “Generate step definition” sobre un step unbound: generar el método C# (o otro lenguaje cuando haya provider) con el patrón sugerido y abrir el archivo.
-- **Nota:** Ya está en [Unreleased] del CHANGELOG.
+### Matching regex — casi cerrado
 
-### 9. Copy as pattern
-- **Idea:** Comando o Code Action en un step: “Copy as C# pattern” para pegar en un atributo `[Given("...")]` (escapado y con placeholders si aplica).
+- **Hecho:** ver [BINDING_MATCHING.md](./BINDING_MATCHING.md) y tests en `bindingRegex.test.ts`.
+- **Opcional:** `countCaptureGroups` ignorando `(` dentro de `[...]`; más tests con alternaciones `|` y cuantificadores.
+- **Known issue consciente:** patrones muy avanzados (lookaheads, alternaciones complejas) pueden comportarse distinto; documentado en README.
 
-### 10. Mejor onboarding
-- **Idea:** Cuando no se detecten bindings (o no haya .feature), un mensaje o panel breve: “BDD Guardian works best with Reqnroll/SpecFlow projects. Open a folder with .feature and .cs bindings,” con enlace a la doc.
-- **En README/Marketplace:** GIF o vídeo corto mostrando CodeLens, Go to Definition y Coach.
+---
+
+## Prioridad media
+
+### Más frameworks (Cucumber JS, Behave, Godog)
+
+- **Estado:** stubs (`jsCucumberProvider`, `pythonBehaveProvider`, `goGodogProvider`, …); C# Reqnroll y SpecFlow completos.
+- **Orden sugerido:** Cucumber JS → Behave → Godog. Ver [PROVIDERS.md](./PROVIDERS.md).
+
+### Find All References
+
+- Step en `.feature` → otros usos del mismo texto/binding.
+- Binding en `.cs` → exponer como `ReferenceProvider` (Shift+F12) además del CodeLens de usages.
+
+### Coach: más reglas y quick fixes
+
+- Reglas posibles: un Then dominante por escenario, imperativo, tags redundantes.
+- Ampliar quick fixes (vague then, too many steps).
+
+### Autocompletado de pasos
+
+- Sugerir textos desde bindings indexados al escribir Given/When/Then.
+
+---
+
+## Prioridad baja / backlog
+
+### Generar binding desde el step
+
+- Code action sobre step unbound → esqueleto C# (u otro lenguaje con provider).
+
+### Copy as pattern
+
+- Copiar patrón escapado para `[Given("...")]`.
+
+### Mejor onboarding
+
+- Mensaje si no hay `.feature`/bindings; GIF en README/Marketplace (CodeLens, Go to Definition, Coach).
 
 ---
 
 ## Resumen por impacto
 
-| Área              | Mejora                                      | Esencia        |
-|-------------------|---------------------------------------------|-----------------|
-| Navegación        | Step usage desde .cs + Find References      | ✅ Core         |
-| Frameworks        | Cucumber JS, Behave, Godog                   | ✅ Extensión    |
-| Rendimiento       | Progreso de indexado, no bloquear            | ✅ Confianza    |
-| Matching          | Regex complejos, edge cases                   | ✅ Precisión    |
-| Coach             | Más reglas y quick fixes                     | ✅ Calidad BDD  |
-| Productividad     | Autocompletado, generar binding, copy pattern| ✅ Flujo        |
+| Área | Siguiente paso | Esencia |
+|------|----------------|---------|
+| Frameworks | Cucumber JS provider | Extensión |
+| Navegación | Find All References | Core |
+| Matching | Edge cases regex (opcional) | Precisión |
+| Coach | Reglas + quick fixes | Calidad BDD |
+| Productividad | Autocomplete, generate binding | Backlog |
 
-Recomendación: empezar por **1** (cerrar el gap de Step Usage) y **2** (feedback de indexado); luego **4** (un framework no-C#) o **5** (Find All References) según lo que prefieras para la siguiente versión.
+**Recomendación para la siguiente versión:** un provider no-C# (Cucumber JS) **o** Find All References — según audiencia; el matching base y el indexado incremental ya están en producción.

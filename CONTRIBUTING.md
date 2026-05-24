@@ -92,15 +92,18 @@ src/
 │           └── ... (other providers)
 │
 ├── features/                # VS Code feature implementations
-│   ├── navigation/          # Go to Definition, history
+│   ├── navigation/          # Go to Definition, CodeLens, history
 │   ├── diagnostics/         # Diagnostics, decorations
+│   ├── coach/               # BDD Coach rules and diagnostics
 │   └── hovers/              # Hover information
 │
-├── indexers/                # File parsing (features, bindings)
+├── providers/bindings/      # Framework providers (see docs/PROVIDERS.md)
 ├── ui/                      # UI utilities (icons, status)
-├── config.ts                # Extension configuration
+├── config/                  # Extension settings
 └── extension.ts             # Extension entry point
 ```
+
+See also [docs/README.md](docs/README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ### Key Concepts
 
@@ -178,6 +181,8 @@ src/__tests__/
 ├── bindingRegex.test.ts   # Regex compilation tests
 ├── ambiguity.test.ts      # Ambiguity detection tests
 ├── parsing.test.ts        # Parsing tests
+├── coach.test.ts          # Coach rules
+├── workspaceIndex.test.ts # Index mutations
 └── exampleExpansion.test.ts  # Scenario Outline tests
 ```
 
@@ -218,8 +223,8 @@ Want to add support for a new BDD framework? Here's how:
 ### 1. Create Provider File
 
 ```typescript
-// src/providers/bindings/implementations/myFramework.ts
-import { IBindingProvider, ProviderDetectionReport } from '../types';
+// src/providers/bindings/myFrameworkProvider.ts
+import { IBindingProvider, ProviderDetectionReport } from './types';
 
 export class MyFrameworkProvider implements IBindingProvider {
     readonly id = 'my-framework';
@@ -245,7 +250,7 @@ export class MyFrameworkProvider implements IBindingProvider {
 
 ```typescript
 // src/providers/bindings/providerManager.ts
-import { MyFrameworkProvider } from './implementations/myFramework';
+import { MyFrameworkProvider } from './myFrameworkProvider';
 
 const PROVIDERS: IBindingProvider[] = [
     // ... existing providers

@@ -11,7 +11,7 @@ alwaysApply: true
 - `src/providers/` — per-framework binding detection and parsing.
 - `src/features/` — VS Code UI (CodeLens, hover, diagnostics, Coach, navigation).
 
-See `docs/ARCHITECTURE.md` for data flow. Do not edit compiled output in `out/`.
+See `docs/README.md` and `docs/ARCHITECTURE.md` for data flow. Do not edit compiled output in `out/`.
 
 ## Before finishing a change
 

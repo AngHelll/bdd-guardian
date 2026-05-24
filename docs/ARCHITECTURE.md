@@ -2,6 +2,8 @@
 
 This document provides a detailed overview of the BDD Guardian extension architecture.
 
+**See also:** [docs/README.md](./README.md) (doc index), [BINDING_MATCHING.md](./BINDING_MATCHING.md), [ROADMAP.md](./ROADMAP.md).
+
 ## High-Level Architecture
 
 ```
@@ -169,44 +171,25 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 
 ### CodeLens Provider
 
+Parses the **open document** line-by-line (not a stale index) so CodeLens stays correct while typing. Uses the workspace index only for **bindings** when resolving each step.
+
 ```typescript
 class CodeLensProvider implements vscode.CodeLensProvider {
     provideCodeLenses(document): CodeLens[] {
-        const steps = index.getStepsForUri(uri);
-        return steps.map(step => {
-            const result = resolver.resolve(step);
-            return new CodeLens(step.range, {
-                title: formatCodeLensTitle(result),
-                command: 'reqnroll-navigator.goToStep',
-                arguments: [result]
-            });
-        });
+        // Walk document lines → build step + candidateTexts (incl. Scenario Outline)
+        // resolve(step) against index.getAllBindings()
+        return codeLenses;
     }
 }
 ```
 
 ### Diagnostics Engine
 
-```typescript
-class DiagnosticsEngine {
-    analyzeFile(document): Diagnostic[] {
-        const diagnostics = [];
-        const steps = index.getStepsForUri(uri);
-        
-        for (const step of steps) {
-            const result = resolver.resolve(step);
-            
-            if (result.candidates.length === 0) {
-                diagnostics.push(unboundStepDiagnostic(step));
-            } else if (result.isAmbiguous) {
-                diagnostics.push(ambiguousStepDiagnostic(step, result));
-            }
-        }
-        
-        return diagnostics;
-    }
-}
-```
+Same pattern: reads the **current document text**, resolves against indexed bindings, replaces diagnostics for that URI via `DiagnosticCollection.set`.
+
+### Coach Diagnostics
+
+Uses `parseFeatureDocument` (core) → `GherkinModel` → rule engine. Subscribes to `onDidChangeTextDocument` for `feature` / `gherkin` / `*.feature` (debounced). Separate diagnostic source: `BDD Coach`.
 
 ## Data Models
 
@@ -301,23 +284,26 @@ interface ExtensionConfig {
 }
 ```
 
-## File Watching
+## File Watching and live edit
 
-The extension watches for file changes to keep the index up-to-date:
+| Trigger | Behavior |
+|---------|----------|
+| `onDidChangeTextDocument` (`.feature`) | Debounced reindex from **open buffer** + refresh CodeLens, diagnostics, decorations |
+| `onDidSaveTextDocument` (`.feature`) | Immediate reindex from buffer + UI refresh |
+| `FileSystemWatcher` (`.feature` / bindings glob) | Debounced reindex from disk (e.g. external edits) |
+| Full workspace index | `IndexManager.indexAll()` on activation / reindex command |
 
 ```typescript
 class FileWatchers {
-    // Feature files
-    featureWatcher: FileSystemWatcher;  // **/*.feature
-    
-    // Binding files (per provider)
-    bindingWatchers: Map<ProviderId, FileSystemWatcher>;
-    
-    // Events
-    onFeatureChange → reindex feature file
-    onBindingChange → reindex binding file
+    featureWatcher: FileSystemWatcher;   // config.featureGlob
+    bindingWatcher: FileSystemWatcher;  // config.bindingsGlob
+
+    onFeatureChange → indexFeatureFile(uri)  // prefers open TextDocument if present
+    onBindingChange → removeBindingsForUri(uri) + addBindings(...)
 }
 ```
+
+Incremental binding updates **must** call `removeBindingsForUri` before `addBindings`; otherwise bindings accumulate on each save.
 
 ## Error Handling
 
