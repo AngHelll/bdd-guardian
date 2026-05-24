@@ -4,6 +4,7 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceIndex, IndexManager, FileWatchers } from './core/index';
+import { FILE_WATCHER_DEBOUNCE_MS } from './core/domain/constants';
 import { getConfig, invalidateConfigCache } from './config';
 import {
     createDefinitionProvider,
@@ -297,13 +298,43 @@ async function showBindingUsages(
     }
 }
 
+let featureEditDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+function refreshFeatureFileUI(doc: vscode.TextDocument): void {
+    codeLensProvider.refresh();
+    diagnosticsEngine.analyzeFile(doc);
+    const editor = vscode.window.activeTextEditor;
+    if (editor && editor.document.uri.toString() === doc.uri.toString()) {
+        decorationsManager.updateDecorations(editor);
+    }
+}
+
+function scheduleFeatureFileReindex(doc: vscode.TextDocument): void {
+    if (featureEditDebounceTimer) {
+        clearTimeout(featureEditDebounceTimer);
+    }
+    featureEditDebounceTimer = setTimeout(() => {
+        featureEditDebounceTimer = undefined;
+        indexManager.indexFeatureDocument(doc);
+        refreshFeatureFileUI(doc);
+    }, FILE_WATCHER_DEBOUNCE_MS);
+}
+
 function registerEventHandlers(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
+        vscode.workspace.onDidChangeTextDocument((e) => {
+            if (isFeatureFile(e.document)) {
+                scheduleFeatureFileReindex(e.document);
+            }
+        }),
         vscode.workspace.onDidSaveTextDocument(async (doc) => {
             if (isFeatureFile(doc)) {
-                await indexManager.indexFeatureFile(doc.uri);
-                codeLensProvider.refresh();
-                diagnosticsEngine.analyzeFile(doc);
+                if (featureEditDebounceTimer) {
+                    clearTimeout(featureEditDebounceTimer);
+                    featureEditDebounceTimer = undefined;
+                }
+                indexManager.indexFeatureDocument(doc);
+                refreshFeatureFileUI(doc);
             }
         }),
         vscode.window.onDidChangeActiveTextEditor((editor) => {

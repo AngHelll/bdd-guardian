@@ -288,11 +288,10 @@ export class IndexManager {
     }
 
     /**
-     * Index a single feature file (with error handling)
+     * Index a feature from an open or in-memory document (preferred while editing).
      */
-    public async indexFeatureFile(uri: vscode.Uri): Promise<boolean> {
+    public indexFeatureDocument(document: vscode.TextDocument): boolean {
         try {
-            const document = await vscode.workspace.openTextDocument(uri);
             const featureDoc = parseFeatureDocument(document);
 
             if (featureDoc) {
@@ -300,6 +299,25 @@ export class IndexManager {
                 return true;
             }
             return false;
+        } catch (error) {
+            this.outputChannel.appendLine(
+                `[IndexManager] Error indexing feature ${document.uri.fsPath}: ${error}`
+            );
+            return false;
+        }
+    }
+
+    /**
+     * Index a single feature file (with error handling).
+     * Uses the unsaved buffer when the file is open in an editor.
+     */
+    public async indexFeatureFile(uri: vscode.Uri): Promise<boolean> {
+        try {
+            const openDoc = vscode.workspace.textDocuments.find(
+                d => d.uri.toString() === uri.toString()
+            );
+            const document = openDoc ?? await vscode.workspace.openTextDocument(uri);
+            return this.indexFeatureDocument(document);
         } catch (error) {
             this.outputChannel.appendLine(`[IndexManager] Error indexing feature ${uri.fsPath}: ${error}`);
             return false;
@@ -322,11 +340,11 @@ export class IndexManager {
             const bindings = provider.parseFile(document, { caseInsensitive });
 
             if (bindings.length > 0) {
-                // Clear old bindings from this file first
-                this.index.removeBindingFile(uri);
+                this.index.removeBindingsForUri(uri);
                 this.index.addBindings(bindings, provider.id);
                 return true;
             }
+            this.index.removeBindingsForUri(uri);
             return false;
         } catch (error) {
             this.outputChannel.appendLine(`[IndexManager] Error indexing binding ${uri.fsPath}: ${error}`);

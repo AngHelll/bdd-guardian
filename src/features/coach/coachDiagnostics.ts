@@ -9,6 +9,14 @@ import { parseFeatureDocumentToGherkinModel } from './featureToGherkinModel';
 import { RuleEngine, RuleEngineResult } from './ruleEngine';
 import { getCoachConfig } from './config';
 
+function isFeatureDocument(doc: vscode.TextDocument): boolean {
+    return (
+        doc.languageId === 'feature' ||
+        doc.languageId === 'gherkin' ||
+        doc.fileName.endsWith('.feature')
+    );
+}
+
 export class CoachDiagnosticsProvider implements vscode.Disposable {
     private diagnosticCollection: vscode.DiagnosticCollection;
     private disposables: vscode.Disposable[] = [];
@@ -41,7 +49,7 @@ export class CoachDiagnosticsProvider implements vscode.Disposable {
         // Subscribe to document changes
         this.disposables.push(
             vscode.workspace.onDidChangeTextDocument(e => {
-                if (this.enabled && e.document.languageId === 'feature') {
+                if (this.enabled && isFeatureDocument(e.document)) {
                     this.analyzeDocumentDebounced(e.document);
                 }
             })
@@ -50,7 +58,7 @@ export class CoachDiagnosticsProvider implements vscode.Disposable {
         // Subscribe to document open
         this.disposables.push(
             vscode.workspace.onDidOpenTextDocument(doc => {
-                if (this.enabled && doc.languageId === 'feature') {
+                if (this.enabled && isFeatureDocument(doc)) {
                     this.analyzeDocument(doc);
                 }
             })
@@ -84,7 +92,7 @@ export class CoachDiagnosticsProvider implements vscode.Disposable {
     
     private analyzeAllOpenFeatureFiles(): void {
         for (const doc of vscode.workspace.textDocuments) {
-            if (doc.languageId === 'feature') {
+            if (isFeatureDocument(doc)) {
                 this.analyzeDocument(doc);
             }
         }

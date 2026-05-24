@@ -345,6 +345,24 @@ describe('DuplicateStepsRule', () => {
         const findings = rule.run(model);
         expect(findings.length).toBe(0);
     });
+
+    it('should not emit both cross-scenario and per-scenario findings for the same step text', () => {
+        const rule = new DuplicateStepsRule();
+        const model: GherkinModel = {
+            scenarios: [
+                createScenario('Scenario A', [
+                    createStep('Given', 'user is logged in', 'Given', 5),
+                    createStep('Given', 'user is logged in', 'Given', 6),
+                    createStep('Given', 'user is logged in', 'Given', 7),
+                ]),
+            ],
+            featureTags: [],
+        };
+
+        const findings = rule.run(model);
+        expect(findings).toHaveLength(1);
+        expect(findings[0].message).toContain('Background');
+    });
 });
 
 describe('VagueThenRule', () => {

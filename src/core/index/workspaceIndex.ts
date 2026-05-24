@@ -280,15 +280,27 @@ export class WorkspaceIndex {
     }
 
     /**
+     * Remove all bindings indexed from a file URI.
+     * Always clears allBindings / byKeyword / byProvider even when bindingFiles
+     * was never populated (incremental index uses addBindings only).
+     */
+    public removeBindingsForUri(uri: vscode.Uri): void {
+        const uriStr = uri.toString();
+        const hadBindings = this.allBindings.some(b => b.uri.toString() === uriStr);
+        this.bindingFiles.delete(uriStr);
+        this.removeBindingsFromFile(uri);
+        if (hadBindings) {
+            this.emitChange('binding-removed', uri);
+        }
+    }
+
+    /**
      * Remove a binding document
      */
     public removeBindingFile(uri: vscode.Uri): boolean {
-        const removed = this.bindingFiles.delete(uri.toString());
-        if (removed) {
-            this.removeBindingsFromFile(uri);
-            this.emitChange('binding-removed', uri);
-        }
-        return removed;
+        const hadEntry = this.bindingFiles.has(uri.toString());
+        this.removeBindingsForUri(uri);
+        return hadEntry;
     }
 
     /**
@@ -340,11 +352,9 @@ export class WorkspaceIndex {
 
     private removeBindingsFromFile(uri: vscode.Uri): void {
         const uriStr = uri.toString();
-        
-        // Remove from allBindings
+
         this.allBindings = this.allBindings.filter(b => b.uri.toString() !== uriStr);
-        
-        // Remove from byKeyword maps
+
         for (const keyword of ['Given', 'When', 'Then'] as ResolvedKeyword[]) {
             const bindings = this.bindingsByKeyword.get(keyword);
             if (bindings) {
@@ -353,6 +363,13 @@ export class WorkspaceIndex {
                     bindings.filter(b => b.uri.toString() !== uriStr)
                 );
             }
+        }
+
+        for (const [providerId, bindings] of this.bindingsByProvider) {
+            this.bindingsByProvider.set(
+                providerId,
+                bindings.filter(b => b.uri.toString() !== uriStr)
+            );
         }
     }
 

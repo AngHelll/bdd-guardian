@@ -35,10 +35,12 @@ export class DuplicateStepsRule implements CoachRule {
             }
         }
         
-        // Find duplicates
+        // Same text in 3+ scenarios → one Background hint (skip per-scenario pass below)
+        const crossScenarioDuplicateTexts = new Set<string>();
+
         for (const [stepText, occurrences] of stepOccurrences.entries()) {
             if (occurrences.length >= 3) {
-                // Same step appears in 3+ places - suggest Background
+                crossScenarioDuplicateTexts.add(stepText);
                 const firstOccurrence = occurrences[0];
                 findings.push({
                     ruleId: this.id,
@@ -54,8 +56,8 @@ export class DuplicateStepsRule implements CoachRule {
                 });
             }
         }
-        
-        // Check for duplicates within same scenario
+
+        // Duplicates within one scenario (only when not already covered above)
         for (const scenario of model.scenarios) {
             const scenarioSteps = new Map<string, GherkinStep[]>();
             
@@ -67,8 +69,7 @@ export class DuplicateStepsRule implements CoachRule {
             }
             
             for (const [stepText, steps] of scenarioSteps.entries()) {
-                if (steps.length > 1) {
-                    // Same exact step appears multiple times in same scenario
+                if (steps.length > 1 && !crossScenarioDuplicateTexts.has(stepText)) {
                     findings.push({
                         ruleId: this.id,
                         message: `Step "${stepText}" is repeated ${steps.length} times in "${scenario.title}". This may be a copy-paste error.`,
