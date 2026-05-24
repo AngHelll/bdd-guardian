@@ -1,0 +1,32 @@
+---
+description: BDD Guardian extension conventions (layers, tests, i18n, matching invariants)
+alwaysApply: true
+---
+
+# BDD Guardian
+
+## Architecture
+
+- `src/core/` — framework-agnostic (index, parsing, matching). No VS Code API here.
+- `src/providers/` — per-framework binding detection and parsing.
+- `src/features/` — VS Code UI (CodeLens, hover, diagnostics, Coach, navigation).
+
+See `docs/ARCHITECTURE.md` for data flow. Do not edit compiled output in `out/`.
+
+## Before finishing a change
+
+- Run `npm test` from the repo root (includes compile + lint).
+- Changes in `src/core/` or matching behavior: add or update Vitest tests under `src/__tests__/`.
+- User-visible strings: update `src/i18n/en.json` and `src/i18n/es.json`.
+
+## Binding matching (invariants)
+
+- Single matching path: regex via `compileBindingRegex` in `src/core/parsing/bindingRegex.ts`.
+- Do not add a resolver fallback that matches literal step text against all bindings unless explicitly requested.
+- Step and pattern whitespace: same normalization (see `docs/BINDING_MATCHING.md`).
+- For matching work, prefer the `@bdd-binding-matcher` skill.
+
+## Providers and Coach
+
+- New framework: follow `docs/PROVIDERS.md` and register in `src/providers/bindings/providerManager.ts`.
+- New Coach rule: mirror `src/features/coach/rules/` and wire in `rules/index.ts` with tests in `coach.test.ts`.
