@@ -17,7 +17,7 @@ Extension manual check: F5 (Extension Development Host), see `CONTRIBUTING.md`.
 
 | Path | Responsibility |
 |------|----------------|
-| `src/core/` | Index, Gherkin/binding parsing, regex compile, resolver, scoring |
+| `src/core/` | Index, Gherkin/binding parsing, regex compile, resolver, scoring, references |
 | `src/providers/bindings/` | Framework-specific providers |
 | `src/features/` | CodeLens, hover, diagnostics, Coach, navigation |
 | `docs/` | Start at `docs/README.md` — architecture, matching, providers, roadmap |

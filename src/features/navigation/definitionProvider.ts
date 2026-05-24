@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { createResolver, ResolverDependencies } from '../../core/matching';
 import { ResolvedKeyword } from '../../core/domain';
+import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
 export class DefinitionProvider implements vscode.DefinitionProvider {
     constructor(private indexManager: IndexManager) {}
@@ -99,12 +100,5 @@ export function createDefinitionProvider(
     
     // Register for multiple selectors to ensure .feature files are handled
     // regardless of whether VS Code recognizes them as 'gherkin' or 'feature'
-    const selectors: vscode.DocumentSelector = [
-        { language: 'gherkin', scheme: 'file' },
-        { language: 'feature', scheme: 'file' },
-        { language: 'cucumber', scheme: 'file' },
-        { pattern: '**/*.feature', scheme: 'file' },
-    ];
-    
-    return vscode.languages.registerDefinitionProvider(selectors, provider);
+    return vscode.languages.registerDefinitionProvider(FEATURE_DOCUMENT_SELECTORS, provider);
 }

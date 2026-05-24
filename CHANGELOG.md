@@ -6,8 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-24
+
+**Highlights:** Find All References (Shift+F12), live index while editing, pattern whitespace matching, docs and Cursor agent setup.
+
 ### Added
 
+- **Find All References (Shift+F12)** on `.feature` steps and binding files — shared `core/references` logic with binding usage CodeLens
 - `docs/BINDING_MATCHING.md` — how step-to-binding regex matching works
 - `docs/README.md` — documentation index and product direction
 - Cursor setup: `AGENTS.md`, `.cursor/rules/bdd-guardian.mdc`, `@bdd-binding-matcher` skill
@@ -21,8 +26,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Binding CodeLens uses indexed bindings per file (works without `bindingFiles` map entries)
 - README, ROADMAP, ARCHITECTURE, and CONTRIBUTING aligned with current behavior
-- Test suite: 144 tests
+- Test suite: 147 tests
 
 ## [0.4.1] - 2025-02-14
 

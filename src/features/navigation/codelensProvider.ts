@@ -11,6 +11,7 @@ import { createResolver, ResolveResult, ResolverDependencies } from '../../core/
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
 import { t } from '../../i18n';
+import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
 interface StepCodeLens extends vscode.CodeLens {
     stepText: string;
@@ -322,14 +323,7 @@ export function createCodeLensProvider(
     const provider = new CodeLensProvider(indexManager);
     
     // Register for multiple selectors to ensure .feature files are handled
-    const selectors: vscode.DocumentSelector = [
-        { language: 'gherkin', scheme: 'file' },
-        { language: 'feature', scheme: 'file' },
-        { language: 'cucumber', scheme: 'file' },
-        { pattern: '**/*.feature', scheme: 'file' },
-    ];
-    
-    const disposable = vscode.languages.registerCodeLensProvider(selectors, provider);
+    const disposable = vscode.languages.registerCodeLensProvider(FEATURE_DOCUMENT_SELECTORS, provider);
     
     return { provider, disposable };
 }

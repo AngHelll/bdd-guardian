@@ -29,6 +29,7 @@ Para visión y enlaces a toda la documentación, ver [docs/README.md](./README.m
 - **Coach v2:** reglas (GWT, duplicate steps, vague then, etc.), Health Score, quick fixes; parser único con `core`; idiomas `feature` y `gherkin`.
 - **i18n:** mensajes UI en inglés/español (`bddGuardian.displayLanguage`).
 - **DX:** `AGENTS.md`, rule/skill Cursor para matching.
+- **Find All References:** Shift+F12 en steps (`.feature`) y bindings (`.cs`, etc.) vía `core/references`.
 
 ---
 
@@ -48,11 +49,6 @@ Para visión y enlaces a toda la documentación, ver [docs/README.md](./README.m
 
 - **Estado:** stubs (`jsCucumberProvider`, `pythonBehaveProvider`, `goGodogProvider`, …); C# Reqnroll y SpecFlow completos.
 - **Orden sugerido:** Cucumber JS → Behave → Godog. Ver [PROVIDERS.md](./PROVIDERS.md).
-
-### Find All References
-
-- Step en `.feature` → otros usos del mismo texto/binding.
-- Binding en `.cs` → exponer como `ReferenceProvider` (Shift+F12) además del CodeLens de usages.
 
 ### Coach: más reglas y quick fixes
 
@@ -86,9 +82,9 @@ Para visión y enlaces a toda la documentación, ver [docs/README.md](./README.m
 | Área | Siguiente paso | Esencia |
 |------|----------------|---------|
 | Frameworks | Cucumber JS provider | Extensión |
-| Navegación | Find All References | Core |
+| Navegación | Peek/rename symbols (futuro) | Core |
 | Matching | Edge cases regex (opcional) | Precisión |
 | Coach | Reglas + quick fixes | Calidad BDD |
 | Productividad | Autocomplete, generate binding | Backlog |
 
-**Recomendación para la siguiente versión:** un provider no-C# (Cucumber JS) **o** Find All References — según audiencia; el matching base y el indexado incremental ya están en producción.
+**Recomendación para la siguiente versión:** provider no-C# (Cucumber JS) o ampliar Coach/quick fixes; matching base, indexado incremental y Find All References ya están en producción.

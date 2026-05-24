@@ -2,8 +2,8 @@
 
 > Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
-[![Version](https://img.shields.io/badge/version-0.4.1-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-144%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![Version](https://img.shields.io/badge/version-0.4.2-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
+[![Tests](https://img.shields.io/badge/tests-147%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
 
@@ -29,7 +29,7 @@ A VS Code extension that provides intelligent navigation, visual feedback, and d
 - **Single architecture** — One indexing and resolution path (IndexManager + binding providers + core resolver); one regex compiler in core.
 - **Unified Gherkin parsing** — Coach and navigation/diagnostics share the same core parser for `.feature` files.
 - **UI language** — Optional English/Spanish via `bddGuardian.displayLanguage`.
-- **144 tests** — Matching, parsing, index, Coach, and Scenario Outline coverage.
+- **147 tests** — Matching, parsing, index, references, Coach, and Scenario Outline coverage.
 
 ### 📊 CodeLens
 See binding status directly above each step:
@@ -73,6 +73,15 @@ Hover over any step for detailed information:
 - Top 3 matching bindings
 - Best match highlighted
 - Link to show all matches
+
+### 🔎 Find All References (Shift+F12)
+
+| From | Shows |
+|------|--------|
+| **Step** in a `.feature` | Other steps with the same text or the same binding match (all indexed features) |
+| **Binding** in `.cs` (etc.) | The binding line + every `.feature` step that resolves to it |
+
+Same resolver and index as CodeLens and Go to Definition — not generated Reqnroll code under `obj/`.
 
 ### 🧭 Navigation History
 Navigate back and forward between steps and bindings:

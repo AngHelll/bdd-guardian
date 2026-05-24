@@ -191,6 +191,15 @@ Same pattern: reads the **current document text**, resolves against indexed bind
 
 Uses `parseFeatureDocument` (core) → `GherkinModel` → rule engine. Subscribes to `onDidChangeTextDocument` for `feature` / `gherkin` / `*.feature` (debounced). Separate diagnostic source: `BDD Coach`.
 
+### Reference Provider (Find All References)
+
+`core/references` implements binding ↔ step lookup. `ReferenceProvider` registers for feature and binding document selectors (Shift+F12).
+
+- **From binding:** `findReferencesForBinding` — all indexed steps that resolve to that attribute line.
+- **From step:** `findReferencesForStep` — same normalized text and/or same binding match across indexed features.
+
+Binding CodeLens reuses the same finder; bindings are listed via `getBindingsForUri(allBindings, uri)`.
+
 ## Data Models
 
 ### FeatureStep

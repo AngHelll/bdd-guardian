@@ -14,6 +14,7 @@ export {
     createDefinitionProvider,
     CodeLensProvider,
     createCodeLensProvider,
+    createReferenceProvider,
     // Phase 2: Navigation History
     NavigationHistoryManager,
     getNavigationHistory,

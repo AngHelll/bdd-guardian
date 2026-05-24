@@ -9,7 +9,12 @@
 import * as vscode from 'vscode';
 import { IndexManager } from '../core/index';
 import { createResolver, ResolverDependencies } from '../core/matching';
-import type { Binding, FeatureStep, ResolvedKeyword, ResolveResult } from '../core/domain/types';
+import {
+    collectAllIndexedSteps,
+    findReferencesForBinding,
+    getBindingsForUri,
+} from '../core/references';
+import type { Binding, FeatureStep, ResolvedKeyword } from '../core/domain/types';
 import { getConfig } from '../config';
 import { t } from '../i18n';
 
@@ -37,23 +42,23 @@ export class BindingCodeLensProvider implements vscode.CodeLensProvider {
         }
 
         const index = this.indexManager.getIndex();
-        const bindingDoc = index.getBindingFileByUri(document.uri);
-        if (!bindingDoc || bindingDoc.bindings.length === 0) {
+        const allBindings = index.getAllBindings();
+        const fileBindings = getBindingsForUri(allBindings, document.uri);
+        if (fileBindings.length === 0) {
             return [];
         }
 
-        const allBindings = index.getAllBindings();
         const deps: ResolverDependencies = {
             getAllBindings: () => allBindings,
             getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
         };
         const resolve = createResolver(deps);
 
-        const allSteps = this.getAllStepsFromIndex(index);
+        const allSteps = collectAllIndexedSteps(index);
         const codeLenses: vscode.CodeLens[] = [];
 
-        for (const binding of bindingDoc.bindings) {
-            const usages = this.findBindingUsages(binding, allSteps, resolve);
+        for (const binding of fileBindings) {
+            const usages = findReferencesForBinding(binding, allSteps, resolve);
             const lens = this.createReferenceLens(binding, usages);
             codeLenses.push(lens);
         }
@@ -63,38 +68,6 @@ export class BindingCodeLensProvider implements vscode.CodeLensProvider {
 
     resolveCodeLens(codeLens: vscode.CodeLens, _token: vscode.CancellationToken): vscode.CodeLens {
         return codeLens;
-    }
-
-    private getAllStepsFromIndex(index: ReturnType<IndexManager['getIndex']>): FeatureStep[] {
-        const steps: FeatureStep[] = [];
-        for (const feature of index.getAllFeatures()) {
-            steps.push(...feature.allSteps);
-        }
-        return steps;
-    }
-
-    private findBindingUsages(
-        binding: Binding,
-        allSteps: FeatureStep[],
-        resolve: (step: FeatureStep) => ResolveResult
-    ): FeatureStep[] {
-        const usages: FeatureStep[] = [];
-        for (const step of allSteps) {
-            const result = resolve(step);
-            const best = result.candidates[0];
-            if (!best) continue;
-            if (this.sameBinding(best.binding, binding)) {
-                usages.push(step);
-            } else if (result.status === 'ambiguous') {
-                const isMatch = result.candidates.some((c) => this.sameBinding(c.binding, binding));
-                if (isMatch) usages.push(step);
-            }
-        }
-        return usages;
-    }
-
-    private sameBinding(a: Binding, b: Binding): boolean {
-        return a.uri.toString() === b.uri.toString() && a.lineNumber === b.lineNumber;
     }
 
     private createReferenceLens(binding: Binding, usages: FeatureStep[]): vscode.CodeLens {

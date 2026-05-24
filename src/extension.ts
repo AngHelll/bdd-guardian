@@ -8,6 +8,7 @@ import { FILE_WATCHER_DEBOUNCE_MS } from './core/domain/constants';
 import { getConfig, invalidateConfigCache } from './config';
 import {
     createDefinitionProvider,
+    createReferenceProvider,
     createCodeLensProvider,
     createHoverProvider,
     DiagnosticsEngine,
@@ -62,6 +63,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     );
 
     context.subscriptions.push(createDefinitionProvider(indexManager));
+    context.subscriptions.push(createReferenceProvider(indexManager));
     context.subscriptions.push(createHoverProvider(indexManager));
     
     const codeLensResult = createCodeLensProvider(indexManager);
