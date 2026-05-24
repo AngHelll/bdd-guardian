@@ -14,8 +14,8 @@ Mejoras y features alineados con la esencia del proyecto: **navegar y validar pa
 ## Prioridad alta (cerrar gaps y pulir)
 
 ### 3. Mejorar manejo de regex complejos ✅ (parcial)
-- **Hecho:** Literal `$`/`^` escapados (sin romper `[^"]`), flag `u`, fallback a match exacto si el patrón no compila. C# verbatim con `""` en el patrón (p. ej. `they click on ""(.*)"" in the menu`) se extrae correctamente. Ver `src/core/parsing/bindingRegex.ts`.
-- **Opcional:** Normalización de espacios en patrón, `countCaptureGroups` para `[...]`.
+- **Hecho:** Literal `$`/`^` escapados (sin romper `[^"]`), flag `u`, fallback a match exacto si el patrón no compila. C# verbatim con `""` en el patrón (p. ej. `they click on ""(.*)"" in the menu`) se extrae correctamente. **Normalización de espacios en patrón:** trim + colapso igual que el step text; reduce falsos "unbound". Ver `src/core/parsing/bindingRegex.ts` y `docs/BINDING_MATCHING.md`.
+- **Opcional:** `countCaptureGroups` que ignore `(` dentro de `[...]`.
 - **Estado (resto):** “Some complex regex patterns may not match correctly” en Known Issues.
 - **Acción:** Revisar casos límite en `bindingRegex.ts` y tests con patrones reales (alternativas `|`, grupos, cuantificadores). Documentar limitaciones o añadir fallback (p. ej. match por texto normalizado si el regex falla).
 - **Beneficio:** Menos pasos “unbound” falsos y más confianza en el matching.

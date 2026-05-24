@@ -77,6 +77,14 @@ describe('compileBindingRegex', () => {
       expect(m).not.toBeNull();
       expect(m![1]).toBe('Projects');
     });
+
+    it('should match normalized step when pattern has multiple spaces (reduces false unbound)', () => {
+      // Step text is normalized (trim + collapse spaces); pattern is normalized the same way
+      const regex = compileBindingRegex('I  have  (\\d+)  apples');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 5 apples')).toBe(true);
+      expect(regex!.test('I have 10 apples')).toBe(true);
+    });
   });
 
   describe('case sensitivity', () => {

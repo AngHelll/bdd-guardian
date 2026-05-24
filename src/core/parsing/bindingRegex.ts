@@ -36,9 +36,21 @@ function compileLiteralPattern(patternRaw: string, caseInsensitive: boolean): Re
 }
 
 /**
+ * Normalize pattern whitespace to align with step text normalization.
+ * Step text is trimmed and has runs of spaces/tabs collapsed to one space;
+ * doing the same for the pattern reduces false "unbound" when the pattern
+ * has multiple spaces but the step was normalized.
+ * Does not alter \s, character classes [...], or escapes.
+ */
+function normalizePatternWhitespace(pattern: string): string {
+    return pattern.trim().replace(/\s+/g, ' ');
+}
+
+/**
  * Compile a binding pattern string into a JavaScript RegExp.
  * Framework-agnostic: the pattern string is produced by each provider (C#, JS, etc.).
  *
+ * - Normalizes pattern whitespace (trim + collapse spaces) to match step normalization.
  * - Ensures full-step match (^...$) so step definitions stay strict.
  * - Escapes $ and ^ when they are literal (e.g. "Cost is $5").
  * - Uses Unicode flag (u) for correct behavior with non-ASCII step text.
@@ -49,8 +61,9 @@ function compileLiteralPattern(patternRaw: string, caseInsensitive: boolean): Re
  * @returns Compiled RegExp or null if invalid and literal fallback also fails
  */
 export function compileBindingRegex(patternRaw: string, caseInsensitive: boolean = false): RegExp | null {
+    const normalized = normalizePatternWhitespace(patternRaw);
     try {
-        let pattern = escapeLiteralAnchors(patternRaw);
+        let pattern = escapeLiteralAnchors(normalized);
 
         if (!pattern.startsWith('^')) {
             pattern = '^' + pattern;
@@ -64,7 +77,7 @@ export function compileBindingRegex(patternRaw: string, caseInsensitive: boolean
     } catch (error) {
         console.warn(`[BDD Guardian] Invalid regex pattern: ${patternRaw}`, error);
         try {
-            return compileLiteralPattern(patternRaw, caseInsensitive);
+            return compileLiteralPattern(normalized, caseInsensitive);
         } catch (fallbackError) {
             return null;
         }
