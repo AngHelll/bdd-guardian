@@ -29,6 +29,24 @@ Thumbs.db
 .env.local
 *.local
 
+# Internal docs (not published)
+docs-internal/
+
+# Maintainer secrets (Marketplace PAT — never commit)
+config/maintainer.local
+
+# Cursor agent config (local workflow)
+.cursor/
+
+# AI assistant guide (local only — see docs-internal/ in maintainer clone)
+AGENTS.md
+
+# .NET (samples/binding-demo — if opened/built with Reqnroll/dotnet)
+**/bin/
+**/obj/
+samples/binding-demo/Features/*.feature.cs
+**/TestResults/
+
 # Temporary files
 tmp/
 temp/

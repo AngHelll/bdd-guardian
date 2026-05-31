@@ -2,7 +2,7 @@
 
 This document provides a detailed overview of the BDD Guardian extension architecture.
 
-**See also:** [docs/README.md](./README.md) (doc index), [BINDING_MATCHING.md](./BINDING_MATCHING.md), [ROADMAP.md](./ROADMAP.md).
+**See also:** [docs/README.md](./README.md) (doc index), [BINDING_MATCHING.md](./BINDING_MATCHING.md), [ROADMAP.md](../ROADMAP.md).
 
 ## High-Level Architecture
 

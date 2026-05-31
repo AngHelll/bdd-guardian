@@ -67,7 +67,15 @@ npm test
 | `npm run lint:fix` | Fix linting issues |
 | `npm test` | Run all tests |
 | `npm run test:watch` | Run tests in watch mode |
-| `npm run package` | Create VSIX package |
+| `npm run package` | Create VSIX package (`bdd-guardian.vsix`) |
+| `npm run verify:local` | Capa A: lint + test + VSIX + Capa B checklist |
+| `npm run publish:check` | Capa C preflight (PAT, version vs Marketplace) |
+| `npm run publish:marketplace` | Publish to VS Code Marketplace (maintainers only) |
+| `npm run guard:secrets` | Fail if `config/maintainer.local` or PAT could reach git |
+
+### Sample workspace
+
+[`samples/binding-demo/`](./samples/binding-demo/) — open as workspace after installing a VSIX to dogfood CodeLens and Go to Definition (Capa B). See `samples/binding-demo/README.md`.
 
 ## Project Architecture
 
@@ -103,7 +111,7 @@ src/
 └── extension.ts             # Extension entry point
 ```
 
-See also [docs/README.md](docs/README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/ROADMAP.md](docs/ROADMAP.md).
+See also [docs/README.md](docs/README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [ROADMAP.md](ROADMAP.md).
 
 ### Key Concepts
 
@@ -198,6 +206,20 @@ describe('MyFeature', () => {
     });
 });
 ```
+
+### Maintainer verification (Capas A–C)
+
+Before a release or Marketplace publish:
+
+```bash
+npm run verify:local          # Capa A: lint, tests, bdd-guardian.vsix
+# Capa B (manual): install VSIX → open samples/binding-demo → CodeLens + F12
+npm run guard:secrets         # before commit/push if using maintainer.local
+npm run publish:check         # Capa C preflight (needs config/maintainer.local)
+npm run publish:marketplace   # only when explicitly publishing
+```
+
+Setup Marketplace PAT: `cp config/maintainer.local.example config/maintainer.local` (gitignored). Never commit tokens.
 
 ## Submitting Changes
 

@@ -6,3 +6,14 @@ node_modules/
 .gitignore
 .editorconfig
 tsconfig.json
+docs-internal/**
+.cursor/**
+config/**
+scripts/**
+samples/**
+.github/**
+vitest.config.mts
+CHANGELOG.md
+ROADMAP.md
+CONTRIBUTING.md
+AGENTS.md

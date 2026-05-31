@@ -175,6 +175,16 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 - Large projects may experience initial indexing delay (status bar shows “Indexing…” while running)
 - Advanced regex in bindings (alternations `|`, lookaheads, complex groups) may not match as in the test runner; prefer simple capture groups and literals where possible ([details](docs/BINDING_MATCHING.md))
 
+## Sample workspace
+
+[`samples/binding-demo/`](./samples/binding-demo/) is a minimal Reqnroll workspace for manual verification: install VSIX → open that folder → CodeLens + Go to Definition on `Features/sample.feature`. For test **execution**, use [BDD Pilot](https://github.com/AngHelll/bdd-pilot) `samples/minimal-bdd`.
+
+Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian.vsix` (Capa A); see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Roadmap
+
+See [ROADMAP.md](./ROADMAP.md). Current release is **v0.4.2**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
+
 ## 📚 Documentation
 
 | Doc | Description |
@@ -183,7 +193,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Extension architecture |
 | [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md) | Step-to-binding matching |
 | [docs/PROVIDERS.md](docs/PROVIDERS.md) | Adding a framework provider |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Done vs planned features |
+| [ROADMAP.md](./ROADMAP.md) | Done vs planned features |
 
 ## 📝 Changelog
 
