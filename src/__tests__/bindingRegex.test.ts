@@ -157,6 +157,48 @@ describe('compileBindingRegex', () => {
       expect(regex!.test('other')).toBe(false);
     });
   });
+
+  describe('Cucumber Expressions (MVP)', () => {
+    it('should compile {int} placeholders and match numeric steps', () => {
+      const regex = compileBindingRegex('I have {int} cucumbers');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 5 cucumbers')).toBe(true);
+      expect(regex!.test('I have -2 cucumbers')).toBe(true);
+      expect(regex!.test('I have five cucumbers')).toBe(false);
+    });
+
+    it('should compile {word} placeholders and match non-whitespace tokens', () => {
+      const regex = compileBindingRegex('state is {word}');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('state is CA')).toBe(true);
+      expect(regex!.test('state is new_york')).toBe(true);
+      expect(regex!.test('state is New York')).toBe(false);
+    });
+
+    it('should compile {string} placeholders and match quoted strings', () => {
+      const regex = compileBindingRegex('I search for {string}');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I search for "milk"')).toBe(true);
+      expect(regex!.test("I search for 'milk'")).toBe(true);
+      expect(regex!.test('I search for milk')).toBe(false);
+    });
+
+    it('should not mis-detect regex quantifiers as Cucumber Expressions', () => {
+      const regex = compileBindingRegex('I have \\d{2} items');
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 12 items')).toBe(true);
+      expect(regex!.test('I have 1 items')).toBe(false);
+    });
+
+    it('should allow ExpressionType override to force regex path', () => {
+      const regex = compileBindingRegex('I have {int} cucumbers', { expressionType: 'regex' });
+      expect(regex).not.toBeNull();
+      // As regex, { and } are treated literally (escaped by the compiler only on fallback),
+      // so this should not match a numeric step.
+      expect(regex!.test('I have 5 cucumbers')).toBe(false);
+      expect(regex!.test('I have {int} cucumbers')).toBe(true);
+    });
+  });
 });
 
 describe('isPatternAnchored', () => {

@@ -86,6 +86,26 @@ describe('CSharpSpecflowProvider', () => {
         expect(bindings.every((b) => b.className === 'LoginSteps')).toBe(true);
     });
 
+    it('parses [StepDefinition] as Given/When/Then bindings (Wave A)', () => {
+        const text = `
+using Reqnroll;
+
+[Binding]
+public class Steps
+{
+    [StepDefinition("I have {int} cucumbers", ExpressionType = ExpressionType.CucumberExpression)]
+    public void AnyKeyword(int n) {}
+}
+`;
+        const bindings = parseCSharpBindingsFromText(text, Uri.file('/test/Steps.cs') as any);
+        const keywords = bindings.map((b) => b.keyword).sort();
+        expect(keywords).toEqual(['Given', 'Then', 'When']);
+
+        for (const b of bindings) {
+            expect(b.regex.test('I have 5 cucumbers')).toBe(true);
+        }
+    });
+
     it('returns confidence 0 when Reqnroll PackageReference is in csproj (T-T03)', async () => {
         const csprojUri = vscode.Uri.file('/workspace/App/App.csproj');
         const stepsUri = vscode.Uri.file('/workspace/StepDefinitions/SampleSteps.cs');

@@ -30,6 +30,15 @@ Filter by tag `@v050` in the feature file, or jump to the scenarios at the botto
 | `@v050 @ambiguity` | Overlapping Then patterns | CodeLens **⚠️ ambiguous** on `Then the result should be 15…` (two bindings: `(.*)` and `\d+`). Not a silent ✅ bound. |
 | `@v050 @outline-examples` | Deposit logged from Examples | CodeLens **✅ bound** → `LoggedAmountSteps.ThenLoggedAmount` even though `Examples` comes **after** the steps (plain `Scenario`, not `Scenario Outline`). |
 
+## Capa B — v0.6.0 Wave A (Cucumber Expressions) extras
+
+Filter by tag `@v060` in the feature file, or jump to the scenarios at the bottom.
+
+| Tag | Scenario | Expected in Guardian |
+|-----|----------|----------------------|
+| `@v060 @cucumber-expressions` | Cucumber Expressions bindings resolve | CodeLens **✅ bound** on `{int}` / `{string}` bindings (no false unbound). |
+| `@v060 @stepdefinition` | StepDefinition binds any keyword | CodeLens **✅ bound** on Given/When/Then all pointing to the same `AnyKeyword` method. |
+
 ### Optional settings
 
 | Setting | Try |

@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-05-31
+
+**Highlights:** Wave A precision foundation — Cucumber Expressions (`{int}`, `{string}`, …) + `[StepDefinition]` support for Reqnroll and future Cucumber JS.
+
+### Added
+
+- **Cucumber Expressions compiler (MVP)** — compile `{int}`, `{float|double}`, `{word}`, `{string}` to strict full-line regex
+- **`[StepDefinition]` support** — indexes StepDefinition bindings as Given/When/Then (Reqnroll)
+- **`ExpressionType = ...` override** — forces CucumberExpression vs RegularExpression compile path when present
+- `samples/binding-demo` scenarios `@v060` to dogfood Cucumber Expressions + StepDefinition
+
+### Changed
+
+- Binding attribute regex now supports `StepDefinition` and ignores extra args after the first string literal
+- Binding identity includes keyword (prevents StepDefinition dedupe collisions)
+- Test suite expanded (Wave A coverage)
+
 ## [0.5.1] - 2026-05-31
 
 **Highlights:** Matching patch — 0 skipped tests, CodeLens resolve from disk when `.feature` tab is closed, SpecFlow detect regression tests.

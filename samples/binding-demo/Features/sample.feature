@@ -64,3 +64,19 @@ Feature: Calculator Operations
       | 100    |
       | 250    |
       | 999    |
+
+  # --- v0.6.0 Wave A (Cucumber Expressions) ---
+
+  @v060 @cucumber-expressions
+  Scenario: Cucumber Expressions bindings resolve
+    # Expect: CodeLens ✅ bound (Cucumber Expressions → regex)
+    Given I have 5 cucumbers
+    When I search for "milk"
+    Then I should see "milk" in results
+
+  @v060 @stepdefinition
+  Scenario: StepDefinition binds any keyword
+    # Expect: CodeLens ✅ bound to the same method for Given/When/Then
+    Given I do a generic step
+    When I do a generic step
+    Then I do a generic step

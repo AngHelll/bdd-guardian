@@ -66,8 +66,19 @@ export const EXAMPLES_REGEX = /^\s*Examples:\s*(.*)$/i;
 /** Matches table row: | cell1 | cell2 | */
 export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;
 
-/** Matches C# binding attributes: [Given(@"pattern")], [When("pattern")], etc. Inner string allows "" (verbatim literal quote). */
-export const BINDING_ATTRIBUTE_REGEX = /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)\]/g;
+/**
+ * Matches C# binding attributes (Reqnroll/SpecFlow):
+ * - [Given(@"pattern")], [When("pattern")], [Then("pattern")]
+ * - [StepDefinition("pattern")] (Reqnroll)
+ *
+ * Captures:
+ * 1) attribute name (Given|When|Then|StepDefinition)
+ * 2) first string literal argument (verbatim @"..." or regular "...")
+ *
+ * Note: we intentionally allow extra args after the first string (e.g. ExpressionType=...).
+ */
+export const BINDING_ATTRIBUTE_REGEX =
+    /\[(Given|When|Then|StepDefinition)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*(?:,[^\]]*)?\)\s*\]/g;
 
 /** Matches C# class declaration */
 export const CLASS_DECLARATION_REGEX = /(?:public|internal|private)?\s*(?:partial\s+)?class\s+(\w+)/g;

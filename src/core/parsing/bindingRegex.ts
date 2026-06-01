@@ -4,6 +4,8 @@
  * Keeps full-step matching (^...$) so step definitions remain strict; no relaxation of BDD practices.
  */
 
+import { compileCucumberExpressionToRegex, looksLikeCucumberExpression } from './cucumberExpression';
+
 /** Regex special characters to escape when using pattern as literal fallback */
 const LITERAL_ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 
@@ -60,7 +62,37 @@ function normalizePatternWhitespace(pattern: string): string {
  * @param caseInsensitive Whether to compile with case insensitivity
  * @returns Compiled RegExp or null if invalid and literal fallback also fails
  */
-export function compileBindingRegex(patternRaw: string, caseInsensitive: boolean = false): RegExp | null {
+export type BindingExpressionType = 'auto' | 'regex' | 'cucumber';
+
+export interface CompileBindingRegexOptions {
+    caseInsensitive?: boolean;
+    expressionType?: BindingExpressionType;
+}
+
+export function compileBindingRegex(
+    patternRaw: string,
+    caseInsensitiveOrOptions: boolean | CompileBindingRegexOptions = false
+): RegExp | null {
+    const options: CompileBindingRegexOptions =
+        typeof caseInsensitiveOrOptions === 'boolean'
+            ? { caseInsensitive: caseInsensitiveOrOptions }
+            : caseInsensitiveOrOptions ?? {};
+
+    const caseInsensitive = options.caseInsensitive ?? false;
+    const expressionType = options.expressionType ?? 'auto';
+
+    if (expressionType === 'cucumber' || (expressionType === 'auto' && looksLikeCucumberExpression(patternRaw))) {
+        try {
+            const re = compileCucumberExpressionToRegex(normalizePatternWhitespace(patternRaw), caseInsensitive);
+            if (re) {
+                return re;
+            }
+            // If CE compilation fails, fall back to regex compilation path below.
+        } catch {
+            // fall through
+        }
+    }
+
     const normalized = normalizePatternWhitespace(patternRaw);
     try {
         let pattern = escapeLiteralAnchors(normalized);

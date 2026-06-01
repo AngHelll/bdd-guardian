@@ -10,7 +10,7 @@ import {
     CLASS_DECLARATION_REGEX,
     METHOD_DECLARATION_REGEX,
 } from '../domain/constants';
-import { compileBindingRegex } from './bindingRegex';
+import { compileBindingRegex, type BindingExpressionType } from './bindingRegex';
 
 export interface CSharpBindingParseOptions {
     caseInsensitive?: boolean;
@@ -32,9 +32,10 @@ export function parseCSharpBindingsFromText(
     const attributeRegex = new RegExp(BINDING_ATTRIBUTE_REGEX.source, 'g');
 
     while ((match = attributeRegex.exec(text)) !== null) {
-        const keyword = match[1] as ResolvedKeyword;
+        const attrName = match[1];
         const patternWithQuotes = match[2];
         const patternRaw = extractCSharpPatternString(patternWithQuotes);
+        const fullAttributeText = match[0];
 
         const beforeMatch = text.substring(0, match.index);
         const lineNumber = beforeMatch.split('\n').length - 1;
@@ -45,22 +46,32 @@ export function parseCSharpBindingsFromText(
         const methodMatch = methodRegex.exec(afterAttribute);
         const methodName = methodMatch ? methodMatch[1] : 'Unknown';
 
-        const compiledRegex = compileBindingRegex(patternRaw, options.caseInsensitive ?? false);
-        if (!compiledRegex) {
-            continue;
-        }
+        const expressionType = inferExpressionTypeOverride(fullAttributeText);
 
-        bindings.push({
-            keyword,
-            patternRaw,
-            regex: compiledRegex,
-            className,
-            methodName,
-            uri,
-            range: new vscode.Range(lineNumber, 0, lineNumber, lines[lineNumber]?.length ?? 0),
-            lineNumber,
-            signature: `${className}.${methodName}`,
-        });
+        const keywords: ResolvedKeyword[] =
+            attrName === 'StepDefinition' ? ['Given', 'When', 'Then'] : [attrName as ResolvedKeyword];
+
+        for (const keyword of keywords) {
+            const compiledRegex = compileBindingRegex(patternRaw, {
+                caseInsensitive: options.caseInsensitive ?? false,
+                expressionType,
+            });
+            if (!compiledRegex) {
+                continue;
+            }
+
+            bindings.push({
+                keyword,
+                patternRaw,
+                regex: compiledRegex,
+                className,
+                methodName,
+                uri,
+                range: new vscode.Range(lineNumber, 0, lineNumber, lines[lineNumber]?.length ?? 0),
+                lineNumber,
+                signature: `${className}.${methodName}`,
+            });
+        }
     }
 
     return bindings;
@@ -118,4 +129,15 @@ function findEnclosingClassName(
         }
     }
     return className;
+}
+
+function inferExpressionTypeOverride(attributeText: string): BindingExpressionType {
+    // Reqnroll supports ExpressionType = ExpressionType.CucumberExpression / RegularExpression.
+    if (/ExpressionType\s*=\s*ExpressionType\.CucumberExpression/.test(attributeText)) {
+        return 'cucumber';
+    }
+    if (/ExpressionType\s*=\s*ExpressionType\.RegularExpression/.test(attributeText)) {
+        return 'regex';
+    }
+    return 'auto';
 }

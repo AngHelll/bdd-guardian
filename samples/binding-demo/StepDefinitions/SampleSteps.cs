@@ -109,4 +109,34 @@ namespace Calculator.Steps
             // Complex quote handling
         }
     }
+
+    [Binding]
+    public class CucumberExpressionSteps
+    {
+        // Wave A: Cucumber Expressions (Reqnroll-style). Guardian compiles {int}/{string} to regex.
+        [Given("I have {int} cucumbers", ExpressionType = ExpressionType.CucumberExpression)]
+        public void GivenIHaveCucumbers(int count)
+        {
+        }
+
+        [When("I search for {string}", ExpressionType = ExpressionType.CucumberExpression)]
+        public void WhenISearchFor(string query)
+        {
+        }
+
+        [Then("I should see {string} in results", ExpressionType = ExpressionType.CucumberExpression)]
+        public void ThenIShouldSeeInResults(string expected)
+        {
+        }
+    }
+
+    [Binding]
+    public class StepDefinitionSteps
+    {
+        // Wave A: StepDefinition should bind Given/When/Then.
+        [StepDefinition("I do a generic step", ExpressionType = ExpressionType.CucumberExpression)]
+        public void AnyKeyword()
+        {
+        }
+    }
 }
