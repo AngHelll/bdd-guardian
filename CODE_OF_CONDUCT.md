@@ -42,8 +42,7 @@ an individual is officially representing the community in public spaces.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-**angel.jimenez@gbm.com**.
+reported to the maintainer (**AngHelll**) via [GitHub Issues](https://github.com/AngHelll/bdd-guardian/issues) (for CoC matters, use *Report content* or contact through your preferred GitHub channel).
 
 All complaints will be reviewed and investigated promptly and fairly.
 

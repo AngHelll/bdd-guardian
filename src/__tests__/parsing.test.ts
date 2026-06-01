@@ -69,7 +69,7 @@ describe('Gherkin Parsing', () => {
             expect(matches[1][1]).toBe('years');
         });
         
-        it('should detect all GBM PPR placeholders', () => {
+        it('should detect all multi-placeholder step text', () => {
             const text = 'I request portfolio projection for <portfolioType> with investment time <years> years, first deposit <firstDeposit>, and monthly deposit <monthlyDeposit>';
             const matches = [...text.matchAll(placeholderRegex)];
             
@@ -106,7 +106,7 @@ describe('Gherkin Parsing', () => {
             expect(result.rows[1]).toEqual(['USD', 'one_week']);
         });
         
-        it('should parse PPR projection Examples', () => {
+        it('should parse portfolio projection Examples table', () => {
             const tableLines = [
                 '| portfolioType | years | firstDeposit | monthlyDeposit |',
                 '| debt          | 5     | 1000         | 1000           |',
@@ -253,7 +253,7 @@ describe('C# verbatim attribute extraction', () => {
 });
 
 describe('Pattern Compilation', () => {
-    describe('GBM-style patterns', () => {
+    describe('matching corpus patterns', () => {
         it('should compile salary update pattern', () => {
             const pattern = 'I update the gross monthly income to (\\d+) with change date (.+)';
             const regex = compileBindingRegex(pattern);

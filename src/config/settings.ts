@@ -112,7 +112,7 @@ export function filterStepsByTags(steps: readonly FeatureStep[], filterConfig?: 
  */
 export function createConfigChangeListener(callback: () => void): vscode.Disposable {
     return vscode.workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('reqnrollNavigator')) {
+        if (e.affectsConfiguration('reqnrollNavigator') || e.affectsConfiguration('bddGuardian.matching')) {
             invalidateConfigCache();
             callback();
         }

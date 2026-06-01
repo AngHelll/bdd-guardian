@@ -78,6 +78,21 @@ namespace Calculator.Steps
     }
 
     [Binding]
+    public class LoggedAmountSteps
+    {
+        // v0.5.0: outline with Examples after steps on plain Scenario
+        [When(@"I record a deposit of (\d+) dollars")]
+        public void WhenIRecordDeposit(int amount)
+        {
+        }
+
+        [Then(@"the logged amount should be (\d+)")]
+        public void ThenLoggedAmount(int amount)
+        {
+        }
+    }
+
+    [Binding]
     public class VerbatimSteps
     {
         // Verbatim string with double quotes inside

@@ -17,6 +17,7 @@ import {
     IndexChangeEvent,
     IndexChangeType,
 } from '../domain/types';
+import { getBindingIdentity } from '../matching/bindingIdentity';
 
 /** Provider ID type (imported from providers module to avoid circular deps) */
 export type ProviderId = string;
@@ -229,8 +230,16 @@ export class WorkspaceIndex {
         if (!this.bindingsByProvider.has(providerId)) {
             this.bindingsByProvider.set(providerId, []);
         }
+
+        const existingKeys = new Set(this.allBindings.map(getBindingIdentity));
         
         for (const binding of bindings) {
+            const key = getBindingIdentity(binding);
+            if (existingKeys.has(key)) {
+                continue;
+            }
+            existingKeys.add(key);
+
             this.allBindings.push(binding);
             
             const keywordBindings = this.bindingsByKeyword.get(binding.keyword);

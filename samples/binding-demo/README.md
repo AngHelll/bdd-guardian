@@ -1,25 +1,49 @@
 # binding-demo — Capa B dogfood workspace
 
-Minimal workspace for manual verification of BDD Guardian (Capa B checklist).
+Minimal Reqnroll workspace for manual verification of BDD Guardian (Capa B checklist).
 
 ## Contents
 
-- `Features/sample.feature` — calculator scenarios (outline, quotes, whitespace)
-- `StepDefinitions/SampleSteps.cs` — Reqnroll C# bindings
+| Path | Purpose |
+|------|---------|
+| `Features/sample.feature` | Calculator + **v0.5.0** alignment scenarios |
+| `StepDefinitions/SampleSteps.cs` | Reqnroll bindings (shared C# model as SpecFlow) |
 
-Copied from `src/__tests__/fixtures/` — keep in sync when fixtures change materially.
+Navigation-only sample (no `.csproj` required for Guardian indexing).
 
-## Capa B steps
+## Capa B — baseline (always)
 
-1. Install `bdd-guardian.vsix` (Install from VSIX…)
-2. **File → Open Folder…** → this directory (`samples/binding-demo`)
+1. Install `bdd-guardian.vsix` (Extensions → … → Install from VSIX…)
+2. **File → Open Folder…** → this directory
 3. Wait for status bar **Ready**
 4. Open `Features/sample.feature`
 5. Verify:
-   - CodeLens shows bound class/method above steps
-   - **Go to Definition** (F12) on a step opens `SampleSteps.cs`
-   - Optional: enable Coach (`bddGuardian.coach.enabled`) and check Problems panel
+   - CodeLens shows bound class/method above `@P0` outline steps
+   - **Go to Definition** (F12) on `Given the calculator is initialized` → `SampleSteps.cs`
+
+## Capa B — v0.5.0 extras
+
+Filter by tag `@v050` in the feature file, or jump to the scenarios at the bottom.
+
+| Tag | Scenario | Expected in Guardian |
+|-----|----------|----------------------|
+| `@v050 @ambiguity` | Overlapping Then patterns | CodeLens **⚠️ ambiguous** on `Then the result should be 15…` (two bindings: `(.*)` and `\d+`). Not a silent ✅ bound. |
+| `@v050 @outline-examples` | Deposit logged from Examples | CodeLens **✅ bound** → `LoggedAmountSteps.ThenLoggedAmount` even though `Examples` comes **after** the steps (plain `Scenario`, not `Scenario Outline`). |
+
+### Optional settings
+
+| Setting | Try |
+|---------|-----|
+| `bddGuardian.matching.preferSpecificBinding` | Set `true` → `@v050 @ambiguity` may show ✅ bound (legacy score winner). Default `false` = Reqnroll-like ambiguous. |
+
+### Contrast scenarios (existing)
+
+- **Scenario Outline** `@P0` — outline with multiple Examples tables (baseline)
+- **Division** `@P1` — quoted strings + `Then the result should be 25` (also ambiguous on result step)
+- **Whitespace** `@P2` — normalization
 
 ## With BDD Pilot
 
-Open [bdd-pilot](https://github.com/AngHelll/bdd-pilot) `samples/minimal-bdd` for test **execution**; this sample is for **navigation/bindings** only.
+Guardian navigates; Pilot runs tests. Flow: fix bindings here → run [bdd-pilot](https://github.com/AngHelll/bdd-pilot) `samples/minimal-bdd` → if `PENDING_STEPS` / `AMBIGUOUS_STEPS`, return here.
+
+**C# bindings:** Reqnroll and SpecFlow share the same attribute model; this sample uses Reqnroll. SpecFlow-only repos get the same Guardian experience (v0.5.0+).

@@ -4,9 +4,10 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
+import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getConfig, shouldShowStep } from '../../config';
-import { ResolvedKeyword, FeatureStep, MatchStatus } from '../../core/domain';
+import { ResolvedKeyword } from '../../core/domain';
 import { t } from '../../i18n';
 
 export interface DiagnosticsResult {
@@ -61,71 +62,28 @@ export class DiagnosticsEngine {
             getAllBindings: () => allBindings,
             getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
         };
-        const resolve = createResolver(deps);
+        const resolve = createResolver(applyMatchingSettings(deps));
         
+        const parsed = parseFeatureDocument(document);
+        const steps = parsed?.allSteps ?? [];
+
         const diagnostics: vscode.Diagnostic[] = [];
         let unbound = 0;
         let ambiguous = 0;
         let bound = 0;
         
-        const lines = document.getText().split('\n');
-        let currentTags: string[] = [];
-        let prevResolvedKeyword: ResolvedKeyword = 'Given';
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            
-            // Track tags
-            const tagMatch = line.match(/^\s*(@\S+(?:\s+@\S+)*)\s*$/);
-            if (tagMatch) {
-                currentTags = tagMatch[1].split(/\s+/).filter(t => t.startsWith('@'));
+        for (const step of steps) {
+            if (config.tagFilter.length > 0 && !shouldShowStep(step.tagsEffective)) {
                 continue;
             }
-            
-            // Reset tags on scenario/feature line
-            if (/^\s*(Feature|Scenario|Scenario Outline|Background):/i.test(line)) {
-                currentTags = [];
-                prevResolvedKeyword = 'Given';
-                continue;
-            }
-            
-            // Check for step
-            const stepMatch = line.match(/^\s*(Given|When|Then|And|But)\s+(.+)$/i);
-            if (!stepMatch) continue;
-            
-            // Apply tag filter
-            if (config.tagFilter.length > 0) {
-                if (!shouldShowStep(currentTags)) {
-                    continue;
-                }
-            }
-            
-            const keyword = stepMatch[1];
-            const text = stepMatch[2].trim();
-            const resolvedKeyword = this.resolveKeyword(keyword, prevResolvedKeyword);
-            prevResolvedKeyword = resolvedKeyword;
-            
-            const step = {
-                keywordOriginal: keyword as any,
-                keywordResolved: resolvedKeyword,
-                rawText: text,
-                normalizedText: text.replace(/\s+/g, ' ').trim(),
-                fullText: line.trim(),
-                tagsEffective: currentTags,
-                uri: document.uri,
-                range: new vscode.Range(i, 0, i, line.length),
-                lineNumber: i,
-                isOutline: false,
-                candidateTexts: [text],
-            };
-            
-            const result = resolve(step as any);
+
+            const result = resolve(step);
             
             if (result.status === 'unbound') {
                 unbound++;
                 diagnostics.push(new vscode.Diagnostic(
                     step.range,
-                    t('diagnosticUnboundStep', text),
+                    t('diagnosticUnboundStep', step.rawText),
                     vscode.DiagnosticSeverity.Warning
                 ));
             } else if (result.status === 'ambiguous') {
@@ -159,17 +117,6 @@ export class DiagnosticsEngine {
      */
     public clearAll(): void {
         this.diagnosticCollection.clear();
-    }
-    
-    /**
-     * Resolve And/But to actual keyword.
-     */
-    private resolveKeyword(keyword: string, previous: ResolvedKeyword): ResolvedKeyword {
-        const lower = keyword.toLowerCase();
-        if (lower === 'given') return 'Given';
-        if (lower === 'when') return 'When';
-        if (lower === 'then') return 'Then';
-        return previous;
     }
     
     dispose(): void {

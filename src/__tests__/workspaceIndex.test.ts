@@ -46,4 +46,13 @@ describe('WorkspaceIndex', () => {
 
         expect(index.getAllBindings()).toHaveLength(1);
     });
+
+    it('skips duplicate bindings when two providers index the same file', () => {
+        const b1 = makeBinding(fileUri, 10, 'StepOne');
+
+        index.addBindings([b1], 'csharp-reqnroll');
+        index.addBindings([b1], 'csharp-specflow');
+
+        expect(index.getAllBindings()).toHaveLength(1);
+    });
 });

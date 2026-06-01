@@ -126,8 +126,8 @@ describe('Scoring Consistency', () => {
         });
     });
     
-    describe('GBM-style pattern scoring', () => {
-        it('should correctly score PPR projection patterns', () => {
+    describe('matching corpus pattern scoring', () => {
+        it('should correctly score portfolio projection patterns', () => {
             const specificPattern = 'I request portfolio projection for (debt|balance|growth) with investment time (\\d+) years, first deposit (\\d+), and monthly deposit (\\d+)';
             const genericPattern = 'I request portfolio projection for (.+)';
             const stepText = 'I request portfolio projection for debt with investment time 5 years, first deposit 1000, and monthly deposit 1000';

@@ -11,7 +11,8 @@ import { Uri, Range } from './mocks/vscode';
 function createBinding(
   keyword: ResolvedKeyword,
   pattern: string,
-  methodName: string = 'TestMethod'
+  methodName: string = 'TestMethod',
+  lineNumber: number = 0
 ): Binding {
   return {
     keyword,
@@ -20,8 +21,8 @@ function createBinding(
     className: 'TestSteps',
     methodName,
     uri: Uri.file('/test/steps.cs') as any,
-    range: new Range(0, 0, 0, 0) as any,
-    lineNumber: 0,
+    range: new Range(lineNumber, 0, lineNumber, 0) as any,
+    lineNumber,
     signature: `TestSteps.${methodName}`,
   };
 }
@@ -90,34 +91,69 @@ describe('createResolver', () => {
   });
 
   describe('scoring and specificity', () => {
-    it('should rank more specific pattern (\\d+) higher than greedy (.*)', () => {
+    it('should rank more specific pattern (\\d+) higher than greedy (.*) when preferSpecificBinding', () => {
+      const step = createStep('Given', 'I have entered 100 into the calculator');
+      const result = resolve(step, { preferSpecificBinding: true });
+      
+      expect(result.candidates.length).toBeGreaterThan(1);
+      expect(result.status).toBe('bound');
+      expect(result.candidates[0].binding.methodName).toBe('GivenNumeric');
+    });
+
+    it('should mark overlapping patterns as ambiguous by default (Reqnroll-like)', () => {
       const step = createStep('Given', 'I have entered 100 into the calculator');
       const result = resolve(step);
       
-      // Both should match, but \\d+ should score higher
       expect(result.candidates.length).toBeGreaterThan(1);
-      
-      // First candidate should be the more specific one
-      const firstCandidate = result.candidates[0];
-      expect(firstCandidate.binding.methodName).toBe('GivenNumeric');
+      expect(result.status).toBe('ambiguous');
     });
 
-    it('should deterministically select the most specific binding', () => {
+    it('should dedupe identical bindings indexed twice (Reqnroll + SpecFlow)', () => {
+      bindings.push(
+        createBinding('Then', 'the result should be (\\d+) on the screen', 'ThenNumeric', 0)
+      );
+
+      const step = createStep('Then', 'the result should be 15 on the screen');
+      const result = resolve(step);
+
+      expect(result.status).toBe('ambiguous');
+      expect(result.candidates).toHaveLength(2);
+      expect(result.candidates.map((c) => c.binding.methodName).sort()).toEqual([
+        'ThenAny',
+        'ThenNumeric',
+      ]);
+    });
+
+    it('should deterministically select the most specific binding when preferSpecificBinding', () => {
       const step = createStep('Then', 'the result should be 120 on the screen');
+      const result = resolve(step, { preferSpecificBinding: true });
+      
+      expect(result.candidates.length).toBeGreaterThan(1);
+      expect(result.status).toBe('bound');
+      expect(result.candidates[0].binding.methodName).toBe('ThenNumeric');
+    });
+  });
+
+  describe('ambiguity detection', () => {
+    it('should return multiple candidates for ambiguous patterns', () => {
+      const step = createStep('Given', 'I have entered 50 into the calculator');
       const result = resolve(step);
       
-      // Should have multiple matches
       expect(result.candidates.length).toBeGreaterThan(1);
+      expect(result.status).toBe('ambiguous');
+    });
+
+    it('should mark result as ambiguous when multiple patterns match (default)', () => {
+      const step = createStep('Then', 'the result should be 100 on the screen');
+      const result = resolve(step);
       
-      // Most specific (\\d+) should be first
-      expect(result.candidates[0].binding.methodName).toBe('ThenNumeric');
+      expect(result.candidates.length).toBeGreaterThan(1);
+      expect(result.status).toBe('ambiguous');
     });
   });
 
   describe('keyword inheritance (And/But)', () => {
     it('should match And step using Given bindings when context is Given', () => {
-      // And/But inherit from previous keyword
-      // For testing, we treat And as Given
       const step = createStep('Given', 'the calculator is initialized', 'And');
       const result = resolve(step);
       
@@ -131,24 +167,6 @@ describe('createResolver', () => {
       
       expect(result.candidates.length).toBe(1);
       expect(result.candidates[0].binding.keyword).toBe('Then');
-    });
-  });
-
-  describe('ambiguity detection', () => {
-    it('should return multiple candidates for ambiguous patterns', () => {
-      const step = createStep('Given', 'I have entered 50 into the calculator');
-      const result = resolve(step);
-      
-      // Both \d+ and .* patterns should match
-      expect(result.candidates.length).toBeGreaterThan(1);
-    });
-
-    it('should mark result as ambiguous when multiple good matches exist', () => {
-      const step = createStep('Then', 'the result should be 100 on the screen');
-      const result = resolve(step);
-      
-      // Multiple patterns match numeric value
-      expect(result.candidates.length).toBeGreaterThan(1);
     });
   });
 

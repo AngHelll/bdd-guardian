@@ -1,6 +1,6 @@
 using Reqnroll;
 
-namespace Gbm.Service.Automation.Steps
+namespace BddGuardian.TestFixtures.Steps
 {
     [Binding]
     public class CommonSteps
@@ -11,8 +11,8 @@ namespace Gbm.Service.Automation.Steps
             // Token setup
         }
 
-        [Given(@"I have PPR questionnaire configuration")]
-        public void GivenIHavePprQuestionnaireConfiguration()
+        [Given(@"I have questionnaire configuration")]
+        public void GivenIHaveQuestionnaireConfiguration()
         {
             // Configuration setup
         }
@@ -21,10 +21,10 @@ namespace Gbm.Service.Automation.Steps
     [Binding]
     public class SalaryUpdateSteps
     {
-        [Given(@"Generate EP token for salary update workflow")]
-        public void GivenGenerateEpTokenForSalaryUpdateWorkflow()
+        [Given(@"Generate token for salary update workflow")]
+        public void GivenGenerateTokenForSalaryUpdateWorkflow()
         {
-            // Generate EP token
+            // Generate token
         }
 
         [When(@"I update the gross monthly income to (\d+) with change date (.+)")]
@@ -49,10 +49,10 @@ namespace Gbm.Service.Automation.Steps
     [Binding]
     public class PortfolioProjectionSteps
     {
-        [Given(@"Generate EP token for portfolio projection workflow")]
-        public void GivenGenerateEpTokenForPortfolioProjection()
+        [Given(@"Generate token for portfolio projection workflow")]
+        public void GivenGenerateTokenForPortfolioProjection()
         {
-            // Generate EP token
+            // Generate token
         }
 
         [When(@"I request portfolio projection for (debt|balance|growth|settlement|preservation|appreciation|equities) with investment time (\d+) years, first deposit (\d+), and monthly deposit (\d+)")]
@@ -89,7 +89,6 @@ namespace Gbm.Service.Automation.Steps
             // Verify success
         }
 
-        // This is the tricky pattern - matches free-form text after "crypto variation"
         [When(@"I attempt to retrieve crypto variation (.+)")]
         public void WhenIAttemptToRetrieveCryptoVariation(string scenario)
         {
@@ -102,7 +101,6 @@ namespace Gbm.Service.Automation.Steps
             // Verify error
         }
 
-        // More specific pattern - could cause ambiguity with the (.+) pattern
         [When(@"I attempt to retrieve crypto variation for currency ""([^""]+)"" and invalid time period ""([^""]+)""")]
         public void WhenIAttemptToRetrieveCryptoVariationWithInvalidTimePeriod(string currency, string invalidPeriod)
         {

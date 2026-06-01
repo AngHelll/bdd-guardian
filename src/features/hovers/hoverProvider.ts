@@ -12,7 +12,7 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
 import { ResolvedKeyword, Binding, MatchCandidate } from '../../core/domain';
 import { 
     StepStatus, 
@@ -23,9 +23,7 @@ import {
     sortCandidatesByScore 
 } from '../../ui/stepStatus';
 import { t } from '../../i18n';
-
-// Placeholder regex for Scenario Outline detection
-const PLACEHOLDER_REGEX = /<([^>]+)>/g;
+import { getStepAtPosition } from '../../core/references/stepContext';
 
 // Cache for code previews
 const codePreviewCache = new Map<string, { code: string; timestamp: number }>();
@@ -56,43 +54,25 @@ export class HoverProvider implements vscode.HoverProvider {
             return null;
         }
         
-        const keyword = stepMatch[1];
-        const text = stepMatch[2].trim();
-        
         const index = this.indexManager.getIndex();
         const allBindings = index.getAllBindings();
         
         if (allBindings.length === 0) {
             return this.createIndexingHover(position, line);
         }
-        
-        // Get Examples context for Scenario Outlines
-        const examples = this.getExamplesForPosition(document, position.line);
-        const candidateTexts = this.generateCandidateTexts(text, examples);
+
+        const step = getStepAtPosition(document, position);
+        if (!step) {
+            return null;
+        }
         
         const deps: ResolverDependencies = {
             getAllBindings: () => allBindings,
             getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
         };
-        const resolve = createResolver(deps);
+        const resolve = createResolver(applyMatchingSettings(deps));
         
-        const resolvedKeyword = this.resolveKeywordWithContext(document, position.line, keyword);
-        
-        const step = {
-            keywordOriginal: keyword as any,
-            keywordResolved: resolvedKeyword,
-            rawText: text,
-            normalizedText: text.replace(/\s+/g, ' ').trim(),
-            fullText: line.trim(),
-            tagsEffective: [],
-            uri: document.uri,
-            range: new vscode.Range(position.line, 0, position.line, line.length),
-            lineNumber: position.line,
-            isOutline: examples.length > 0,
-            candidateTexts: candidateTexts,
-        };
-        
-        const result = resolve(step as any);
+        const result = resolve(step);
         
         // Build hover content
         const contents = new vscode.MarkdownString();
@@ -117,11 +97,11 @@ export class HoverProvider implements vscode.HoverProvider {
         
         // Build content based on status
         if (status === StepStatus.Unbound) {
-            await this.buildUnboundContent(contents, text);
+            await this.buildUnboundContent(contents, step.rawText, step.keywordResolved);
         } else if (status === StepStatus.Ambiguous) {
-            await this.buildAmbiguousContent(contents, [...result.candidates], text);
+            await this.buildAmbiguousContent(contents, [...result.candidates], step.rawText);
         } else {
-            await this.buildBoundContent(contents, result.best!, text);
+            await this.buildBoundContent(contents, result.best!, step.rawText);
         }
         
         return new vscode.Hover(contents, new vscode.Range(position.line, 0, position.line, line.length));
@@ -132,15 +112,15 @@ export class HoverProvider implements vscode.HoverProvider {
      */
     private async buildUnboundContent(
         contents: vscode.MarkdownString,
-        stepText: string
+        stepText: string,
+        keyword: ResolvedKeyword = 'When'
     ): Promise<void> {
         contents.appendMarkdown(t('hoverNoBindingFound') + '\n\n');
         
-        // Suggest creating a binding
         const suggestedPattern = this.suggestBindingPattern(stepText);
         contents.appendMarkdown(`**${t('hoverSuggestedBinding')}**\n`);
         contents.appendMarkdown('```csharp\n');
-        contents.appendMarkdown(`[When(@"${suggestedPattern}")]\n`);
+        contents.appendMarkdown(`[${keyword}(@"${suggestedPattern}")]\n`);
         contents.appendMarkdown('public void Step() { }\n');
         contents.appendMarkdown('```\n');
     }
@@ -332,136 +312,6 @@ export class HoverProvider implements vscode.HoverProvider {
     private truncate(str: string, maxLength: number): string {
         if (str.length <= maxLength) return str;
         return str.substring(0, maxLength - 3) + '...';
-    }
-    
-    /**
-     * Get Examples data for a position in a Scenario Outline.
-     */
-    private getExamplesForPosition(
-        document: vscode.TextDocument,
-        lineNumber: number
-    ): { headers: string[], rows: string[][] }[] {
-        const examples: { headers: string[], rows: string[][] }[] = [];
-        const lines = document.getText().split('\n');
-        
-        let inScenarioOutline = false;
-        let scenarioOutlineStart = -1;
-        
-        for (let i = lineNumber; i >= 0; i--) {
-            if (/^\s*Scenario Outline:/i.test(lines[i])) {
-                inScenarioOutline = true;
-                scenarioOutlineStart = i;
-                break;
-            }
-            if (/^\s*(Scenario|Feature):/i.test(lines[i])) {
-                break;
-            }
-        }
-        
-        if (!inScenarioOutline) {
-            return examples;
-        }
-        
-        let currentExample: { headers: string[], rows: string[][] } | null = null;
-        
-        for (let i = scenarioOutlineStart; i < lines.length; i++) {
-            const line = lines[i];
-            
-            if (i > scenarioOutlineStart && /^\s*(Scenario|Feature):/i.test(line)) {
-                break;
-            }
-            
-            if (/^\s*Examples:/i.test(line)) {
-                currentExample = { headers: [], rows: [] };
-                examples.push(currentExample);
-            } else if (line.trim().startsWith('|') && currentExample) {
-                const cells = line.trim().slice(1, -1).split('|').map(c => c.trim());
-                if (currentExample.headers.length === 0) {
-                    currentExample.headers = cells;
-                } else {
-                    currentExample.rows.push(cells);
-                }
-            }
-        }
-        
-        return examples;
-    }
-    
-    /**
-     * Generate candidate texts by expanding placeholders.
-     */
-    private generateCandidateTexts(
-        stepText: string,
-        examples: { headers: string[], rows: string[][] }[]
-    ): string[] {
-        const candidates: string[] = [];
-        const normalizedText = stepText.replace(/\s+/g, ' ').trim();
-        
-        const hasPlaceholders = PLACEHOLDER_REGEX.test(normalizedText);
-        PLACEHOLDER_REGEX.lastIndex = 0;
-        
-        const fallbackCandidate = normalizedText.replace(PLACEHOLDER_REGEX, 'X');
-        candidates.push(fallbackCandidate);
-        
-        if (!hasPlaceholders || examples.length === 0) {
-            return candidates;
-        }
-        
-        for (const example of examples) {
-            if (example.headers.length === 0) continue;
-            
-            const maxRows = Math.min(example.rows.length, 10);
-            for (let rowIdx = 0; rowIdx < maxRows; rowIdx++) {
-                if (candidates.length >= 15) break;
-                
-                const row = example.rows[rowIdx];
-                let expandedText = normalizedText;
-                
-                for (let colIdx = 0; colIdx < example.headers.length; colIdx++) {
-                    const placeholder = `<${example.headers[colIdx]}>`;
-                    const value = row[colIdx] ?? 'X';
-                    expandedText = expandedText.split(placeholder).join(value);
-                }
-                
-                expandedText = expandedText.replace(/\s+/g, ' ').trim();
-                
-                if (!candidates.includes(expandedText)) {
-                    candidates.push(expandedText);
-                }
-            }
-        }
-        
-        return candidates;
-    }
-    
-    /**
-     * Resolve And/But keyword by looking at previous steps.
-     */
-    private resolveKeywordWithContext(
-        document: vscode.TextDocument,
-        lineNumber: number,
-        keyword: string
-    ): ResolvedKeyword {
-        const lower = keyword.toLowerCase();
-        if (lower === 'given') return 'Given';
-        if (lower === 'when') return 'When';
-        if (lower === 'then') return 'Then';
-        
-        for (let i = lineNumber - 1; i >= 0; i--) {
-            const line = document.lineAt(i).text;
-            const match = line.match(/^\s*(Given|When|Then)\s+/i);
-            if (match) {
-                const prevKeyword = match[1].toLowerCase();
-                if (prevKeyword === 'given') return 'Given';
-                if (prevKeyword === 'when') return 'When';
-                if (prevKeyword === 'then') return 'Then';
-            }
-            if (/^\s*(Scenario|Feature|Background):/i.test(line)) {
-                break;
-            }
-        }
-        
-        return 'Given';
     }
 }
 

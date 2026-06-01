@@ -41,3 +41,26 @@ Feature: Calculator Operations
     And   I   have   entered   25   into   the   calculator
     When I press "add"
     Then the result should be 75 on the screen
+
+  # --- v0.5.0 Capa B extras (see README) ---
+
+  @v050 @ambiguity
+  Scenario: Overlapping Then patterns (Reqnroll-like ambiguous)
+    # Bindings: ThenTheResultShouldBe (.*) AND ThenTheResultShouldBeNumeric (\d+)
+    # Expect: CodeLens ⚠️ ambiguous — not a silent ✅ bound
+    Given I have entered 10 into the calculator
+    And I have entered 5 into the calculator
+    When I press "add"
+    Then the result should be 15 on the screen
+
+  @v050 @outline-examples
+  Scenario: Deposit logged from Examples table
+    # Plain Scenario (not Outline) with Examples AFTER steps — v0.5.0 candidate refresh
+    # Expect: CodeLens ✅ bound to LoggedAmountSteps (expanded rows 100, 250, 999)
+    When I record a deposit of <amount> dollars
+    Then the logged amount should be <amount>
+    Examples:
+      | amount |
+      | 100    |
+      | 250    |
+      | 999    |

@@ -4,8 +4,8 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, ResolverDependencies } from '../../core/matching';
-import { ResolvedKeyword } from '../../core/domain';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
+import { getStepAtPosition } from '../../core/references/stepContext';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
 export class DefinitionProvider implements vscode.DefinitionProvider {
@@ -16,22 +16,15 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         position: vscode.Position,
         _token: vscode.CancellationToken
     ): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-        // Only process .feature files
         if (!document.fileName.endsWith('.feature')) {
             return null;
         }
-        
-        const line = document.lineAt(position.line).text;
-        const stepMatch = line.match(/^\s*(Given|When|Then|And|But)\s+(.+)$/i);
-        
-        if (!stepMatch) {
+
+        const step = getStepAtPosition(document, position);
+        if (!step) {
             return null;
         }
         
-        const keyword = stepMatch[1];
-        const text = stepMatch[2].trim();
-        
-        // Get all bindings
         const index = this.indexManager.getIndex();
         const allBindings = index.getAllBindings();
         
@@ -39,37 +32,18 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             return null;
         }
         
-        // Build a simple step object for resolution
-        const resolvedKeyword = this.normalizeKeyword(keyword);
         const deps: ResolverDependencies = {
             getAllBindings: () => allBindings,
-            getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
+            getBindingsByKeyword: (kw) => index.getBindingsByKeyword(kw),
         };
         
-        const resolve = createResolver(deps);
-        
-        // Create a minimal step object
-        const step = {
-            keywordOriginal: keyword as any,
-            keywordResolved: resolvedKeyword,
-            rawText: text,
-            normalizedText: text.replace(/\s+/g, ' ').trim(),
-            fullText: line.trim(),
-            tagsEffective: [],
-            uri: document.uri,
-            range: new vscode.Range(position.line, 0, position.line, line.length),
-            lineNumber: position.line,
-            isOutline: false,
-            candidateTexts: [text],
-        };
-        
-        const result = resolve(step as any);
+        const resolve = createResolver(applyMatchingSettings(deps));
+        const result = resolve(step);
         
         if (result.candidates.length === 0) {
             return null;
         }
         
-        // Return all locations - VS Code will show peek if multiple
         return result.candidates.map(candidate => {
             return new vscode.Location(
                 candidate.binding.uri,
@@ -77,28 +51,11 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             );
         });
     }
-    
-    /**
-     * Normalize keyword (And/But -> Given as default).
-     */
-    private normalizeKeyword(keyword: string): ResolvedKeyword {
-        const upper = keyword.toLowerCase();
-        if (upper === 'given') return 'Given';
-        if (upper === 'when') return 'When';
-        if (upper === 'then') return 'Then';
-        return 'Given';
-    }
 }
 
-/**
- * Create and register the definition provider.
- */
 export function createDefinitionProvider(
     indexManager: IndexManager
 ): vscode.Disposable {
     const provider = new DefinitionProvider(indexManager);
-    
-    // Register for multiple selectors to ensure .feature files are handled
-    // regardless of whether VS Code recognizes them as 'gherkin' or 'feature'
     return vscode.languages.registerDefinitionProvider(FEATURE_DOCUMENT_SELECTORS, provider);
 }

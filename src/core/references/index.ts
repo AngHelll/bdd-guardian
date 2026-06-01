@@ -11,4 +11,4 @@ export {
     stepLocationKey,
     type ResolveStep,
 } from './referenceFinder';
-export { getStepAtPosition, isFeatureDocument } from './stepContext';
+export { getStepAtPosition, isFeatureDocument, resolveStepAtPosition } from './stepContext';

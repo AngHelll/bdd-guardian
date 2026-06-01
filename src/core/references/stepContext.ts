@@ -4,8 +4,9 @@
 
 import * as vscode from 'vscode';
 import { parseFeatureDocument } from '../parsing/gherkinParser';
-import type { FeatureStep, ResolvedKeyword, StepKeyword } from '../domain/types';
+import type { FeatureStep, ResolvedKeyword, StepKeyword, ResolveResult } from '../domain/types';
 import { normalizeWhitespace } from '../matching/normalization';
+import type { createResolver } from '../matching/resolver';
 
 const STEP_LINE_REGEX = /^\s*(Given|When|Then|And|But)\s+(.+)$/i;
 
@@ -88,4 +89,19 @@ export function isFeatureDocument(doc: vscode.TextDocument): boolean {
         doc.languageId === 'cucumber' ||
         doc.fileName.endsWith('.feature')
     );
+}
+
+/**
+ * Resolve a step at cursor using full Gherkin parse (outline + Scenario+Examples).
+ */
+export function resolveStepAtPosition(
+    document: vscode.TextDocument,
+    position: vscode.Position,
+    resolve: ReturnType<typeof createResolver>
+): ResolveResult | undefined {
+    const step = getStepAtPosition(document, position);
+    if (!step) {
+        return undefined;
+    }
+    return resolve(step);
 }

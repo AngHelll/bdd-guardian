@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-31
+
+**Highlights:** Binding alignment (SRBA) — Reqnroll/SpecFlow shared C# parser, Reqnroll-like ambiguity policy, Scenario Outline precision corpus, Examples-after-steps refresh.
+
+### Added
+
+- **Shared C# binding parser** (`core/parsing/csharpBindingParser.ts`) — Reqnroll and SpecFlow providers delegate to the same attribute/regex extraction
+- **SpecFlow provider** — indexes SpecFlow-only projects (NuGet / `TechTalk.SpecFlow` detection); same navigation as Reqnroll
+- **Precision corpus** — `matching-corpus.feature` + `MatchingCorpusSteps.cs` regression suite (`precision-corpus.test.ts`)
+- **Ambiguity policy (default)** — when ≥2 bindings match, status is `ambiguous` (aligned with Reqnroll runtime / BDD Pilot `AMBIGUOUS_STEPS`)
+- Setting **`bddGuardian.matching.preferSpecificBinding`** (default `false`) — legacy score-based winner when `true`
+- **Scenario Outline** — Examples tables on plain `Scenario` (not only `Scenario Outline`); candidate refresh when Examples appear after steps
+
+### Changed
+
+- README and docs: **C# bindings — Reqnroll & SpecFlow use the same model**; Guardian navigates, [BDD Pilot](https://github.com/AngHelll/bdd-pilot) executes
+- Test suite: **164 tests** (1 skipped: portfolio alternation follow-up v0.5.1)
+
+### Fixed
+
+- False “bound” when overlapping patterns (`\d+` vs `.*`) — now ambiguous unless `preferSpecificBinding` is enabled
+- Outline steps with Examples after steps no longer stay unbound in the editor
+
 ## [0.4.2] - 2026-05-24
 
 **Highlights:** Find All References (Shift+F12), live index while editing, pattern whitespace matching, docs and Cursor agent setup.
@@ -60,12 +83,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added - Testing Infrastructure
 
 - **Expanded Test Suite**: 109 tests (44 new tests added)
-  - `scoring.test.ts`: Deterministic scoring, specificity scoring, GBM-style pattern tests
+  - `scoring.test.ts`: Deterministic scoring, specificity scoring, matching-corpus pattern tests
   - `ambiguity.test.ts`: Overlapping pattern detection, best match selection, edge cases
   - `parsing.test.ts`: Gherkin parsing, C# binding extraction, pattern compilation
-- **GBM-style Fixtures**: Real-world test fixtures from production environments
-  - `gbm-ppr.feature`: PPR portfolio projection scenarios
-  - `GbmPprSteps.cs`: Matching C# step bindings
+- **Matching corpus fixtures**: Synthetic multi-scenario fixtures for precision regression
+  - `matching-corpus.feature`: Outlines, quotes, alternations, ambiguous pairs
+  - `MatchingCorpusSteps.cs`: Matching C# step bindings
 - **Coverage Reporting**: v8 coverage integration with Vitest
 
 ### Changed

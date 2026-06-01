@@ -11,7 +11,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
    - Full-step match is enforced (`^...$`).
    - Unicode flag `u` is used.
    - On compile error, fallback to exact literal match so the binding is not dropped.
-3. **Resolver** tests each binding’s regex against the step’s candidate texts; the best match (by score) is chosen.
+3. **Resolver** tests each binding’s regex against the step’s candidate texts. If **two or more** bindings match, status is **`ambiguous`** by default (Reqnroll runtime and BDD Pilot `AMBIGUOUS_STEPS` behave similarly). Optional setting `bddGuardian.matching.preferSpecificBinding` (`true`) restores legacy behavior: pick the highest-scoring match as **bound**.
 
 ## Implemented (reduces false unbound)
 
@@ -19,6 +19,8 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **C# verbatim `""`** — Attribute regex captures the full verbatim string so patterns with quoted parts (e.g. `they click on ""(.*)"" in the menu`) are not truncated.
 - **Literal `$` / `^`** — Treated as characters when not at start/end of the pattern.
 - **Fallback to literal** — Invalid regex pattern still produces a binding that matches the exact text.
+- **Ambiguity policy (v0.5.0+)** — Overlapping patterns (e.g. `\d+` vs `.*`) → **ambiguous**, not silent bound. Enable `bddGuardian.matching.preferSpecificBinding` for score-based winner.
+- **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
 
 ## Optional improvements (good practice, no relaxation of BDD)
 

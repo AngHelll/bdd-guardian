@@ -12,14 +12,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { IndexManager } from '../../core/index';
-import { createResolver, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword } from '../../core/domain';
 import { StepStatus, getUIConfig, getStatusEmoji } from '../../ui/stepStatus';
+import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { t } from '../../i18n';
-
-// Placeholder regex for Scenario Outline detection
-const PLACEHOLDER_REGEX = /<([^>]+)>/g;
 
 // Debounce timer
 let debounceTimer: NodeJS.Timeout | null = null;
@@ -180,110 +178,23 @@ export class DecorationsManager {
             getAllBindings: () => allBindings,
             getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
         };
-        const resolve = createResolver(deps);
+        const resolve = createResolver(applyMatchingSettings(deps));
         
         const document = editor.document;
-        const lines = document.getText().split('\n');
+        const parsed = parseFeatureDocument(document);
+        const steps = parsed?.allSteps ?? [];
         
         const boundRanges: vscode.DecorationOptions[] = [];
         const unboundRanges: vscode.DecorationOptions[] = [];
         const ambiguousRanges: vscode.DecorationOptions[] = [];
         
-        let currentTags: string[] = [];
-        let prevResolvedKeyword: ResolvedKeyword = 'Given';
-        
-        // Track Scenario Outline context
-        let inScenarioOutline = false;
-        let outlineExamples: { headers: string[], rows: string[][] }[] = [];
-        let currentExampleBlock: { headers: string[], rows: string[][] } | null = null;
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const trimmed = line.trim();
-            
-            // Track tags
-            const tagMatch = line.match(/^\s*(@\S+(?:\s+@\S+)*)\s*$/);
-            if (tagMatch) {
-                currentTags = tagMatch[1].split(/\s+/).filter(t => t.startsWith('@'));
+        for (const step of steps) {
+            if (config.tagFilter.length > 0 && !shouldShowStep(step.tagsEffective)) {
                 continue;
             }
+
+            const result = resolve(step);
             
-            // Track Scenario Outline
-            if (/^\s*Scenario Outline:/i.test(line)) {
-                inScenarioOutline = true;
-                outlineExamples = [];
-                currentExampleBlock = null;
-                currentTags = [];
-                prevResolvedKeyword = 'Given';
-                continue;
-            }
-            
-            // Reset on regular Scenario/Feature/Background
-            if (/^\s*(Scenario|Feature|Background):/i.test(line)) {
-                inScenarioOutline = false;
-                outlineExamples = [];
-                currentExampleBlock = null;
-                currentTags = [];
-                prevResolvedKeyword = 'Given';
-                continue;
-            }
-            
-            // Track Examples blocks
-            if (/^\s*Examples:/i.test(line) && inScenarioOutline) {
-                currentExampleBlock = { headers: [], rows: [] };
-                outlineExamples.push(currentExampleBlock);
-                continue;
-            }
-            
-            // Track table rows
-            if (trimmed.startsWith('|') && currentExampleBlock) {
-                const cells = trimmed.slice(1, -1).split('|').map(c => c.trim());
-                if (currentExampleBlock.headers.length === 0) {
-                    currentExampleBlock.headers = cells;
-                } else if (currentExampleBlock.rows.length < 20) {
-                    currentExampleBlock.rows.push(cells);
-                }
-                continue;
-            }
-            
-            // Check for step
-            const stepMatch = line.match(/^\s*(Given|When|Then|And|But)\s+(.+)$/i);
-            if (!stepMatch) continue;
-            
-            // Apply tag filter
-            if (config.tagFilter.length > 0 && !shouldShowStep(currentTags)) {
-                continue;
-            }
-            
-            const keyword = stepMatch[1];
-            const text = stepMatch[2].trim();
-            const resolvedKeyword = this.resolveKeyword(keyword, prevResolvedKeyword);
-            prevResolvedKeyword = resolvedKeyword;
-            
-            // Generate candidate texts for matching
-            const candidateTexts = this.generateCandidateTexts(
-                text, 
-                inScenarioOutline ? outlineExamples : undefined
-            );
-            
-            const step = {
-                keywordOriginal: keyword as any,
-                keywordResolved: resolvedKeyword,
-                rawText: text,
-                normalizedText: text.replace(/\s+/g, ' ').trim(),
-                fullText: line.trim(),
-                tagsEffective: currentTags,
-                uri: document.uri,
-                range: new vscode.Range(i, 0, i, line.length),
-                lineNumber: i,
-                isOutline: inScenarioOutline,
-                candidateTexts: candidateTexts,
-            };
-            
-            const result = resolve(step as any);
-            const range = new vscode.Range(i, 0, i, line.length);
-            
-            // Determine status
             let status: StepStatus;
             if (result.status === 'unbound') {
                 status = StepStatus.Unbound;
@@ -296,13 +207,11 @@ export class DecorationsManager {
                 stats.bound++;
             }
             
-            // Create decoration option with minimal hover
             const decorationOption: vscode.DecorationOptions = {
-                range,
+                range: step.range,
                 hoverMessage: this.createMinimalHover(status, result.candidates.length),
             };
             
-            // Add to appropriate array
             if (status === StepStatus.Unbound) {
                 unboundRanges.push(decorationOption);
             } else if (status === StepStatus.Ambiguous) {
@@ -324,53 +233,6 @@ export class DecorationsManager {
         }
         
         return stats;
-    }
-    
-    /**
-     * Generate candidate texts for matching, expanding placeholders with Examples values.
-     */
-    private generateCandidateTexts(
-        stepText: string,
-        examples?: { headers: string[], rows: string[][] }[]
-    ): string[] {
-        const candidates: string[] = [];
-        const normalizedText = stepText.replace(/\s+/g, ' ').trim();
-        
-        const hasPlaceholders = PLACEHOLDER_REGEX.test(normalizedText);
-        PLACEHOLDER_REGEX.lastIndex = 0;
-        
-        const fallbackCandidate = normalizedText.replace(PLACEHOLDER_REGEX, 'X');
-        candidates.push(fallbackCandidate);
-        
-        if (!hasPlaceholders || !examples || examples.length === 0) {
-            return candidates;
-        }
-        
-        for (const example of examples) {
-            if (example.headers.length === 0) continue;
-            
-            const maxRows = Math.min(example.rows.length, 20);
-            for (let rowIdx = 0; rowIdx < maxRows; rowIdx++) {
-                if (candidates.length >= 25) break;
-                
-                const row = example.rows[rowIdx];
-                let expandedText = normalizedText;
-                
-                for (let colIdx = 0; colIdx < example.headers.length; colIdx++) {
-                    const placeholder = `<${example.headers[colIdx]}>`;
-                    const value = row[colIdx] ?? 'X';
-                    expandedText = expandedText.split(placeholder).join(value);
-                }
-                
-                expandedText = expandedText.replace(/\s+/g, ' ').trim();
-                
-                if (!candidates.includes(expandedText)) {
-                    candidates.push(expandedText);
-                }
-            }
-        }
-        
-        return candidates;
     }
     
     /**
@@ -407,17 +269,6 @@ export class DecorationsManager {
         if (decorationTypes.ambiguous) {
             editor.setDecorations(decorationTypes.ambiguous, []);
         }
-    }
-    
-    /**
-     * Resolve And/But to actual keyword.
-     */
-    private resolveKeyword(keyword: string, previous: ResolvedKeyword): ResolvedKeyword {
-        const lower = keyword.toLowerCase();
-        if (lower === 'given') return 'Given';
-        if (lower === 'when') return 'When';
-        if (lower === 'then') return 'Then';
-        return previous;
     }
     
     dispose(): void {

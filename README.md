@@ -2,8 +2,8 @@
 
 > Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
 
-[![Version](https://img.shields.io/badge/version-0.4.2-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-147%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
+[![Tests](https://img.shields.io/badge/tests-164%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
 
@@ -20,6 +20,14 @@
 | **Codespaces** | ✅ |
 
 A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
+
+### ✨ What's improved (0.5.0)
+
+- **Reqnroll & SpecFlow — same binding engine** — Shared C# parser; SpecFlow-only projects index and navigate like Reqnroll. Reqnroll is the current open-source line; SpecFlow projects keep the same UX.
+- **Ambiguity aligned with runtime** — When multiple bindings match, Guardian shows ⚠️ ambiguous (Reqnroll-like), not a silent “best score” bound. Optional `bddGuardian.matching.preferSpecificBinding` restores legacy behavior.
+- **Scenario Outline precision** — Examples on plain `Scenario`; expanded candidates from table rows; matching-corpus regression suite.
+- **Guardian ↔ Pilot workflow** — Navigate and validate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot). If Pilot reports `PENDING_STEPS` or `AMBIGUOUS_STEPS`, refine bindings and re-check in Guardian.
+- **164 tests** — Includes precision corpus and SpecFlow provider coverage.
 
 ### ✨ What's improved (0.4.x)
 
@@ -123,10 +131,16 @@ Full support for Scenario Outlines with Examples tables:
 
 ### 🔌 Multi-Framework Support
 Automatic detection of BDD frameworks:
-- ✅ **C# Reqnroll** - Fully implemented
-- ✅ **C# SpecFlow** - Fully implemented  
-- 🔜 JavaScript Cucumber (planned)
+- ✅ **C# Reqnroll** — Full navigation (current open-source stack)
+- ✅ **C# SpecFlow** — Same attribute-based bindings as Reqnroll; shared parser, separate NuGet detection
+- 🔜 JavaScript Cucumber (planned v0.6+)
 - 🔜 Python Behave (planned)
+
+#### C# step bindings (Reqnroll & SpecFlow)
+
+Reqnroll and SpecFlow share the same binding model (`[Binding]`, `[Given(@"...")]`, etc.). BDD Guardian indexes both with one C# parser — Reqnroll is the active open-source line; legacy SpecFlow projects get the same CodeLens, Go to Definition, and diagnostics.
+
+**Recommended flow:** Guardian (navigate & validate) → [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (run `dotnet test`) → if `PENDING_STEPS` or `AMBIGUOUS_STEPS`, fix bindings and re-open in Guardian. Sample pair: [`samples/binding-demo/`](./samples/binding-demo/) + Pilot [`samples/minimal-bdd`](https://github.com/AngHelll/bdd-pilot/tree/main/samples/minimal-bdd).
 
 ## 📦 Installation
 
@@ -153,6 +167,12 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 |---------|---------|-------------|
 | `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
+
+### Matching
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `bddGuardian.matching.preferSpecificBinding` | `false` | When multiple bindings match, pick highest score (`true`, legacy). Default `false`: show ambiguous (Reqnroll-like). |
 
 ### Core Features
 
@@ -183,7 +203,7 @@ Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian
 
 ## Roadmap
 
-See [ROADMAP.md](./ROADMAP.md). Current release is **v0.4.2**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
+See [ROADMAP.md](./ROADMAP.md). Current release is **v0.5.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
 
 ## 📚 Documentation
 

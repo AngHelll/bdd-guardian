@@ -1,16 +1,16 @@
-@PprExtendedEndpoints @P1 @functional
-Feature: PPR Extended Endpoints
-    As a GBM client
-    I want to use extended PPR functionality
-    So that I can update my salary and get portfolio projections
+@matching-corpus @functional
+Feature: Matching corpus — API scenarios
+    As a service client
+    I want to exercise varied step patterns
+    So that binding precision can be regression-tested
 
     Background:
         Given I have a valid access token
-        And I have PPR questionnaire configuration
+        And I have questionnaire configuration
 
-    @P1 @Level3 @functional @salary-update
+    @salary-update
     Scenario: Update gross monthly income successfully
-        Given Generate EP token for salary update workflow
+        Given Generate token for salary update workflow
         When I update the gross monthly income to <newSalary> with change date <changeDate>
         Then I should get a successful salary update response
         And the response should contain updated salary <newSalary>
@@ -19,9 +19,9 @@ Feature: PPR Extended Endpoints
             | 35000     | 2025-11    |
             | 45000     | 2025-12    |
 
-    @P1 @Level3 @functional @portfolio-projection
+    @portfolio-projection
     Scenario: Get portfolio projection for different portfolio types
-        Given Generate EP token for portfolio projection workflow
+        Given Generate token for portfolio projection workflow
         When I request portfolio projection for <portfolioType> with investment time <years> years, first deposit <firstDeposit>, and monthly deposit <monthlyDeposit>
         Then I should get a valid portfolio projection response
         And the response should contain projection data for <years> years
@@ -31,7 +31,7 @@ Feature: PPR Extended Endpoints
             | balance       | 10    | 5000         | 2000           |
             | growth        | 5     | 1000         | 1000           |
 
-    @P1 @Level3 @functional @crypto
+    @crypto
     Scenario Outline: Retrieve crypto variation
         When I retrieve crypto variation for currency "<currency>" and time period "<time_period>"
         Then I should receive a successful response for crypto variation

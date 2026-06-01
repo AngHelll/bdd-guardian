@@ -13,23 +13,16 @@ import {
     BindingIndexOptions,
     createDetectionResult,
 } from './types';
-import { Binding, ResolvedKeyword } from '../../core/domain';
-import { compileBindingRegex } from '../../core/parsing/bindingRegex';
+import { Binding } from '../../core/domain';
+import { parseCSharpBindingsFromText } from '../../core/parsing/csharpBindingParser';
 
 /**
  * Regex patterns for C# Reqnroll binding detection and parsing
  */
 const PATTERNS = {
-    // Detection patterns
     CSPROJ_REQNROLL: /PackageReference\s+Include\s*=\s*["']Reqnroll/i,
     BINDING_ATTRIBUTE: /\[Binding\]/,
     USING_REQNROLL: /using\s+Reqnroll/,
-    
-    // Parsing patterns
-    // Inner string: [^"\\] | \. | "" (verbatim "" is one literal quote; allow so we capture full pattern)
-    STEP_ATTRIBUTE: /\[(Given|When|Then)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*\)\]/g,
-    CLASS_NAME: /(?:public\s+)?(?:partial\s+)?class\s+(\w+)/,
-    METHOD_NAME: /(?:public|private|protected|internal)\s+(?:async\s+)?(?:\w+(?:<[^>]+>)?)\s+(\w+)\s*\(/,
 };
 
 /**
@@ -179,79 +172,9 @@ export class CSharpReqnrollProvider implements IBindingProvider {
      * Parse a single C# file for Reqnroll bindings.
      */
     parseFile(document: vscode.TextDocument, options: BindingIndexOptions = {}): Binding[] {
-        const bindings: Binding[] = [];
-        const text = document.getText();
-        const lines = text.split('\n');
-        const uri = document.uri;
-        
-        // Find class name
-        const classMatch = text.match(PATTERNS.CLASS_NAME);
-        const className = classMatch ? classMatch[1] : 'Unknown';
-        
-        // Find all step attributes
-        let match: RegExpExecArray | null;
-        const regex = new RegExp(PATTERNS.STEP_ATTRIBUTE.source, 'g');
-        
-        while ((match = regex.exec(text)) !== null) {
-            const keyword = match[1] as ResolvedKeyword;
-            const patternWithQuotes = match[2];
-            
-            // Extract pattern from quotes
-            const patternRaw = this.extractPattern(patternWithQuotes);
-            
-            // Find line number
-            const beforeMatch = text.substring(0, match.index);
-            const lineNumber = beforeMatch.split('\n').length - 1;
-            
-            // Find method name (search after the attribute)
-            const afterAttribute = text.substring(match.index + match[0].length);
-            const methodMatch = afterAttribute.match(PATTERNS.METHOD_NAME);
-            const methodName = methodMatch ? methodMatch[1] : 'Unknown';
-            
-            // Compile regex
-            const compiledRegex = compileBindingRegex(patternRaw, options.caseInsensitive);
-            
-            if (compiledRegex) {
-                const binding: Binding = {
-                    keyword,
-                    patternRaw,
-                    regex: compiledRegex,
-                    className,
-                    methodName,
-                    uri,
-                    range: new vscode.Range(lineNumber, 0, lineNumber, lines[lineNumber]?.length || 0),
-                    lineNumber,
-                    signature: `${className}.${methodName}`,
-                };
-                
-                bindings.push(binding);
-            }
-        }
-        
-        return bindings;
-    }
-    
-    /**
-     * Extract pattern string from C# string literal (handles verbatim and regular strings).
-     */
-    private extractPattern(quotedString: string): string {
-        // Remove outer quotes
-        let pattern = quotedString;
-        
-        if (pattern.startsWith('@"')) {
-            // Verbatim string: @"..." - double quotes become single
-            pattern = pattern.slice(2, -1).replace(/""/g, '"');
-        } else if (pattern.startsWith('"')) {
-            // Regular string: "..." - handle escape sequences
-            pattern = pattern.slice(1, -1)
-                .replace(/\\"/g, '"')
-                .replace(/\\\\/g, '\\')
-                .replace(/\\n/g, '\n')
-                .replace(/\\r/g, '\r')
-                .replace(/\\t/g, '\t');
-        }
-        
-        return pattern;
+        return parseCSharpBindingsFromText(document.getText(), document.uri, {
+            caseInsensitive: options.caseInsensitive,
+        });
     }
     
     /**

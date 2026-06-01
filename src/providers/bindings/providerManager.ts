@@ -25,6 +25,7 @@ import { getJavaCucumberProvider } from './javaCucumberProvider';
 import { getPythonBehaveProvider } from './pythonBehaveProvider';
 import { getPythonPytestBddProvider } from './pythonPytestBddProvider';
 import { getGoGodogProvider } from './goGodogProvider';
+import { applyCSharpProviderExclusivity } from './csharpProviderExclusivity';
 
 /**
  * Provider Manager
@@ -145,11 +146,19 @@ export class ProviderManager {
         // Sort report by confidence (descending)
         report.sort((a, b) => b.confidence - a.confidence);
         
-        // Select active providers
-        const activeProviders = report
-            .filter(r => r.confidence >= this.config.activeThreshold)
-            .map(r => this.providers.get(r.id)!)
-            .filter(Boolean);
+        // Select active providers (Reqnroll + SpecFlow must not both index the same .cs files)
+        let activeProviders = applyCSharpProviderExclusivity(
+            report
+                .filter(r => r.confidence >= this.config.activeThreshold)
+                .map(r => this.providers.get(r.id)!)
+                .filter(Boolean),
+            report
+        );
+
+        // Reqnroll supersedes SpecFlow — never index the same bindings twice
+        if (activeProviders.some((p) => p.id === 'csharp-reqnroll')) {
+            activeProviders = activeProviders.filter((p) => p.id !== 'csharp-specflow');
+        }
         
         // Determine primary provider
         const primary = report.length > 0 && report[0].confidence > 0

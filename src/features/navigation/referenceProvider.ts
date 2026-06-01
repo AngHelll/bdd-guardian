@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
 import {
     collectAllIndexedSteps,
     findReferencesForBinding,
@@ -37,7 +37,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             getAllBindings: () => allBindings,
             getBindingsByKeyword: kw => index.getBindingsByKeyword(kw),
         };
-        const resolve = createResolver(deps);
+        const resolve = createResolver(applyMatchingSettings(deps));
         const allSteps = collectAllIndexedSteps(index);
 
         if (isFeatureDocument(document)) {

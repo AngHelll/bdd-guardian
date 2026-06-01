@@ -337,12 +337,16 @@ def eat_step(context, eaten, remaining):
 - **ID**: `csharp-reqnroll`
 - **Pattern**: `**/*.cs`
 - **Detection**: NuGet package `Reqnroll`, `[Binding]` attribute
+- **Parsing**: `core/parsing/csharpBindingParser.ts` (shared with SpecFlow)
 
 ### C# SpecFlow
 
 - **ID**: `csharp-specflow`
 - **Pattern**: `**/*.cs`
-- **Detection**: NuGet package `SpecFlow`, `[Binding]` attribute
+- **Detection**: NuGet package `SpecFlow`, `using TechTalk.SpecFlow`, `[Binding]` attribute
+- **Parsing**: Delegates to the **same shared C# parser** as Reqnroll (`core/parsing/csharpBindingParser.ts`). Only detection differs — attribute syntax and regex compilation are identical.
+
+Reqnroll is the current open-source line; SpecFlow is the legacy stack. Guardian treats both as the same binding contract for navigation.
 
 ## Best Practices
 

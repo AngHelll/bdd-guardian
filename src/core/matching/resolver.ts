@@ -16,23 +16,25 @@ import {
     ResolvedKeyword,
 } from '../domain/types';
 import { calculateScore, compareScores } from './scoring';
+import { getBindingIdentity } from './bindingIdentity';
 
 /**
  * Resolver options
- */
-export interface ResolverOptions {
-    /** Enable debug information in results */
-    debug?: boolean;
-}
-
-/**
- * Resolver dependencies (injected)
  */
 export interface ResolverDependencies {
     /** Get all bindings */
     getAllBindings: () => readonly Binding[];
     /** Get bindings by keyword */
     getBindingsByKeyword: (keyword: ResolvedKeyword) => readonly Binding[];
+    /** Prefer highest score when multiple bindings match (legacy; default false) */
+    preferSpecificBinding?: boolean;
+}
+
+export interface ResolverOptions {
+    /** Enable debug information in results */
+    debug?: boolean;
+    /** Override deps.preferSpecificBinding for this call */
+    preferSpecificBinding?: boolean;
 }
 
 /**
@@ -41,7 +43,17 @@ export interface ResolverDependencies {
 export function createResolver(deps: ResolverDependencies) {
     return function resolve(step: FeatureStep, options: ResolverOptions = {}): ResolveResult {
         const candidates: MatchCandidate[] = [];
+        const seenBindings = new Set<string>();
         const { debug = false } = options;
+
+        const addCandidate = (matchResult: MatchCandidate): void => {
+            const key = getBindingIdentity(matchResult.binding);
+            if (seenBindings.has(key)) {
+                return;
+            }
+            seenBindings.add(key);
+            candidates.push(matchResult);
+        };
 
         // First, try matching with exact keyword
         const keywordBindings = deps.getBindingsByKeyword(step.keywordResolved);
@@ -49,7 +61,7 @@ export function createResolver(deps: ResolverDependencies) {
         for (const binding of keywordBindings) {
             const matchResult = tryMatch(binding, step.candidateTexts, true);
             if (matchResult) {
-                candidates.push(matchResult);
+                addCandidate(matchResult);
             }
         }
 
@@ -60,7 +72,7 @@ export function createResolver(deps: ResolverDependencies) {
                 if (binding.keyword !== step.keywordResolved) {
                     const matchResult = tryMatch(binding, step.candidateTexts, false);
                     if (matchResult) {
-                        candidates.push(matchResult);
+                        addCandidate(matchResult);
                     }
                 }
             }
@@ -79,11 +91,12 @@ export function createResolver(deps: ResolverDependencies) {
             status = 'bound';
             best = candidates[0];
         } else {
-            // Check if top matches have same score (ambiguous)
-            if (candidates[0].score === candidates[1].score) {
-                status = 'ambiguous';
-            } else {
+            const preferSpecific =
+                options.preferSpecificBinding ?? deps.preferSpecificBinding ?? false;
+            if (preferSpecific && candidates[0].score > candidates[1].score) {
                 status = 'bound';
+            } else {
+                status = 'ambiguous';
             }
             best = candidates[0];
         }

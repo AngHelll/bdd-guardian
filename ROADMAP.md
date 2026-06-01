@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.4.2** · **147 unit tests**
+> **Current release: v0.5.0** · **164 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.4.2** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.5.0** — Cucumber JS provider (first non-C#) or Coach quick fixes expansion |
+| ✅ Shipped | v0.1.0 → **v0.5.0** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.6.0** — Cucumber JS provider (first non-C#) |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -37,14 +37,22 @@
 | Version | Milestone |
 |---------|-----------|
 | **0.4.x** | Matching polish, Find All References, live index, i18n EN/ES, agent docs |
-| **0.5.0** | First complete non-C# provider (Cucumber JS) |
-| **0.6.0** | Behave provider + Coach quick fixes batch |
+| **0.5.0** | Binding alignment — SpecFlow = Reqnroll parser, ambiguity policy, outline corpus |
+| **0.6.0** | First complete non-C# provider (Cucumber JS) + Coach quick fixes batch |
 | **0.7.0** | Godog provider; provider detection report polish |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
 ---
 
 ## Shipped (summary)
+
+### v0.5.0 — Binding alignment (SRBA)
+
+- **Shared C# parser** for Reqnroll and SpecFlow providers
+- **Ambiguity policy** default Reqnroll-like (`ambiguous` when ≥2 bindings match); optional `preferSpecificBinding`
+- **Scenario Outline** — Examples on plain Scenario; refresh candidates when Examples follow steps
+- **Precision corpus** regression suite (`matching-corpus`)
+- **164 tests** (1 skipped: portfolio alternation → v0.5.1)
 
 ### v0.4.2 — References & live index
 
@@ -63,7 +71,7 @@
 
 ### v0.3.0 — Test infrastructure
 
-- Vitest suite expansion; GBM-style fixtures; coverage on core matching
+- Vitest suite expansion; matching-corpus fixtures; coverage on core matching
 
 ### v0.2.0 / v0.1.0 — Navigation MVP
 
@@ -73,22 +81,26 @@
 
 ---
 
-## Plan v0.5.0
+## Plan v0.6.0
 
-Concrete path from **v0.4.2** → first multi-framework milestone. Small PRs; dogfood each step on `samples/binding-demo` before merging.
+Concrete path from **v0.5.0** → first non-C# provider. Small PRs; dogfood on `samples/binding-demo` before merging.
 
-### Milestone 0.5.0 — Cucumber JS provider
+### Milestone 0.6.0 — Cucumber JS provider
 
 | # | Issue title | Scope | Done when |
 |---|-------------|-------|-----------|
-| **0.5.0-1** | `feat(provider): Cucumber JS binding detection` | `jsCucumberProvider.ts`, tests | `.ts` step defs index; CodeLens bound on sample |
-| **0.5.0-2** | `test: provider smoke in verify-local` | fixtures or `samples/` | Capa A passes with JS fixture |
-| **0.5.0-3** | `docs: PROVIDERS.md + README Cucumber JS` | docs | User can enable JS project |
-| **0.5.0-4** | `release: v0.5.0 VSIX + Marketplace` | CHANGELOG, tag | Capa B OK on binding-demo + JS sample |
+| **0.6.0-1** | `feat(provider): Cucumber JS binding detection` | `jsCucumberProvider.ts`, tests | `.ts` step defs index; CodeLens bound on sample |
+| **0.6.0-2** | `test: provider smoke in verify-local` | fixtures or `samples/` | Capa A passes with JS fixture |
+| **0.6.0-3** | `docs: PROVIDERS.md + README Cucumber JS` | docs | User can enable JS project |
+| **0.6.0-4** | `release: v0.6.0 VSIX + Marketplace` | CHANGELOG, tag | Capa B OK on binding-demo + JS sample |
 
 **Exit criteria:** Open a repo with `.feature` + `.ts` bindings; Guardian indexes both without manual config beyond globs.
 
-**Alternative for 0.5.0:** if JS provider slips, ship **Coach quick fixes batch** (vague then, too many steps) as v0.5.0 instead — pick one primary theme per minor.
+### Follow-up v0.5.1 (optional patch)
+
+- Portfolio alternation regex (`|`) alignment with Reqnroll runtime — precision corpus test currently skipped
+
+*v0.5.0 shipped binding alignment instead of Cucumber JS (see [CHANGELOG.md](./CHANGELOG.md)).*
 
 ---
 
@@ -104,7 +116,7 @@ Use before clicking **Publish**:
 - [x] Coach optional (`bddGuardian.coach.enabled`)
 - [x] i18n EN/ES for UI strings
 - [ ] Dogfood on `samples/binding-demo` after each release (Capa B)
-- [ ] Non-C# provider verified (post v0.5.0)
+- [ ] Non-C# provider verified (post v0.6.0)
 
 #### Repo & brand
 - [x] `CHANGELOG.md` through current version
@@ -129,6 +141,7 @@ Use before clicking **Publish**:
 
 | Priority | Item | Rationale |
 |----------|------|-----------|
+| P1 | **Portfolio alternation matching** | Precision corpus `@skip`; align `\|` with Reqnroll |
 | P1 | **Cucumber JS provider** (complete stub) | First non-C#; broadest audience |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
 | P2 | **Behave provider** | Python BDD teams |
@@ -162,4 +175,4 @@ src/
 
 ---
 
-*Last updated: 2026-05-31 — v0.5.0 plan added.*
+*Last updated: 2026-05-31 — v0.5.0 binding alignment shipped.*

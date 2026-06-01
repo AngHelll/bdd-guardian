@@ -25,7 +25,8 @@ import {
 import { getProviderManager } from './providers/bindings';
 import { BindingCodeLensProvider } from './providers/bindingCodeLensProvider';
 import { ResolveResult, ResolvedKeyword } from './core/domain';
-import { createResolver, ResolverDependencies } from './core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies } from './core/matching';
+import { getStepAtPosition } from './core/references/stepContext';
 // Coach Mode
 import {
     CoachDiagnosticsProvider,
@@ -206,46 +207,23 @@ async function showAmbiguousMatches(): Promise<void> {
     }
     const document = editor.document;
     const position = editor.selection.active;
-    const line = document.lineAt(position.line).text;
-    const stepMatch = line.match(/^\s*(Given|When|Then|And|But)\s+(.+)$/i);
-    if (!stepMatch) {
-        vscode.window.showInformationMessage(t('noBindingFound'));
-        return;
-    }
-    const keyword = stepMatch[1];
-    const text = stepMatch[2].trim();
     const index = indexManager.getIndex();
     const allBindings = index.getAllBindings();
     if (allBindings.length === 0) {
         vscode.window.showInformationMessage(t('noBindingsFound'));
         return;
     }
-    const resolvedKeyword = (kw: string): ResolvedKeyword => {
-        const lower = kw.toLowerCase();
-        if (lower === 'given') return 'Given';
-        if (lower === 'when') return 'When';
-        if (lower === 'then') return 'Then';
-        return 'Given';
-    };
     const deps: ResolverDependencies = {
         getAllBindings: () => allBindings,
         getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
     };
-    const resolve = createResolver(deps);
-    const step = {
-        keywordOriginal: keyword as 'Given' | 'When' | 'Then' | 'And' | 'But',
-        keywordResolved: resolvedKeyword(keyword),
-        rawText: text,
-        normalizedText: text.replace(/\s+/g, ' ').trim(),
-        fullText: line.trim(),
-        tagsEffective: [] as string[],
-        uri: document.uri,
-        range: new vscode.Range(position.line, 0, position.line, line.length),
-        lineNumber: position.line,
-        isOutline: false,
-        candidateTexts: [text],
-    };
-    const result = resolve(step as any);
+    const resolve = createResolver(applyMatchingSettings(deps));
+    const step = getStepAtPosition(document, position);
+    if (!step) {
+        vscode.window.showInformationMessage(t('noBindingFound'));
+        return;
+    }
+    const result = resolve(step);
     if (result.candidates.length <= 1) {
         vscode.window.showInformationMessage(t('noBindingFound'));
         return;

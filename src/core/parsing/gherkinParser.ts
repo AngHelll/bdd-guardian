@@ -22,6 +22,7 @@ import {
     EXAMPLES_REGEX,
     TABLE_ROW_REGEX,
     MAX_EXAMPLE_ROWS,
+    PLACEHOLDER_REGEX,
 } from '../domain/constants';
 import { normalizeWhitespace, generateCandidateTexts } from '../matching/normalization';
 
@@ -128,9 +129,9 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        // Parse Examples:
+        // Parse Examples: (Scenario Outline or Scenario with Examples table)
         const examplesMatch = trimmedLine.match(EXAMPLES_REGEX);
-        if (examplesMatch && currentScenario?.type === 'Scenario Outline') {
+        if (examplesMatch && currentScenario) {
             currentExamples = {
                 headers: [],
                 rows: [],
@@ -175,12 +176,25 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
                 tagsEffective.push(...currentScenario.tags);
             }
 
-            // Determine if in scenario outline
-            const isOutline = currentScenario?.type === 'Scenario Outline';
-            const examples = isOutline ? currentScenario?.examples : undefined;
+            // Determine if scenario uses outline-style placeholders
+            const scenarioExamples = currentScenario?.examples?.filter(
+                (e) => e.headers.length > 0 && e.rows.length > 0
+            );
+            const hasExamplesForMatching =
+                scenarioExamples !== undefined && scenarioExamples.length > 0;
 
-            // Generate candidate texts for matching
-            const candidateTexts = generateCandidateTexts(rawText, examples as ExampleTable[] | undefined);
+            PLACEHOLDER_REGEX.lastIndex = 0;
+            const hasPlaceholders = PLACEHOLDER_REGEX.test(rawText);
+            PLACEHOLDER_REGEX.lastIndex = 0;
+
+            const candidateTexts = generateCandidateTexts(
+                rawText,
+                hasExamplesForMatching ? (scenarioExamples as ExampleTable[]) : undefined
+            );
+
+            const isOutline =
+                currentScenario?.type === 'Scenario Outline' ||
+                (hasExamplesForMatching && hasPlaceholders);
 
             const step: FeatureStep = {
                 keywordOriginal,
@@ -210,6 +224,11 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
     // Finalize last scenario
     if (currentScenario) {
         finalizeScenario(currentScenario, scenarios);
+    }
+
+    // Re-sync outline candidates on all indexed steps (Scenario + Examples after steps)
+    for (const scenario of scenarios) {
+        refreshScenarioStepCandidates(scenario as unknown as MutableScenario);
     }
 
     if (!featureName) {
@@ -242,9 +261,38 @@ function normalizeKeyword(keyword: string): StepKeyword {
 }
 
 /**
+ * Re-expand step candidates after Examples tables are parsed (often below steps).
+ */
+function refreshScenarioStepCandidates(scenario: MutableScenario): void {
+    const examples = scenario.examples.filter(
+        (e) => e.headers.length > 0 && e.rows.length > 0
+    );
+    if (examples.length === 0) {
+        return;
+    }
+
+    for (const step of scenario.steps) {
+        PLACEHOLDER_REGEX.lastIndex = 0;
+        const hasPlaceholders = PLACEHOLDER_REGEX.test(step.rawText);
+        PLACEHOLDER_REGEX.lastIndex = 0;
+        if (!hasPlaceholders) {
+            continue;
+        }
+        const mutableStep = step as FeatureStep & { candidateTexts: string[]; isOutline: boolean };
+        mutableStep.candidateTexts = generateCandidateTexts(
+            step.rawText,
+            examples as ExampleTable[]
+        );
+        mutableStep.isOutline =
+            scenario.type === 'Scenario Outline' || hasPlaceholders;
+    }
+}
+
+/**
  * Finalize a scenario and add to scenarios array
  */
 function finalizeScenario(scenario: MutableScenario, scenarios: Scenario[]): void {
+    refreshScenarioStepCandidates(scenario);
     scenarios.push({
         type: scenario.type,
         name: scenario.name,
