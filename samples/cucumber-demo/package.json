@@ -1,0 +1,9 @@
+{
+  "name": "bdd-guardian-cucumber-demo",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.0"
+  }
+}
+

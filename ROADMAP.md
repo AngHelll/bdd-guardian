@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.6.0** · **183 unit tests**
+> **Current release: v0.6.1** · **187 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.6.0** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.6.1** — Cucumber JS provider (first non-C#) |
+| ✅ Shipped | v0.1.0 → **v0.6.1** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.6.2** — Coach quick fixes batch + provider polish |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -40,7 +40,8 @@
 | **0.5.1** | Matching patch — portfolio corpus unskipped, CodeLens disk resolve, SpecFlow detect tests |
 | **0.5.0** | Binding alignment — SpecFlow = Reqnroll parser, ambiguity policy, outline corpus |
 | **0.6.0** | Wave A precision foundation — Cucumber Expressions + StepDefinition (Reqnroll / future JS) |
-| **0.6.1** | First complete non-C# provider (Cucumber JS) + Coach quick fixes batch |
+| **0.6.1** | First complete non-C# provider — Cucumber.js (JS/TS) |
+| **0.6.2** | Coach quick fixes batch + provider polish |
 | **0.7.0** | Godog provider; provider detection report polish |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
@@ -83,18 +84,18 @@
 
 ---
 
-## Plan v0.6.1
+## Plan v0.6.2
 
-Concrete path from **v0.6.0** → first non-C# provider. Small PRs; dogfood on `samples/binding-demo` before merging.
+Concrete path from **v0.6.1** → Coach quick fixes + provider polish. Small PRs; dogfood on `samples/binding-demo` and `samples/cucumber-demo` before merging.
 
-### Milestone 0.6.1 — Cucumber JS provider
+### Milestone 0.6.2 — Coach + polish
 
 | # | Issue title | Scope | Done when |
 |---|-------------|-------|-----------|
-| **0.6.1-1** | `feat(provider): Cucumber JS binding detection` | `jsCucumberProvider.ts`, tests | `.ts` step defs index; CodeLens bound on sample |
-| **0.6.1-2** | `test: provider smoke in verify-local` | fixtures or `samples/` | Capa A passes with JS fixture |
-| **0.6.1-3** | `docs: PROVIDERS.md + README Cucumber JS` | docs | User can enable JS project |
-| **0.6.1-4** | `release: v0.6.1 VSIX + Marketplace` | CHANGELOG, tag | Capa B OK on binding-demo + JS sample |
+| **0.6.2-1** | `feat(coach): quick fixes batch` | `src/features/coach/quickFixes.ts` | Multiple fixes in one action; no noisy rules |
+| **0.6.2-2** | `polish(provider): js-cucumber perf + patterns` | provider | Avoid wide globs; better folder heuristics |
+| **0.6.2-3** | `docs: Coach + JS provider` | docs | Clear enablement + limitations |
+| **0.6.2-4** | `release: v0.6.2 VSIX + Marketplace` | CHANGELOG, tag | Capa B OK on binding-demo + cucumber-demo |
 
 **Exit criteria:** Open a repo with `.feature` + `.ts` bindings; Guardian indexes both without manual config beyond globs.
 
