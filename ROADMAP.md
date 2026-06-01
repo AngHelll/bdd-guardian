@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.6.1** · **187 unit tests**
+> **Current release: v0.6.2** · **191 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.6.1** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.6.2** — Coach quick fixes batch + provider polish |
+| ✅ Shipped | v0.1.0 → **v0.6.2** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.7.0** — Godog provider; detection report polish |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -41,7 +41,7 @@
 | **0.5.0** | Binding alignment — SpecFlow = Reqnroll parser, ambiguity policy, outline corpus |
 | **0.6.0** | Wave A precision foundation — Cucumber Expressions + StepDefinition (Reqnroll / future JS) |
 | **0.6.1** | First complete non-C# provider — Cucumber.js (JS/TS) |
-| **0.6.2** | Coach quick fixes batch + provider polish |
+| **0.6.2** | Coach quick fixes batch + JS indexing/UX polish |
 | **0.7.0** | Godog provider; provider detection report polish |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
@@ -84,20 +84,17 @@
 
 ---
 
-## Plan v0.6.2
+## Plan v0.6.2 — ✅ shipped (2026-06-01)
 
-Concrete path from **v0.6.1** → Coach quick fixes + provider polish. Small PRs; dogfood on `samples/binding-demo` and `samples/cucumber-demo` before merging.
+| # | Status |
+|---|--------|
+| **0.6.2-1** Coach quick fixes batch | ✅ |
+| **0.6.2-2** js-cucumber glob polish | ✅ |
+| **0.6.2-2b** Indexing + hover + reindex UX | ✅ |
+| **0.6.2-3** CHANGELOG + roadmap | ✅ |
+| **0.6.2-4** VSIX + Marketplace | ✅ |
 
-### Milestone 0.6.2 — Coach + polish
-
-| # | Issue title | Scope | Done when |
-|---|-------------|-------|-----------|
-| **0.6.2-1** | `feat(coach): quick fixes batch` | `src/features/coach/quickFixes.ts` | Multiple fixes in one action; no noisy rules |
-| **0.6.2-2** | `polish(provider): js-cucumber perf + patterns` | provider | Avoid wide globs; better folder heuristics |
-| **0.6.2-3** | `docs: Coach + JS provider` | docs | Clear enablement + limitations |
-| **0.6.2-4** | `release: v0.6.2 VSIX + Marketplace` | CHANGELOG, tag | Capa B OK on binding-demo + cucumber-demo |
-
-**Exit criteria:** Open a repo with `.feature` + `.ts` bindings; Guardian indexes both without manual config beyond globs.
+**Exit criteria met:** `cucumber-demo` indexes JS bindings; `binding-demo` unchanged for C# Capa B.
 
 ### Follow-up v0.5.1 — ✅ shipped
 

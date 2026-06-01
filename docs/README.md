@@ -4,9 +4,9 @@
 
 **Core:** navigate and validate BDD steps between Gherkin (`.feature`) and step-definition bindings.
 
-**Shipped today:** C# Reqnroll and SpecFlow (full), binding usages CodeLens, diagnostics, decorations, Coach mode, en/es UI, incremental index while editing.
+**Shipped today:** C# Reqnroll and SpecFlow (full), Cucumber.js (JS/TS), binding usages CodeLens, diagnostics, decorations, Coach mode (incl. batch quick fixes), en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** v0.6.0 Cucumber JS provider (first non-C#), Coach quick fixes batch.
+**Next (see [ROADMAP.md](../ROADMAP.md)):** v0.7.0 Godog provider and detection report polish.
 
 ## Documents
 

@@ -14,11 +14,10 @@ import { FILE_WATCHER_DEBOUNCE_MS } from '../domain/constants';
 export type FileWatcherCallback = () => void;
 
 /**
- * File Watchers - Watches .feature and .cs files for changes
+ * File Watchers - Watches .feature and binding files for changes
  */
 export class FileWatchers implements vscode.Disposable {
     private featureWatcher: vscode.FileSystemWatcher | undefined;
-    private bindingWatcher: vscode.FileSystemWatcher | undefined;
     private disposables: vscode.Disposable[] = [];
     private debounceTimers: Map<string, NodeJS.Timeout> = new Map();
 
@@ -42,16 +41,19 @@ export class FileWatchers implements vscode.Disposable {
             this.featureWatcher.onDidDelete(uri => this.handleFeatureDelete(uri))
         );
 
-        // Watch C# files
-        this.bindingWatcher = vscode.workspace.createFileSystemWatcher(this.config.bindingsGlob);
-        
-        this.disposables.push(
-            this.bindingWatcher.onDidCreate(uri => this.handleBindingChange(uri, 'create')),
-            this.bindingWatcher.onDidChange(uri => this.handleBindingChange(uri, 'change')),
-            this.bindingWatcher.onDidDelete(uri => this.handleBindingDelete(uri))
-        );
+        // Watch binding files (per active provider globs after initial index)
+        const bindingPatterns = this.indexManager.getBindingWatchPatterns(this.config);
+        for (const pattern of bindingPatterns) {
+            const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+            this.disposables.push(
+                watcher.onDidCreate(uri => this.handleBindingChange(uri, 'create')),
+                watcher.onDidChange(uri => this.handleBindingChange(uri, 'change')),
+                watcher.onDidDelete(uri => this.handleBindingDelete(uri)),
+                watcher
+            );
+        }
 
-        this.disposables.push(this.featureWatcher, this.bindingWatcher);
+        this.disposables.push(this.featureWatcher);
     }
 
     /**

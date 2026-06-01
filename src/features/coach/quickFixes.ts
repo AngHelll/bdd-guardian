@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import { CoachDiagnosticsProvider } from './coachDiagnostics';
 import { calculateHealthScore, formatHealthReport } from './healthScore';
 import { getAllRuleInfo } from './rules';
+import { computeCoachQuickFixInserts } from './quickFixBatch';
 import { t } from '../../i18n';
 
 export class CoachQuickFixProvider implements vscode.CodeActionProvider {
@@ -29,6 +30,12 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
             d => d.source === CoachDiagnosticsProvider.SOURCE
         );
         
+        // Batch quick fixes (file)
+        const batchAction = this.createApplyQuickFixesFileAction(document, coachDiagnostics);
+        if (batchAction) {
+            actions.push(batchAction);
+        }
+
         for (const diagnostic of coachDiagnostics) {
             // Create "Disable this rule" action
             const disableAction = this.createDisableRuleAction(diagnostic);
@@ -44,6 +51,38 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
         }
         
         return actions;
+    }
+
+    private createApplyQuickFixesFileAction(
+        document: vscode.TextDocument,
+        coachDiagnostics: readonly vscode.Diagnostic[]
+    ): vscode.CodeAction | undefined {
+        const edits = computeCoachQuickFixInserts(
+            document.getText(),
+            coachDiagnostics
+                .map((d) => ({
+                    line: d.range.start.line,
+                    ruleId: String(d.code ?? ''),
+                }))
+                .filter((d) => d.ruleId.length > 0)
+        );
+
+        if (edits.length === 0) {
+            return undefined;
+        }
+
+        const action = new vscode.CodeAction(
+            t('coachApplyQuickFixesFile'),
+            vscode.CodeActionKind.QuickFix
+        );
+
+        const workspaceEdit = new vscode.WorkspaceEdit();
+        for (const e of edits) {
+            workspaceEdit.insert(document.uri, new vscode.Position(e.line, 0), e.newText);
+        }
+        action.edit = workspaceEdit;
+        action.isPreferred = true;
+        return action;
     }
     
     private createDisableRuleAction(diagnostic: vscode.Diagnostic): vscode.CodeAction | undefined {

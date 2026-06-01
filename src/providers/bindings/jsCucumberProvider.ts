@@ -19,9 +19,17 @@ export class JsCucumberProvider implements IBindingProvider {
     public readonly id: BindingProviderId = 'js-cucumber';
     public readonly displayName = 'JavaScript Cucumber';
     public readonly bindingFileExtensions = ['.js', '.ts', '.mjs', '.cjs'];
-    // Wide glob; we filter aggressively in parseFile (must reference @cucumber/cucumber).
-    // This keeps MVP working across common repo layouts without requiring config.
-    public readonly bindingGlob = '**/*.{js,ts,mjs,cjs}';
+    /**
+     * Narrower glob than "everything" to keep indexing snappy on large repos.
+     * We still do a hard filter in parseFile (must reference @cucumber/cucumber).
+     */
+    public readonly bindingGlob =
+        '{' +
+        '**/features/**/*.{js,ts,mjs,cjs},' +
+        '**/features/step_definitions/**/*.{js,ts,mjs,cjs},' +
+        '**/features/support/**/*.{js,ts,mjs,cjs},' +
+        '**/*.{steps,step,definitions}.{js,ts,mjs,cjs}' +
+        '}';
     
     async detect(workspaceFolders: readonly vscode.WorkspaceFolder[]): Promise<DetectionResult> {
         if (workspaceFolders.length === 0) {

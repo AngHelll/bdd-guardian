@@ -58,7 +58,10 @@ export class HoverProvider implements vscode.HoverProvider {
         const allBindings = index.getAllBindings();
         
         if (allBindings.length === 0) {
-            return this.createIndexingHover(position, line);
+            if (this.indexManager.isIndexing()) {
+                return this.createIndexingHover(position, line);
+            }
+            return this.createNoBindingsHover(position, line);
         }
 
         const step = getStepAtPosition(document, position);
@@ -198,6 +201,20 @@ export class HoverProvider implements vscode.HoverProvider {
         }
     }
     
+    /**
+     * Create hover when indexing finished but no bindings were indexed.
+     */
+    private createNoBindingsHover(position: vscode.Position, line: string): vscode.Hover {
+        const contents = new vscode.MarkdownString();
+        contents.isTrusted = true;
+        contents.appendMarkdown(`#### ${t('hoverTitle')}\n\n`);
+        contents.appendMarkdown(`**${t('hoverStatus')}:** ${getStatusEmoji(StepStatus.Unbound)} ${getStatusLabel(StepStatus.Unbound)}\n\n`);
+        contents.appendMarkdown('---\n\n');
+        contents.appendMarkdown(t('hoverNoBindingsIndexed') + '\n\n');
+        contents.appendMarkdown(`[${t('hoverReindexNow')}](command:reqnrollNavigator.reindex)`);
+        return new vscode.Hover(contents, new vscode.Range(position.line, 0, position.line, line.length));
+    }
+
     /**
      * Create hover when indexing is in progress.
      */

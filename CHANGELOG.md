@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-06-01
+
+**Highlights:** Coach batch quick fixes, Cucumber.js indexing fixes, and clearer UX when bindings are missing.
+
+### Added
+
+- **Coach batch quick fix** — CodeAction “Apply Coach quick fixes (file)” for deterministic fixes (MVP: `coach/outline-examples` inserts `Examples:` template)
+- **`quickFixBatch.ts`** — pure helper + Vitest coverage
+- **`bindingGlob.ts`** — split top-level brace alternates for reliable `findFiles`
+
+### Changed
+
+- **`js-cucumber` binding glob** — narrower paths under `features/` and `*.{steps,step,definitions}.*`
+- **Binding file watchers** — watch globs from all active providers (not only `**/*.cs`)
+- **Incremental binding index** — picks provider by file extension (e.g. `.ts` → JS Cucumber)
+
+### Fixed
+
+- **Cucumber.js workspaces** — `findFiles` failed on nested `{…}` binding globs → 0 bindings indexed in `cucumber-demo`
+- **Hover** — no longer shows perpetual “Indexing…” when index finished with zero bindings
+- **CodeLens reindex** — uses `reqnrollNavigator.reindex` (broken command id removed)
+
 ## [0.6.1] - 2026-05-31
 
 **Highlights:** First non-C# provider — Cucumber.js (JS/TS) step definition navigation and matching.

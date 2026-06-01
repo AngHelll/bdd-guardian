@@ -116,7 +116,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         if (allBindings.length === 0) {
             codeLens.command = {
                 title: `$(warning) ${t('codelensNoBindingsIndexed')}`,
-                command: 'reqnroll-navigator.reindexWorkspace',
+                command: 'reqnrollNavigator.reindex',
             };
             return codeLens;
         }

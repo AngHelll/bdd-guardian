@@ -22,6 +22,7 @@ import {
     IBindingProvider,
     ProviderSelection,
 } from '../../providers/bindings';
+import { resolveBindingSearchGlobs } from './bindingGlob';
 
 // ============================================================================
 // Enterprise Constants
@@ -235,11 +236,8 @@ export class IndexManager {
         try {
             this.outputChannel.appendLine(`[IndexManager] Indexing with ${provider.displayName}...`);
 
-            // Find files matching provider's glob
-            const allFiles = await vscode.workspace.findFiles(
-                provider.bindingGlob,
-                `{${config.excludePatterns.join(',')}}`
-            );
+            const exclude = `{${config.excludePatterns.join(',')}}`;
+            const allFiles = await this.findBindingFilesForProvider(provider, exclude);
 
             const files = allFiles.slice(0, maxFiles);
             
@@ -330,7 +328,7 @@ export class IndexManager {
     public async indexBindingFile(uri: vscode.Uri, caseInsensitive: boolean = false): Promise<boolean> {
         try {
             const selection = this.cachedProviderSelection ?? await this.safeDetectProviders();
-            const provider = selection.primary;
+            const provider = this.providerForBindingUri(uri, selection);
 
             if (!provider) {
                 return false;
@@ -371,6 +369,67 @@ export class IndexManager {
      */
     public isIndexing(): boolean {
         return this.indexing;
+    }
+
+    /**
+     * Glob patterns for binding file watchers (union of active providers).
+     */
+    public getBindingWatchPatterns(config: ExtensionConfig): string[] {
+        const patterns = new Set<string>();
+        const selection = this.cachedProviderSelection;
+
+        if (selection?.active.length) {
+            for (const provider of selection.active) {
+                for (const glob of resolveBindingSearchGlobs(provider.bindingGlob)) {
+                    patterns.add(glob);
+                }
+            }
+        }
+
+        if (patterns.size === 0) {
+            patterns.add(config.bindingsGlob);
+        }
+
+        return [...patterns];
+    }
+
+    private async findBindingFilesForProvider(
+        provider: IBindingProvider,
+        exclude: string
+    ): Promise<vscode.Uri[]> {
+        const seen = new Set<string>();
+        const merged: vscode.Uri[] = [];
+
+        for (const glob of resolveBindingSearchGlobs(provider.bindingGlob)) {
+            const files = await vscode.workspace.findFiles(glob, exclude);
+            for (const uri of files) {
+                const key = uri.fsPath;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    merged.push(uri);
+                }
+            }
+        }
+
+        return merged;
+    }
+
+    private providerForBindingUri(
+        uri: vscode.Uri,
+        selection: ProviderSelection
+    ): IBindingProvider | null {
+        const ext = uri.fsPath.includes('.')
+            ? '.' + uri.fsPath.split('.').pop()!.toLowerCase()
+            : '';
+
+        const candidates = selection.active.length > 0
+            ? selection.active
+            : selection.primary
+                ? [selection.primary]
+                : [];
+
+        const byExt = candidates.find((p) => p.bindingFileExtensions.includes(ext));
+        return byExt ?? selection.primary;
     }
 
     /**

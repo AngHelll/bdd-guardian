@@ -33,6 +33,7 @@
   "hoverPreview": "Preview",
   "hoverClickFileLink": "Click the file link above to open the full method.",
   "hoverIndexing": "Bindings are being indexed...",
+  "hoverNoBindingsIndexed": "No step bindings are indexed for this workspace. Check that step definition files exist and match your framework (e.g. `@cucumber/cucumber` in package.json).",
   "hoverReindexNow": "Reindex Now",
   "bindingUsagesNoUsages": "No usages",
   "bindingUsagesOneUsage": "1 usage",
@@ -44,5 +45,6 @@
   "coachEnabled": "BDD Coach enabled",
   "coachDisabled": "BDD Coach disabled",
   "coachRuleDisabled": "Disabled Coach rule: {0}",
+  "coachApplyQuickFixesFile": "BDD Guardian: Apply Coach quick fixes (file)",
   "debugReportCopied": "Debug report copied to clipboard"
 }
