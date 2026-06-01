@@ -10,6 +10,38 @@ import type { createResolver } from '../matching/resolver';
 
 const STEP_LINE_REGEX = /^\s*(Given|When|Then|And|But)\s+(.+)$/i;
 
+/** Build a minimal TextDocument for headless / disk-read feature parsing. */
+export function featureTextDocument(uri: vscode.Uri, text: string): vscode.TextDocument {
+    const lines = text.split('\n');
+    return {
+        uri,
+        getText: () => text,
+        lineAt: (line: number) => {
+            const lineText = lines[line] ?? '';
+            return {
+                text: lineText,
+                lineNumber: line,
+                range: new vscode.Range(line, 0, line, lineText.length),
+                rangeIncludingLineBreak: new vscode.Range(line, 0, line, lineText.length),
+                firstNonWhitespaceCharacterIndex: lineText.match(/^\s*/)?.[0].length ?? 0,
+                isEmptyOrWhitespace: lineText.trim().length === 0,
+            };
+        },
+    } as vscode.TextDocument;
+}
+
+/** Resolve step from raw feature file content (e.g. CodeLens when editor tab is closed). */
+export function getStepAtPositionFromContent(
+    uri: vscode.Uri,
+    content: string,
+    lineNumber: number
+): FeatureStep | undefined {
+    return getStepAtPosition(
+        featureTextDocument(uri, content),
+        new vscode.Position(lineNumber, 0)
+    );
+}
+
 function resolveKeyword(keyword: string, previous: ResolvedKeyword): ResolvedKeyword {
     const lower = keyword.toLowerCase();
     if (lower === 'given') return 'Given';

@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.5.0** · **164 unit tests**
+> **Current release: v0.5.1** · **177 unit tests**
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.5.0** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| ✅ Shipped | v0.1.0 → **v0.5.1** (see [CHANGELOG.md](./CHANGELOG.md)) |
 | 🎯 Next | **v0.6.0** — Cucumber JS provider (first non-C#) |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
@@ -37,6 +37,7 @@
 | Version | Milestone |
 |---------|-----------|
 | **0.4.x** | Matching polish, Find All References, live index, i18n EN/ES, agent docs |
+| **0.5.1** | Matching patch — portfolio corpus unskipped, CodeLens disk resolve, SpecFlow detect tests |
 | **0.5.0** | Binding alignment — SpecFlow = Reqnroll parser, ambiguity policy, outline corpus |
 | **0.6.0** | First complete non-C# provider (Cucumber JS) + Coach quick fixes batch |
 | **0.7.0** | Godog provider; provider detection report polish |
@@ -96,9 +97,11 @@ Concrete path from **v0.5.0** → first non-C# provider. Small PRs; dogfood on `
 
 **Exit criteria:** Open a repo with `.feature` + `.ts` bindings; Guardian indexes both without manual config beyond globs.
 
-### Follow-up v0.5.1 (optional patch)
+### Follow-up v0.5.1 — ✅ shipped
 
-- Portfolio alternation regex (`|`) alignment with Reqnroll runtime — precision corpus test currently skipped
+- Portfolio alternation — precision corpus enabled; outline + `(option|…)` groups match Reqnroll-style patterns
+- CodeLens closed-tab resolve reads `.feature` from disk before literal fallback
+- SpecFlow `detect()` regression tests for Reqnroll exclusivity
 
 *v0.5.0 shipped binding alignment instead of Cucumber JS (see [CHANGELOG.md](./CHANGELOG.md)).*
 
@@ -141,7 +144,7 @@ Use before clicking **Publish**:
 
 | Priority | Item | Rationale |
 |----------|------|-----------|
-| P1 | **Portfolio alternation matching** | Precision corpus `@skip`; align `\|` with Reqnroll |
+| P1 | ~~**Portfolio alternation matching**~~ | ✅ v0.5.1 — precision corpus enabled |
 | P1 | **Cucumber JS provider** (complete stub) | First non-C#; broadest audience |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
 | P2 | **Behave provider** | Python BDD teams |

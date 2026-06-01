@@ -193,7 +193,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 ## 🐛 Known Issues
 
 - Large projects may experience initial indexing delay (status bar shows “Indexing…” while running)
-- Advanced regex in bindings (alternations `|`, lookaheads, complex groups) may not match as in the test runner; prefer simple capture groups and literals where possible ([details](docs/BINDING_MATCHING.md))
+- Advanced regex in bindings (lookaheads, complex nested groups) may not match as in the test runner; standard alternation `(a|b)` is covered by tests ([details](docs/BINDING_MATCHING.md))
 
 ## Sample workspace
 

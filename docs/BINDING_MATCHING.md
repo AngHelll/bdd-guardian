@@ -29,7 +29,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 
 ## Documented limitations
 
-README **Known Issues** states that advanced regex (alternations `|`, lookaheads, complex groups) may behave differently from the test runner. Prefer simple capture groups and literal text when possible.
+- **Documented limitations:** lookaheads and complex nested groups may differ from the test runner; standard alternation `(a|b)` is covered by the precision corpus.
 
 ## Where the code lives
 

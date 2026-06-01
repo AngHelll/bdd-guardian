@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-05-31
+
+**Highlights:** Matching patch — 0 skipped tests, CodeLens resolve from disk when `.feature` tab is closed, SpecFlow detect regression tests.
+
+### Added
+
+- **`getStepAtPositionFromContent`** — resolve outline candidates from on-disk `.feature` text (CodeLens closed-tab path)
+- **SpecFlow detect tests** — confidence 0 when workspace uses Reqnroll (`using` or NuGet)
+
+### Changed
+
+- **CodeLens resolve** — reads `.feature` from disk before literal fallback when editor tab is closed
+- Test suite: **177 tests** (0 skipped)
+
+### Fixed
+
+- Precision corpus **portfolio alternation** test enabled (outline + `(debt|balance|…)` regex already matched post v0.5.0)
+
 ## [0.5.0] - 2026-05-31
 
 **Highlights:** Binding alignment (SRBA) — Reqnroll/SpecFlow shared C# parser, Reqnroll-like ambiguity policy, Scenario Outline precision corpus, Examples-after-steps refresh.

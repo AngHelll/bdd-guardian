@@ -97,7 +97,7 @@ describe('precision corpus (matching-corpus fixtures)', () => {
         expect(result.candidates.length).toBeGreaterThanOrEqual(2);
     });
 
-    it.skip('portfolio alternation row — follow-up v0.5.1 (regex parity)', () => {
+    it('portfolio alternation row — bound via outline candidates and alternation regex', () => {
         const step = findStep(
             allSteps,
             'When',

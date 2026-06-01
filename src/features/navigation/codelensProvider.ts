@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { createResolver, applyMatchingSettings, ResolveResult, ResolverDependencies } from '../../core/matching';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
-import { getStepAtPosition } from '../../core/references/stepContext';
+import { getStepAtPosition, getStepAtPositionFromContent } from '../../core/references/stepContext';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
 import { t } from '../../i18n';
@@ -104,7 +104,11 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     resolveCodeLens(
         codeLens: vscode.CodeLens,
         _token: vscode.CancellationToken
-    ): vscode.CodeLens | Thenable<vscode.CodeLens> {
+    ): vscode.ProviderResult<vscode.CodeLens> {
+        return this.resolveCodeLensAsync(codeLens);
+    }
+
+    private async resolveCodeLensAsync(codeLens: vscode.CodeLens): Promise<vscode.CodeLens> {
         const stepLens = codeLens as StepCodeLens;
         const index = this.indexManager.getIndex();
         const allBindings = index.getAllBindings();
@@ -123,13 +127,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         };
         const resolve = createResolver(applyMatchingSettings(deps));
 
-        const openDoc = vscode.workspace.textDocuments.find(
-            (d) => d.uri.toString() === stepLens.documentUri.toString()
-        );
-        const step =
-            (openDoc ? getStepAtPosition(openDoc, codeLens.range.start) : undefined) ??
-            stepLens.indexedStep ??
-            this.fallbackStep(stepLens, codeLens);
+        const step = await this.resolveStepForLens(stepLens, codeLens);
         
         const result = resolve(step);
         stepLens.result = result;
@@ -159,7 +157,49 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         return codeLens;
     }
-    
+
+    private async resolveStepForLens(
+        stepLens: StepCodeLens,
+        codeLens: vscode.CodeLens
+    ): Promise<FeatureStep> {
+        const openDoc = vscode.workspace.textDocuments.find(
+            (d) => d.uri.toString() === stepLens.documentUri.toString()
+        );
+        if (openDoc) {
+            const fromOpen = getStepAtPosition(openDoc, codeLens.range.start);
+            if (fromOpen) {
+                return fromOpen;
+            }
+        }
+
+        const fromDisk = await this.getStepFromFeatureFile(
+            stepLens.documentUri,
+            codeLens.range.start.line
+        );
+        if (fromDisk) {
+            return fromDisk;
+        }
+
+        if (stepLens.indexedStep) {
+            return stepLens.indexedStep;
+        }
+
+        return this.fallbackStep(stepLens, codeLens);
+    }
+
+    private async getStepFromFeatureFile(
+        uri: vscode.Uri,
+        lineNumber: number
+    ): Promise<FeatureStep | undefined> {
+        try {
+            const bytes = await vscode.workspace.fs.readFile(uri);
+            const text = Buffer.from(bytes).toString('utf-8');
+            return getStepAtPositionFromContent(uri, text, lineNumber);
+        } catch {
+            return undefined;
+        }
+    }
+
     private fallbackStep(stepLens: StepCodeLens, codeLens: vscode.CodeLens): FeatureStep {
         return {
             keywordOriginal: stepLens.keyword as FeatureStep['keywordOriginal'],
