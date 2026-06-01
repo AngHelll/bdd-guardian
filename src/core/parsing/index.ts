@@ -8,3 +8,4 @@ export { parseCSharpBindingsFromText, extractCSharpPatternString } from './cshar
 export { compileBindingRegex, type BindingExpressionType, isPatternAnchored, countCaptureGroups } from './bindingRegex';
 export { compileCucumberExpressionToRegex, looksLikeCucumberExpression } from './cucumberExpression';
 export { parseJsCucumberBindingsFromText } from './jsCucumberBindingParser';
+export { parseGoGodogBindingsFromText, looksLikeGodogBindingFile } from './goGodogBindingParser';

@@ -21,6 +21,7 @@ import {
     ProviderManager,
     IBindingProvider,
     ProviderSelection,
+    DEFAULT_PROVIDER_CONFIG,
 } from '../../providers/bindings';
 import { resolveBindingSearchGlobs } from './bindingGlob';
 
@@ -98,9 +99,11 @@ export class IndexManager {
                 return;
             }
 
-            // Step 2: Detect and select providers (with safe fallback)
+            // Step 2: Detect and select providers (fresh on each full index)
             this.outputChannel.appendLine('[IndexManager] Detecting binding providers...');
+            this.providerManager.invalidateCache();
             this.cachedProviderSelection = await this.safeDetectProviders();
+            this.logProviderDetectionSummary(this.cachedProviderSelection);
 
             // Check cancellation
             if (token?.isCancellationRequested) {
@@ -126,6 +129,41 @@ export class IndexManager {
         } finally {
             this.indexing = false;
         }
+    }
+
+    private logProviderDetectionSummary(selection: ProviderSelection): void {
+        const threshold = DEFAULT_PROVIDER_CONFIG.activeThreshold;
+        const thresholdPct = (threshold * 100).toFixed(0);
+
+        this.outputChannel.appendLine(
+            `[IndexManager] Provider detection (active threshold ${thresholdPct}%):`
+        );
+
+        const activeIds = new Set(selection.active.map((p) => p.id));
+
+        for (const report of selection.report) {
+            const pct = (report.confidence * 100).toFixed(0);
+            const status = activeIds.has(report.id)
+                ? 'ACTIVE'
+                : report.confidence > 0
+                  ? 'detected'
+                  : 'inactive';
+            const reason = report.reasons[0] ?? '—';
+            this.outputChannel.appendLine(
+                `  · ${report.displayName}: ${status} (${pct}%) — ${reason}`
+            );
+        }
+
+        if (selection.active.length === 0) {
+            this.logNoActiveProvidersHint();
+        }
+    }
+
+    private logNoActiveProvidersHint(): void {
+        this.outputChannel.appendLine('[IndexManager] No active binding providers detected.');
+        this.outputChannel.appendLine(
+            '[IndexManager] Check go.mod (Godog), package.json (@cucumber/cucumber), or .csproj (Reqnroll/SpecFlow), then run "BDD Guardian: Reindex" or "Show Provider Detection Report".'
+        );
     }
 
     /**
@@ -205,7 +243,7 @@ export class IndexManager {
             if (selection?.primary) {
                 await this.indexWithProvider(selection.primary, config, maxFiles, token);
             } else {
-                this.outputChannel.appendLine('[IndexManager] No active binding providers detected');
+                this.logNoActiveProvidersHint();
             }
             return;
         }

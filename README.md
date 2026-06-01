@@ -37,7 +37,7 @@ A VS Code extension that provides intelligent navigation, visual feedback, and d
 - **Single architecture** — One indexing and resolution path (IndexManager + binding providers + core resolver); one regex compiler in core.
 - **Unified Gherkin parsing** — Coach and navigation/diagnostics share the same core parser for `.feature` files.
 - **UI language** — Optional English/Spanish via `bddGuardian.displayLanguage`.
-- **147 tests** — Matching, parsing, index, references, Coach, and Scenario Outline coverage.
+- **197 tests** — Matching, parsing, index, references, Coach, and multi-provider coverage.
 
 ### 📊 CodeLens
 See binding status directly above each step:
@@ -133,7 +133,9 @@ Full support for Scenario Outlines with Examples tables:
 Automatic detection of BDD frameworks:
 - ✅ **C# Reqnroll** — Full navigation (current open-source stack)
 - ✅ **C# SpecFlow** — Same attribute-based bindings as Reqnroll; shared parser, separate NuGet detection
-- 🔜 JavaScript Cucumber (planned v0.6+)
+- ✅ JavaScript Cucumber.js (v0.6.1+)
+- ✅ Go Godog (v0.7.0+)
+- 🔜 Python Behave / Java Cucumber (planned)
 - 🔜 Python Behave (planned)
 
 #### C# step bindings (Reqnroll & SpecFlow)

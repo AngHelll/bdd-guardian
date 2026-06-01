@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-01
+
+**Highlights:** Third binding provider — **Go Godog** — plus clearer provider detection output after indexing.
+
+### Added
+
+- **Godog provider (Go)** — detects `github.com/cucumber/godog` in `go.mod` / imports; indexes `ctx.Given`/`When`/`Then`/`Step` with backtick regex patterns
+- **`goGodogBindingParser.ts`** — static parser + Vitest coverage
+- **`samples/godog-demo`** — Capa B workspace for Go navigation
+
+### Changed
+
+- **Full reindex** invalidates provider detection cache (fresh detect on Reindex)
+- **Output channel** — provider detection summary (ACTIVE / inactive, confidence, primary reason)
+- Actionable hint when no providers are active
+
 ## [0.6.2] - 2026-06-01
 
 **Highlights:** Coach batch quick fixes, Cucumber.js indexing fixes, and clearer UX when bindings are missing.

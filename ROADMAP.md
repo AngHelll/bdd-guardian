@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.6.2** · **191 unit tests**
+> **Current release: v0.7.0** · **197 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.6.2** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.7.0** — Godog provider; detection report polish |
+| ✅ Shipped | v0.1.0 → **v0.7.0** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.7.1+** — Behave provider; mono-provider indexing option |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -42,7 +42,7 @@
 | **0.6.0** | Wave A precision foundation — Cucumber Expressions + StepDefinition (Reqnroll / future JS) |
 | **0.6.1** | First complete non-C# provider — Cucumber.js (JS/TS) |
 | **0.6.2** | Coach quick fixes batch + JS indexing/UX polish |
-| **0.7.0** | Godog provider; provider detection report polish |
+| **0.7.0** | Godog provider (Go) + detection report polish |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
 ---
@@ -84,6 +84,19 @@
 
 ---
 
+## Plan v0.7.0 — ✅ shipped (2026-06-01)
+
+| # | Status |
+|---|--------|
+| **0.7.0-1** Godog provider MVP | ✅ |
+| **0.7.0-2** `samples/godog-demo` Capa B | ✅ |
+| **0.7.0-3** Detection summary in Output + reindex detect | ✅ |
+| **0.7.0-4** VSIX + Marketplace | ✅ |
+
+**Exit criteria met:** `godog-demo` indexes Go bindings; C# + JS demos unchanged.
+
+---
+
 ## Plan v0.6.2 — ✅ shipped (2026-06-01)
 
 | # | Status |
@@ -118,7 +131,7 @@ Use before clicking **Publish**:
 - [x] Coach optional (`bddGuardian.coach.enabled`)
 - [x] i18n EN/ES for UI strings
 - [x] Dogfood on `samples/binding-demo` after each release (Capa B OK 2026-05-31, v0.5.0)
-- [ ] Non-C# provider verified (post v0.6.0)
+- [x] Non-C# provider verified (cucumber-demo v0.6.1+, godog-demo v0.7.0)
 
 #### Repo & brand
 - [x] `CHANGELOG.md` through current version
@@ -177,4 +190,4 @@ src/
 
 ---
 
-*Last updated: 2026-05-31 — v0.5.0 binding alignment shipped.*
+*Last updated: 2026-06-01 — v0.7.0 Godog provider shipped.*
