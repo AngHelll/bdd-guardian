@@ -6,7 +6,7 @@
 
 **Shipped today:** C# Reqnroll and SpecFlow (full), binding usages CodeLens, diagnostics, decorations, Coach mode, en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** v0.5.0 Cucumber JS provider, Coach quick fixes, multi-framework polish.
+**Next (see [ROADMAP.md](../ROADMAP.md)):** v0.6.0 Cucumber JS provider (first non-C#), Coach quick fixes batch.
 
 ## Documents
 

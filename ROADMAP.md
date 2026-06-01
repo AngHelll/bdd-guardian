@@ -115,7 +115,7 @@ Use before clicking **Publish**:
 - [x] Find All References (Shift+F12)
 - [x] Coach optional (`bddGuardian.coach.enabled`)
 - [x] i18n EN/ES for UI strings
-- [ ] Dogfood on `samples/binding-demo` after each release (Capa B)
+- [x] Dogfood on `samples/binding-demo` after each release (Capa B OK 2026-05-31, v0.5.0)
 - [ ] Non-C# provider verified (post v0.6.0)
 
 #### Repo & brand
@@ -128,11 +128,11 @@ Use before clicking **Publish**:
 #### Technical
 - [x] `npm test` (lint + vitest) in CI Node 18/20
 - [x] VSIX artifact in CI
-- [ ] `npm run verify:local` in maintainer workflow (added v0.4.3 process)
+- [x] `npm run verify:local` in maintainer workflow (Capa A OK pre-publish v0.5.0)
 - [x] `engines.vscode` ^1.85.0
 
 #### Post-publish
-- [ ] Watch issues 1–2 weeks; patch if matching regressions
+- [x] Watch issues 1–2 weeks; patch if matching regressions (iniciado 2026-05-31, v0.5.0)
 - [ ] Good first issue: Cucumber JS provider or Coach rule
 
 ---
