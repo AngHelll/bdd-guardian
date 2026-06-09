@@ -323,11 +323,14 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
             }
         }),
         vscode.workspace.onDidChangeConfiguration((e) => {
-            if (e.affectsConfiguration('reqnrollNavigator')) {
+            if (e.affectsConfiguration('reqnrollNavigator') || e.affectsConfiguration('bddGuardian.providers')) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
                 updateAllDiagnostics();
+                if (e.affectsConfiguration('bddGuardian.providers')) {
+                    void performInitialIndexing().then(() => refreshAllUI());
+                }
             }
             if (e.affectsConfiguration('bddGuardian.displayLanguage')) {
                 refreshLanguage();
@@ -391,11 +394,18 @@ async function copyDebugReport(): Promise<void> {
 }
 function showProviderDetectionReport(): void {
     const pm = getProviderManager();
-    outputChannel.appendLine(pm.getDetectionReportString());
+    const config = getConfig();
+    outputChannel.appendLine(
+        pm.getDetectionReportString({ indexMode: config.providerIndexMode })
+    );
     outputChannel.show();
     const sel = pm.getCachedSelection();
     if (sel) {
-        vscode.window.showInformationMessage(t('activeProviders', sel.active.map(p => p.displayName).join(', ') || 'None'));
+        const modeLabel =
+            config.providerIndexMode === 'primary'
+                ? t('indexingModePrimary', sel.primary?.displayName ?? 'None')
+                : t('indexingModeAll', sel.active.map((p) => p.displayName).join(', ') || 'None');
+        vscode.window.showInformationMessage(modeLabel);
     }
 }
 

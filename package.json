@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -144,6 +144,12 @@
           "type": "boolean",
           "default": false,
           "description": "When multiple bindings match a step, pick the highest-scoring one (legacy). Default false: show ambiguous (Reqnroll-like)."
+        },
+        "bddGuardian.providers.indexMode": {
+          "type": "string",
+          "enum": ["all", "primary"],
+          "default": "all",
+          "description": "Binding providers to index: all detected active providers, or only the primary (highest confidence) provider."
         },
         "reqnrollNavigator.caseInsensitive": {
           "type": "boolean",

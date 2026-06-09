@@ -217,16 +217,19 @@ export class ProviderManager {
     /**
      * Get detection report as formatted string (for debug command).
      */
-    getDetectionReportString(): string {
+    getDetectionReportString(options?: { indexMode?: 'all' | 'primary' }): string {
         const selection = this.cachedSelection;
         if (!selection) {
             return 'No detection has been run yet. Provider detection runs on extension activation.';
         }
-        
+
+        const indexMode = options?.indexMode ?? 'all';
+
         const lines: string[] = [
             '═══════════════════════════════════════════════════════════════',
             '  PROVIDER DETECTION REPORT',
             `  Detected at: ${selection.detectedAt.toISOString()}`,
+            `  Indexing mode: ${indexMode}`,
             '═══════════════════════════════════════════════════════════════',
             '',
         ];

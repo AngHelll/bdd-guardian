@@ -11,6 +11,8 @@
   "statusIndexingFailed": "BDD Guardian: Indexing failed",
   "statsMessage": "Features: {0}, Steps: {1}, Bindings: {2}",
   "activeProviders": "Active: {0}",
+  "indexingModeAll": "Indexing: all providers ({0})",
+  "indexingModePrimary": "Indexing: primary only ({0})",
   "noNavigationHistory": "No navigation history",
   "navigationHistoryCleared": "Navigation history cleared",
   "noBindingsForStep": "No bindings found for: \"{0}\"",

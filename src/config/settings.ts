@@ -20,7 +20,8 @@ export function getConfig(): ExtensionConfig {
     }
     
     const config = vscode.workspace.getConfiguration('reqnrollNavigator');
-    
+    const guardianConfig = vscode.workspace.getConfiguration('bddGuardian');
+
     cachedConfig = {
         caseInsensitive: config.get('caseInsensitive', DEFAULT_CONFIG.caseInsensitive),
         tagFilter: config.get('tagFilter', DEFAULT_CONFIG.tagFilter),
@@ -34,6 +35,7 @@ export function getConfig(): ExtensionConfig {
         enableDecorations: config.get('enableDecorations', DEFAULT_CONFIG.enableDecorations),
         debug: config.get('debug', DEFAULT_CONFIG.debug),
         maxFilesIndexed: config.get('maxFilesIndexed', 5000),
+        providerIndexMode: guardianConfig.get('providers.indexMode', DEFAULT_CONFIG.providerIndexMode),
     };
     
     return cachedConfig;
@@ -112,7 +114,11 @@ export function filterStepsByTags(steps: readonly FeatureStep[], filterConfig?: 
  */
 export function createConfigChangeListener(callback: () => void): vscode.Disposable {
     return vscode.workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('reqnrollNavigator') || e.affectsConfiguration('bddGuardian.matching')) {
+        if (
+            e.affectsConfiguration('reqnrollNavigator') ||
+            e.affectsConfiguration('bddGuardian.matching') ||
+            e.affectsConfiguration('bddGuardian.providers')
+        ) {
             invalidateConfigCache();
             callback();
         }

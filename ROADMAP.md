@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.7.1** · **203 unit tests**
+> **Current release: v0.7.2** · **209 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.7.1** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.7.2+** — mono-provider indexing; Java Cucumber |
+| ✅ Shipped | v0.1.0 → **v0.7.2** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.8** — Java Cucumber provider |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -152,6 +152,17 @@ Use before clicking **Publish**:
 
 ---
 
+## Plan v0.7.2 — ✅ shipped (2026-06-02)
+
+| # | Status |
+|---|--------|
+| **0.7.2-1** Setting `bddGuardian.providers.indexMode` | ✅ |
+| **0.7.2-2** `IndexManager` primary-only indexing | ✅ |
+| **0.7.2-3** Output + provider report + tests | ✅ |
+| **0.7.2-4** CHANGELOG + VSIX | ✅ |
+
+---
+
 ## Plan v0.7.1 — ✅ shipped (2026-06-02)
 
 | # | Status |
@@ -203,4 +214,4 @@ src/
 
 ---
 
-*Last updated: 2026-06-02 — v0.7.1 Behave provider shipped.*
+*Last updated: 2026-06-02 — v0.7.2 mono-provider indexing shipped.*

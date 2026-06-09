@@ -16,6 +16,7 @@ import * as vscode from 'vscode';
 import { WorkspaceIndex } from './workspaceIndex';
 import { parseFeatureDocument } from '../parsing/gherkinParser';
 import { ExtensionConfig } from '../domain/types';
+import { getConfig } from '../../config';
 import { 
     getProviderManager, 
     ProviderManager,
@@ -24,6 +25,7 @@ import {
     DEFAULT_PROVIDER_CONFIG,
 } from '../../providers/bindings';
 import { resolveBindingSearchGlobs } from './bindingGlob';
+import { formatIndexingModeLog, resolveProvidersToIndex } from './providerIndexing';
 
 // ============================================================================
 // Enterprise Constants
@@ -103,7 +105,7 @@ export class IndexManager {
             this.outputChannel.appendLine('[IndexManager] Detecting binding providers...');
             this.providerManager.invalidateCache();
             this.cachedProviderSelection = await this.safeDetectProviders();
-            this.logProviderDetectionSummary(this.cachedProviderSelection);
+            this.logProviderDetectionSummary(this.cachedProviderSelection, config);
 
             // Check cancellation
             if (token?.isCancellationRequested) {
@@ -111,7 +113,7 @@ export class IndexManager {
                 return;
             }
 
-            // Step 3: Index bindings using active providers
+            // Step 3: Index bindings using selected providers (all active or primary only)
             await this.indexBindingsWithProviders(config, maxFiles, token);
 
             this.index.markIndexed();
@@ -131,10 +133,14 @@ export class IndexManager {
         }
     }
 
-    private logProviderDetectionSummary(selection: ProviderSelection): void {
+    private logProviderDetectionSummary(selection: ProviderSelection, config: ExtensionConfig): void {
         const threshold = DEFAULT_PROVIDER_CONFIG.activeThreshold;
         const thresholdPct = (threshold * 100).toFixed(0);
+        const toIndex = resolveProvidersToIndex(selection, config.providerIndexMode);
 
+        this.outputChannel.appendLine(
+            `[IndexManager] Indexing mode: ${formatIndexingModeLog(config.providerIndexMode, toIndex)}`
+        );
         this.outputChannel.appendLine(
             `[IndexManager] Provider detection (active threshold ${thresholdPct}%):`
         );
@@ -156,6 +162,12 @@ export class IndexManager {
 
         if (selection.active.length === 0) {
             this.logNoActiveProvidersHint();
+        }
+
+        if (config.providerIndexMode === 'primary' && !selection.primary) {
+            this.outputChannel.appendLine(
+                '[IndexManager] Primary indexing mode: no primary provider detected — no bindings indexed.'
+            );
         }
     }
 
@@ -238,23 +250,23 @@ export class IndexManager {
         token?: vscode.CancellationToken
     ): Promise<void> {
         const selection = this.cachedProviderSelection;
-        if (!selection || selection.active.length === 0) {
-            // Fallback: no active providers, try primary
-            if (selection?.primary) {
-                await this.indexWithProvider(selection.primary, config, maxFiles, token);
-            } else {
-                this.logNoActiveProvidersHint();
-            }
+        if (!selection) {
+            this.logNoActiveProvidersHint();
+            return;
+        }
+
+        const providers = resolveProvidersToIndex(selection, config.providerIndexMode);
+        if (providers.length === 0) {
+            this.logNoActiveProvidersHint();
             return;
         }
 
         this.outputChannel.appendLine(
-            `[IndexManager] Using ${selection.active.length} active provider(s): ` +
-            selection.active.map(p => p.displayName).join(', ')
+            `[IndexManager] Indexing ${providers.length} provider(s): ` +
+            providers.map((p) => p.displayName).join(', ')
         );
 
-        // Index with each active provider
-        for (const provider of selection.active) {
+        for (const provider of providers) {
             if (token?.isCancellationRequested) {
                 return;
             }
@@ -416,8 +428,9 @@ export class IndexManager {
         const patterns = new Set<string>();
         const selection = this.cachedProviderSelection;
 
-        if (selection?.active.length) {
-            for (const provider of selection.active) {
+        if (selection) {
+            const providers = resolveProvidersToIndex(selection, config.providerIndexMode);
+            for (const provider of providers) {
                 for (const glob of resolveBindingSearchGlobs(provider.bindingGlob)) {
                     patterns.add(glob);
                 }
@@ -460,14 +473,10 @@ export class IndexManager {
             ? '.' + uri.fsPath.split('.').pop()!.toLowerCase()
             : '';
 
-        const candidates = selection.active.length > 0
-            ? selection.active
-            : selection.primary
-                ? [selection.primary]
-                : [];
+        const candidates = resolveProvidersToIndex(selection, getConfig().providerIndexMode);
 
         const byExt = candidates.find((p) => p.bindingFileExtensions.includes(ext));
-        return byExt ?? selection.primary;
+        return byExt ?? candidates[0] ?? selection.primary;
     }
 
     /**

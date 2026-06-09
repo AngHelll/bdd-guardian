@@ -189,6 +189,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
+| `bddGuardian.providers.indexMode` | `all` | `all` = index every detected provider; `primary` = only the highest-confidence provider |
 | `reqnrollNavigator.bindingsGlob` | `**/*.cs` | Paths to search for bindings |
 | `reqnrollNavigator.excludePatterns` | `[**/bin/**, **/obj/**]` | Paths to exclude |
 

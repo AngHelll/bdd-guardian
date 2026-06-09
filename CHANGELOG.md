@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-06-02
+
+**Highlights:** Optional **mono-provider indexing** — index only the primary detected framework when you do not need every active provider in the workspace.
+
+### Added
+
+- **`bddGuardian.providers.indexMode`** — `all` (default) or `primary` (index only highest-confidence provider)
+- **`providerIndexing.ts`** — resolves which providers to index; Vitest coverage
+
+### Changed
+
+- **Output channel** and **Provider Detection Report** show the active indexing mode
+- Changing `indexMode` triggers a full reindex
+
 ## [0.7.1] - 2026-06-02
 
 **Highlights:** Fourth binding provider — **Python Behave** — for `.feature` ↔ `features/steps/*.py` navigation.

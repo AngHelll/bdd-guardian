@@ -115,4 +115,5 @@ export const DEFAULT_CONFIG = {
     enableDiagnostics: true,
     enableDecorations: true,
     debug: false,
+    providerIndexMode: 'all' as const,
 };

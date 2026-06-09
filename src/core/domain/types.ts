@@ -205,6 +205,8 @@ export interface ResolveDebugInfo {
 /**
  * Extension configuration
  */
+export type ProviderIndexMode = 'all' | 'primary';
+
 export interface ExtensionConfig {
     readonly caseInsensitive: boolean;
     readonly tagFilter: readonly string[];
@@ -218,6 +220,8 @@ export interface ExtensionConfig {
     readonly enableDecorations: boolean;
     readonly debug: boolean;
     readonly maxFilesIndexed?: number;
+    /** Which detected providers to index: all active, or primary only */
+    readonly providerIndexMode: ProviderIndexMode;
 }
 
 /**
