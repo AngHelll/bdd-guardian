@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-06-02
+
+**Highlights:** Fourth binding provider — **Python Behave** — for `.feature` ↔ `features/steps/*.py` navigation.
+
+### Added
+
+- **Behave provider (Python)** — detects `behave` in `requirements.txt` / `pyproject.toml` / `behave.ini`; indexes `@given` / `@when` / `@then` string patterns
+- **`pythonBehaveBindingParser.ts`** — static parser + Vitest coverage
+- **`samples/behave-demo`** — Capa B workspace for Python navigation
+
 ## [0.7.0] - 2026-06-01
 
 **Highlights:** Third binding provider — **Go Godog** — plus clearer provider detection output after indexing.

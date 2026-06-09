@@ -135,8 +135,8 @@ Automatic detection of BDD frameworks:
 - ✅ **C# SpecFlow** — Same attribute-based bindings as Reqnroll; shared parser, separate NuGet detection
 - ✅ JavaScript Cucumber.js (v0.6.1+)
 - ✅ Go Godog (v0.7.0+)
-- 🔜 Python Behave / Java Cucumber (planned)
-- 🔜 Python Behave (planned)
+- ✅ Python Behave (v0.7.1+)
+- 🔜 Java Cucumber (planned)
 
 #### C# step bindings (Reqnroll & SpecFlow)
 

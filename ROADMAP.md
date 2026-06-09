@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.7.0** · **197 unit tests**
+> **Current release: v0.7.1** · **203 unit tests**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.7.0** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.7.1+** — Behave provider; mono-provider indexing option |
+| ✅ Shipped | v0.1.0 → **v0.7.1** (see [CHANGELOG.md](./CHANGELOG.md)) |
+| 🎯 Next | **v0.7.2+** — mono-provider indexing; Java Cucumber |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
@@ -152,6 +152,19 @@ Use before clicking **Publish**:
 
 ---
 
+## Plan v0.7.1 — ✅ shipped (2026-06-02)
+
+| # | Status |
+|---|--------|
+| **0.7.1-1** `pythonBehaveBindingParser` + tests | ✅ |
+| **0.7.1-2** `pythonBehaveProvider` detect + index | ✅ |
+| **0.7.1-3** `samples/behave-demo` Capa B | ✅ |
+| **0.7.1-4** CHANGELOG + VSIX | ✅ |
+
+**Exit criteria met:** `behave-demo` indexes Python bindings; C#/JS/Go demos unchanged.
+
+---
+
 ## Post-v0.5.0 backlog (prioritized)
 
 | Priority | Item | Rationale |
@@ -159,7 +172,7 @@ Use before clicking **Publish**:
 | P1 | ~~**Portfolio alternation matching**~~ | ✅ v0.5.1 — precision corpus enabled |
 | P1 | **Cucumber JS provider** (complete stub) | First non-C#; broadest audience |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
-| P2 | **Behave provider** | Python BDD teams |
+| P2 | ~~**Behave provider**~~ | ✅ v0.7.1 — `samples/behave-demo` |
 | P2 | Coach: more rules + quick fixes | un Then dominante, imperativo, tags redundantes |
 | P2 | **Godog provider** | Go BDD |
 | P3 | Step autocomplete | Productivity; needs index API |
@@ -190,4 +203,4 @@ src/
 
 ---
 
-*Last updated: 2026-06-01 — v0.7.0 Godog provider shipped.*
+*Last updated: 2026-06-02 — v0.7.1 Behave provider shipped.*
