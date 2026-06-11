@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.7.2** · **209 unit tests**
+> **Current release: v0.8.3** · **217 unit tests** · Marketplace en v0.7.2 hasta publish explícito (Capa C)
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.7.2** (see [CHANGELOG.md](./CHANGELOG.md)) |
-| 🎯 Next | **v0.8** — Java Cucumber provider |
+| ✅ Shipped | v0.1.0 → **v0.7.2** Marketplace · **v0.8.2–v0.8.3** Index API v1 + `resolveStep` (repo; publish pendiente) |
+| 🎯 Next | **v0.9.0** — Java Cucumber · **v0.9.1** — bindings UX hygiene (spec lista) |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
-**Companion extension:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution). Guardian = navigation & bindings.
+**Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
 **Deep docs:** [docs/README.md](./docs/README.md) · [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · [docs/BINDING_MATCHING.md](./docs/BINDING_MATCHING.md)
 
@@ -152,6 +152,32 @@ Use before clicking **Publish**:
 
 ---
 
+## Plan v0.9.0 — Java Cucumber provider (alineado 2026-06-02, renumerado de v0.8.0 el 2026-06-11)
+
+| # | Item |
+|---|------|
+| **0.9.0-1** | `javaCucumberBindingParser` + tests |
+| **0.9.0-2** | `javaCucumberProvider` detect (Maven/Gradle) + index |
+| **0.9.0-3** | `samples/java-cucumber-demo` Capa B |
+| **0.9.0-4** | CHANGELOG + VSIX |
+
+**Exit criteria:** demo Java indexa bindings; demos C#/JS/Go/Python sin regresión.
+
+Spec: `docs-internal/specs/java-cucumber-provider-v0.9.0.md` (local).
+
+## Plan v0.9.1 — bindings UX hygiene (alineado 2026-06-02, renumerado de v0.8.1 el 2026-06-11)
+
+| # | Item |
+|---|------|
+| **0.9.1-1** | Diagnostic source `BDD Guardian` |
+| **0.9.1-2** | i18n status labels + `showMatchScore` setting |
+| **0.9.1-3** | README settings map + CHANGELOG |
+| **0.9.1-4** | VSIX |
+
+Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local). Tras v0.9.0 Java.
+
+---
+
 ## Plan v0.7.2 — ✅ shipped (2026-06-02)
 
 | # | Status |
@@ -191,6 +217,7 @@ Use before clicking **Publish**:
 | P3 | Copy as pattern code action | DX for binding authors |
 | P4 | Shared `@anghelll/bdd-gherkin-lite` with Pilot | Wait until parsers stabilize |
 | P4 | Onboarding GIF / empty workspace hint | Marketplace conversion |
+| P2 | **Java Cucumber provider** | plan v0.9.0 alineado — último stack JVM |
 
 ---
 
@@ -214,4 +241,4 @@ src/
 
 ---
 
-*Last updated: 2026-06-02 — v0.7.2 mono-provider indexing shipped.*
+*Last updated: 2026-06-11 — v0.8.3 Index API ship; planes Java/UX renumerados a v0.9.x.*

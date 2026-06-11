@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-06-11
+
+**Highlights:** Index API **v1.1** — `resolveStep(featurePath, line)` for bound / unbound / ambiguous status (BDD Jarvis v0.2.2 consumer).
+
+### Added
+
+- **`resolveStep`** on `GuardianIndexApiV1` — serializable `GuardianStepResolveDto`
+- `src/api/stepResolve.ts` — reuses Guardian resolver (same as CodeLens)
+- Vitest: `stepResolve.test.ts` (binding-demo corpus)
+
+## [0.8.2] - 2026-06-09
+
+**Highlights:** **Index API v1** — read-only `extension.exports` surface for companion extensions (BDD Jarvis).
+
+### Added
+
+- **`src/api/`** — `GuardianIndexApiV1`, snapshot mapper, `createGuardianIndexApi`
+- `activate()` returns API via `extension.exports` (`isReady`, `getSnapshot`, `onDidChangeIndex`)
+- `docs/EXTENSION_API.md` — consumer documentation
+- Vitest: `indexApiMapper.test.ts`
+
 ## [0.7.2] - 2026-06-02
 
 **Highlights:** Optional **mono-provider indexing** — index only the primary detected framework when you do not need every active provider in the workspace.

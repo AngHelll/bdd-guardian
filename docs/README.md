@@ -15,6 +15,7 @@
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Layers, index, resolver, providers, VS Code features |
 | [BINDING_MATCHING.md](./BINDING_MATCHING.md) | Regex compile, normalization, false unbound |
 | [PROVIDERS.md](./PROVIDERS.md) | How to implement a binding provider |
+| [EXTENSION_API.md](./EXTENSION_API.md) | Index API v1 (`extension.exports`) for BDD Jarvis and other consumers |
 | [ROADMAP.md](../ROADMAP.md) | Done vs planned work (single source for priorities) |
 
 ## Repo root

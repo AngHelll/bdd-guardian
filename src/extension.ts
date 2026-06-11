@@ -34,6 +34,7 @@ import {
     registerCoachCommands,
 } from './features/coach';
 import { t, refreshLanguage } from './i18n';
+import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -47,7 +48,7 @@ let navigationStatusBar: vscode.StatusBarItem;
 let indexingStatusBarItem: vscode.StatusBarItem;
 let coachDiagnosticsProvider: CoachDiagnosticsProvider;
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+export async function activate(context: vscode.ExtensionContext): Promise<GuardianIndexApiV1> {
     outputChannel = vscode.window.createOutputChannel('BDD Guardian');
     outputChannel.appendLine(t('activation'));
 
@@ -141,6 +142,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     outputChannel.appendLine(t('activated'));
     vscode.window.showInformationMessage(t('ready'));
+
+    return createGuardianIndexApi(workspaceIndex, indexManager);
 }
 
 function registerCommands(context: vscode.ExtensionContext): void {
