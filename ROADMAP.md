@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.8.3** · **217 unit tests** · Marketplace en v0.7.2 hasta publish explícito (Capa C)
+> **Current release: v0.9.0** · **224 unit tests** · Marketplace **0.7.2** (publish 0.8.3+ pendiente — preflight OK)
 
 ---
 
@@ -9,8 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.7.2** Marketplace · **v0.8.2–v0.8.3** Index API v1 + `resolveStep` (repo; publish pendiente) |
-| 🎯 Next | **v0.9.0** — Java Cucumber · **v0.9.1** — bindings UX hygiene (spec lista) |
+| ✅ Shipped | v0.1.0 → **v0.7.2** Marketplace · **v0.8.2–v0.8.3** Index API · **v0.9.0** Java Cucumber-JVM (repo + tag) |
+| 🎯 Next | **v0.9.1** — bindings UX hygiene (spec lista) |
+| 📋 Gate | Publish Marketplace 0.8.3+ · spec v0.9.1 → **spec aprobada, implementa** |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
@@ -43,6 +44,8 @@
 | **0.6.1** | First complete non-C# provider — Cucumber.js (JS/TS) |
 | **0.6.2** | Coach quick fixes batch + JS indexing/UX polish |
 | **0.7.0** | Godog provider (Go) + detection report polish |
+| **0.8.2–0.8.3** | Index API v1 (`extension.exports`) + `resolveStep` v1.1 for BDD Jarvis |
+| **0.9.0** | Java Cucumber-JVM provider (fifth complete framework) |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
 ---
@@ -152,20 +155,37 @@ Use before clicking **Publish**:
 
 ---
 
-## Plan v0.9.0 — Java Cucumber provider (alineado 2026-06-02, renumerado de v0.8.0 el 2026-06-11)
+---
 
-| # | Item |
-|---|------|
-| **0.9.0-1** | `javaCucumberBindingParser` + tests |
-| **0.9.0-2** | `javaCucumberProvider` detect (Maven/Gradle) + index |
-| **0.9.0-3** | `samples/java-cucumber-demo` Capa B |
-| **0.9.0-4** | CHANGELOG + VSIX |
+## Plan v0.8.2–v0.8.3 — ✅ shipped (2026-06-11)
 
-**Exit criteria:** demo Java indexa bindings; demos C#/JS/Go/Python sin regresión.
+| # | Status |
+|---|--------|
+| **0.8.2-1** Index API v1 (`isReady`, `getSnapshot`, `onDidChangeIndex`) | ✅ |
+| **0.8.2-2** `docs/EXTENSION_API.md` + snapshot mapper tests | ✅ |
+| **0.8.3-1** `resolveStep` v1.1 (bound/unbound/ambiguous) | ✅ |
+| **0.8.3-2** Vitest `stepResolve.test.ts` + tag `v0.8.3` | ✅ |
+
+**Exit criteria met:** Jarvis consume contrato v1; Capa B `binding-demo` OK; publish Marketplace pendiente.
+
+Spec: `docs-internal/specs/guardian-index-api-v0.8.2.md` (local).
+
+---
+
+## Plan v0.9.0 — ✅ shipped (2026-06-11)
+
+| # | Status |
+|---|--------|
+| **0.9.0-1** `javaCucumberBindingParser` + tests | ✅ |
+| **0.9.0-2** `javaCucumberProvider` detect (Maven/Gradle) + index | ✅ |
+| **0.9.0-3** `samples/java-cucumber-demo` Capa B | ✅ |
+| **0.9.0-4** CHANGELOG + VSIX + tag | ✅ |
+
+**Exit criteria met:** demo Java indexa bindings; demos C#/JS/Go/Python sin regresión; Capa B OK.
 
 Spec: `docs-internal/specs/java-cucumber-provider-v0.9.0.md` (local).
 
-## Plan v0.9.1 — bindings UX hygiene (alineado 2026-06-02, renumerado de v0.8.1 el 2026-06-11)
+## Plan v0.9.1 — bindings UX hygiene (spec lista · alineado 2026-06-11)
 
 | # | Item |
 |---|------|
@@ -174,7 +194,7 @@ Spec: `docs-internal/specs/java-cucumber-provider-v0.9.0.md` (local).
 | **0.9.1-3** | README settings map + CHANGELOG |
 | **0.9.1-4** | VSIX |
 
-Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local). Tras v0.9.0 Java.
+Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local). Tras v0.9.0 Java. **Gate spec:** pendiente (tras ship 0.9.0).
 
 ---
 
@@ -207,17 +227,18 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local). Tras v0.9.0 J
 | Priority | Item | Rationale |
 |----------|------|-----------|
 | P1 | ~~**Portfolio alternation matching**~~ | ✅ v0.5.1 — precision corpus enabled |
-| P1 | **Cucumber JS provider** (complete stub) | First non-C#; broadest audience |
+| P1 | ~~**Cucumber JS provider**~~ | ✅ v0.6.1 — `cucumber-demo` |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
 | P2 | ~~**Behave provider**~~ | ✅ v0.7.1 — `samples/behave-demo` |
 | P2 | Coach: more rules + quick fixes | un Then dominante, imperativo, tags redundantes |
-| P2 | **Godog provider** | Go BDD |
+| P2 | ~~**Godog provider**~~ | ✅ v0.7.0 |
+| P3 | Framework-aware hover (Track B) | Tras v0.9.1; candidato **v0.9.2** — spec aparte |
 | P3 | Step autocomplete | Productivity; needs index API |
 | P3 | Generate binding from unbound step | Complements Pilot `PENDING_STEPS` |
 | P3 | Copy as pattern code action | DX for binding authors |
 | P4 | Shared `@anghelll/bdd-gherkin-lite` with Pilot | Wait until parsers stabilize |
 | P4 | Onboarding GIF / empty workspace hint | Marketplace conversion |
-| P2 | **Java Cucumber provider** | plan v0.9.0 alineado — último stack JVM |
+| P2 | ~~**Java Cucumber provider**~~ | ✅ v0.9.0 — `samples/java-cucumber-demo` |
 
 ---
 
@@ -241,4 +262,4 @@ src/
 
 ---
 
-*Last updated: 2026-06-11 — v0.8.3 Index API ship; planes Java/UX renumerados a v0.9.x.*
+*Last updated: 2026-06-11 — v0.9.0 Java Cucumber-JVM shipped; next v0.9.1 UX hygiene.*

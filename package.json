@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber with CodeLens, Go to Definition, and diagnostics",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {

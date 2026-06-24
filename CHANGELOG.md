@@ -6,7 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [0.8.3] - 2026-06-11
+## [0.9.0] - 2026-06-11
+
+**Highlights:** **Java Cucumber-JVM provider** — fifth complete binding provider (Maven/Gradle detect + `@Given`/`@When`/`@Then` indexing).
+
+### Added
+
+- **`javaCucumberBindingParser`** — parse Cucumber-JVM annotations (`io.cucumber.java` + legacy `cucumber.api.java`)
+- **`JavaCucumberProvider`** — detect `io.cucumber` in `pom.xml` / `build.gradle(.kts)`; narrowed binding globs
+- **`samples/java-cucumber-demo`** — Capa B Maven sample
+- Vitest: `javaCucumberBindingParser.test.ts`, `javaCucumberProvider.test.ts`, `java-cucumber-demo.test.ts`
+
 
 **Highlights:** Index API **v1.1** — `resolveStep(featurePath, line)` for bound / unbound / ambiguous status (BDD Jarvis v0.2.2 consumer).
 

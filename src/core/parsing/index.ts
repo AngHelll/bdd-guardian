@@ -9,3 +9,4 @@ export { compileBindingRegex, type BindingExpressionType, isPatternAnchored, cou
 export { compileCucumberExpressionToRegex, looksLikeCucumberExpression } from './cucumberExpression';
 export { parseJsCucumberBindingsFromText } from './jsCucumberBindingParser';
 export { parseGoGodogBindingsFromText, looksLikeGodogBindingFile } from './goGodogBindingParser';
+export { parseJavaCucumberBindingsFromText } from './javaCucumberBindingParser';

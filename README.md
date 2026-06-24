@@ -136,7 +136,7 @@ Automatic detection of BDD frameworks:
 - ✅ JavaScript Cucumber.js (v0.6.1+)
 - ✅ Go Godog (v0.7.0+)
 - ✅ Python Behave (v0.7.1+)
-- 🔜 Java Cucumber (planned)
+- ✅ Java Cucumber-JVM (v0.9.0+)
 
 #### C# step bindings (Reqnroll & SpecFlow)
 
