@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-06
+
+**Highlights:** Bindings **UX hygiene** — consistent BDD Guardian branding in Problems, i18n status labels, optional CodeLens match score.
+
+### Added
+
+- **`bddGuardian.ui.showMatchScore`** — default `false`; hide numeric score in bound CodeLens titles
+- i18n keys `statusBound`, `statusUnbound`, `statusAmbiguous`, `statusIndexingLabel` (EN/ES)
+- Vitest: `stepStatus.test.ts`
+
+### Changed
+
+- Binding diagnostics collection and `Diagnostic.source` → **`BDD Guardian`** (was `reqnroll-navigator`)
+- `getStatusLabel()` and gutter decoration hovers use localized status labels
+- README **Settings map** — `bddGuardian.*` vs legacy `reqnrollNavigator.*`
+
 ## [0.9.0] - 2026-06-11
 
 **Highlights:** **Java Cucumber-JVM provider** — fifth complete binding provider (Maven/Gradle detect + `@Given`/`@When`/`@Then` indexing).
@@ -17,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`samples/java-cucumber-demo`** — Capa B Maven sample
 - Vitest: `javaCucumberBindingParser.test.ts`, `javaCucumberProvider.test.ts`, `java-cucumber-demo.test.ts`
 
+## [0.8.3] - 2026-06-11
 
 **Highlights:** Index API **v1.1** — `resolveStep(featurePath, line)` for bound / unbound / ambiguous status (BDD Jarvis v0.2.2 consumer).
 

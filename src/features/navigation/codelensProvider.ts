@@ -10,6 +10,7 @@ import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getStepAtPosition, getStepAtPositionFromContent } from '../../core/references/stepContext';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
+import { getUIConfig, formatBoundCodeLensTitle } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
@@ -141,8 +142,15 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         } else if (result.candidates.length === 1 || result.status === 'bound') {
             const candidate = result.candidates[0];
             const icon = result.status === 'ambiguous' ? '$(warning)' : '$(symbol-method)';
+            const showScore = getUIConfig().showMatchScore;
+            const title = formatBoundCodeLensTitle(
+                candidate.binding.className,
+                candidate.binding.methodName,
+                candidate.score,
+                showScore
+            );
             codeLens.command = {
-                title: `${icon} ${candidate.binding.className}.${candidate.binding.methodName} (${candidate.score})`,
+                title: `${icon} ${title}`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };

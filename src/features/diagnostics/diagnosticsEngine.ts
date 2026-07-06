@@ -18,12 +18,14 @@ export interface DiagnosticsResult {
     readonly bound: number;
 }
 
+export const BINDINGS_DIAGNOSTIC_SOURCE = 'BDD Guardian';
+
 export class DiagnosticsEngine {
     private diagnosticCollection: vscode.DiagnosticCollection;
     
     constructor(
         private indexManager: IndexManager,
-        collectionName: string = 'reqnroll-navigator'
+        collectionName: string = BINDINGS_DIAGNOSTIC_SOURCE
     ) {
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection(collectionName);
     }
@@ -81,20 +83,24 @@ export class DiagnosticsEngine {
             
             if (result.status === 'unbound') {
                 unbound++;
-                diagnostics.push(new vscode.Diagnostic(
+                const diagnostic = new vscode.Diagnostic(
                     step.range,
                     t('diagnosticUnboundStep', step.rawText),
                     vscode.DiagnosticSeverity.Warning
-                ));
+                );
+                diagnostic.source = BINDINGS_DIAGNOSTIC_SOURCE;
+                diagnostics.push(diagnostic);
             } else if (result.status === 'ambiguous') {
                 ambiguous++;
                 const names = result.candidates.slice(0, 3).map(c => c.binding.methodName).join(', ');
                 const moreSuffix = result.candidates.length > 3 ? t('diagnosticAmbiguousStepMore', String(result.candidates.length - 3)) : '';
-                diagnostics.push(new vscode.Diagnostic(
+                const diagnostic = new vscode.Diagnostic(
                     step.range,
                     t('diagnosticAmbiguousStep', names) + moreSuffix,
                     vscode.DiagnosticSeverity.Information
-                ));
+                );
+                diagnostic.source = BINDINGS_DIAGNOSTIC_SOURCE;
+                diagnostics.push(diagnostic);
             } else {
                 bound++;
             }

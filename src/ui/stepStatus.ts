@@ -7,6 +7,7 @@
 
 import * as vscode from 'vscode';
 import { MatchCandidate, ResolvedKeyword, ResolveResult } from '../core/domain';
+import { t } from '../i18n';
 
 /**
  * Step binding status enum.
@@ -38,6 +39,7 @@ export interface UIConfig {
     decorationsEnabled: boolean;
     codeLensEnabled: boolean;
     diagnosticsEnabled: boolean;
+    showMatchScore: boolean;
 }
 
 /**
@@ -53,6 +55,7 @@ export function getUIConfig(): UIConfig {
         decorationsEnabled: legacyConfig.get<boolean>('enableDecorations', true),
         codeLensEnabled: legacyConfig.get<boolean>('enableCodeLens', true),
         diagnosticsEnabled: legacyConfig.get<boolean>('enableDiagnostics', true),
+        showMatchScore: config.get<boolean>('ui.showMatchScore', false),
     };
 }
 
@@ -97,16 +100,36 @@ export function getStatusIcon(status: StepStatus): vscode.ThemeIcon {
 export function getStatusLabel(status: StepStatus): string {
     switch (status) {
         case StepStatus.Bound:
-            return 'Bound';
+            return t('statusBound');
         case StepStatus.Ambiguous:
-            return 'Ambiguous';
+            return t('statusAmbiguous');
         case StepStatus.Unbound:
-            return 'Unbound';
+            return t('statusUnbound');
         case StepStatus.Indexing:
-            return 'Indexing...';
+            return t('statusIndexingLabel');
         default:
-            return 'Unknown';
+            return t('statusUnknown');
     }
+}
+
+/**
+ * Gutter hover label for ambiguous steps including match count.
+ */
+export function getAmbiguousStatusLabel(candidateCount: number): string {
+    return t('statusAmbiguousWithCount', String(candidateCount));
+}
+
+/**
+ * Format bound step CodeLens title (optionally with debug match score).
+ */
+export function formatBoundCodeLensTitle(
+    className: string,
+    methodName: string,
+    score: number,
+    showMatchScore: boolean
+): string {
+    const binding = `${className}.${methodName}`;
+    return showMatchScore ? `${binding} (${score})` : binding;
 }
 
 /**

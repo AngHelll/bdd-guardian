@@ -326,7 +326,11 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
             }
         }),
         vscode.workspace.onDidChangeConfiguration((e) => {
-            if (e.affectsConfiguration('reqnrollNavigator') || e.affectsConfiguration('bddGuardian.providers')) {
+            if (
+                e.affectsConfiguration('reqnrollNavigator') ||
+                e.affectsConfiguration('bddGuardian.providers') ||
+                e.affectsConfiguration('bddGuardian.ui')
+            ) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
@@ -337,6 +341,12 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
             }
             if (e.affectsConfiguration('bddGuardian.displayLanguage')) {
                 refreshLanguage();
+                codeLensProvider.refresh();
+                bindingCodeLensProvider.refresh();
+                const editor = vscode.window.activeTextEditor;
+                if (editor && isFeatureFile(editor.document)) {
+                    decorationsManager.updateDecorationsImmediate(editor);
+                }
             }
         })
     );

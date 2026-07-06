@@ -15,9 +15,8 @@ import { IndexManager } from '../../core/index';
 import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword } from '../../core/domain';
-import { StepStatus, getUIConfig, getStatusEmoji } from '../../ui/stepStatus';
+import { StepStatus, getUIConfig, getStatusEmoji, getStatusLabel, getAmbiguousStatusLabel } from '../../ui/stepStatus';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
-import { t } from '../../i18n';
 
 // Debounce timer
 let debounceTimer: NodeJS.Timeout | null = null;
@@ -244,13 +243,13 @@ export class DecorationsManager {
         const emoji = getStatusEmoji(status);
         switch (status) {
             case StepStatus.Bound:
-                md.appendMarkdown(`${emoji} **${t('decorationBound')}**`);
+                md.appendMarkdown(`${emoji} **${getStatusLabel(StepStatus.Bound)}**`);
                 break;
             case StepStatus.Ambiguous:
-                md.appendMarkdown(`${emoji} **${t('decorationAmbiguous', String(candidateCount))}**`);
+                md.appendMarkdown(`${emoji} **${getAmbiguousStatusLabel(candidateCount)}**`);
                 break;
             case StepStatus.Unbound:
-                md.appendMarkdown(`${emoji} **${t('decorationUnbound')}**`);
+                md.appendMarkdown(`${emoji} **${getStatusLabel(StepStatus.Unbound)}**`);
                 break;
         }
         return md;

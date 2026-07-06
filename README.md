@@ -169,6 +169,30 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 |---------|---------|-------------|
 | `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
+| `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
+
+### Settings map (legacy vs branding)
+
+Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibility — do not rename in settings JSON. New UX settings use `bddGuardian.*`.
+
+| Setting | Namespace | Role |
+|---------|-----------|------|
+| `bddGuardian.displayLanguage` | branding | UI language (EN/ES) for status labels, toasts, hover |
+| `bddGuardian.gutterIcons.enabled` | branding | Gutter icons on steps |
+| `bddGuardian.hoverDetails.enabled` | branding | Rich binding hover |
+| `bddGuardian.ui.showMatchScore` | branding | CodeLens debug score |
+| `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
+| `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
+| `bddGuardian.coach.*` | branding | Coach rules and UI |
+| `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
+| `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |
+| `reqnrollNavigator.enableDecorations` | legacy | Gutter border / overview ruler |
+| `reqnrollNavigator.caseInsensitive` | legacy | Case-insensitive matching |
+| `reqnrollNavigator.tagFilter` / `tagFilterMode` | legacy | Filter steps in CodeLens/diagnostics |
+| `reqnrollNavigator.featureGlob` / `bindingsGlob` | legacy | Index globs |
+| `reqnrollNavigator.excludePatterns` | legacy | Index exclusions |
+| `reqnrollNavigator.navigationHistorySize` | legacy | Back/forward history size |
+| `reqnrollNavigator.debug` | legacy | Verbose output |
 
 ### Matching
 

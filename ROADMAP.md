@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.9.0** · **224 unit tests** · Marketplace **0.7.2** (publish 0.8.3+ pendiente — preflight OK)
+> **Current release: v0.9.1** · **229 unit tests** · Marketplace **v0.9.0** → publish 0.9.1
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.7.2** Marketplace · **v0.8.2–v0.8.3** Index API · **v0.9.0** Java Cucumber-JVM (repo + tag) |
-| 🎯 Next | **v0.9.1** — bindings UX hygiene (spec lista) |
-| 📋 Gate | Publish Marketplace 0.8.3+ · spec v0.9.1 → **spec aprobada, implementa** |
+| ✅ Shipped | v0.1.0 → **v0.9.1** (repo; Marketplace publish 0.9.1 en curso) |
+| 🎯 Next | **v0.9.2** — framework-aware hover (Track B, backlog) · camino **v1.0.0** |
+| 📋 Gate | v1.0 polish / Track B spec |
 | 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
@@ -46,6 +46,7 @@
 | **0.7.0** | Godog provider (Go) + detection report polish |
 | **0.8.2–0.8.3** | Index API v1 (`extension.exports`) + `resolveStep` v1.1 for BDD Jarvis |
 | **0.9.0** | Java Cucumber-JVM provider (fifth complete framework) |
+| **0.9.1** | Bindings UX hygiene — diagnostic source, i18n labels, `showMatchScore` |
 | **1.0.0** | Stable API, marketplace-ready docs, regression suite on sample workspace |
 
 ---
@@ -185,16 +186,16 @@ Spec: `docs-internal/specs/guardian-index-api-v0.8.2.md` (local).
 
 Spec: `docs-internal/specs/java-cucumber-provider-v0.9.0.md` (local).
 
-## Plan v0.9.1 — bindings UX hygiene (spec lista · alineado 2026-06-11)
+## Plan v0.9.1 — ✅ shipped (2026-07-06)
 
-| # | Item |
-|---|------|
-| **0.9.1-1** | Diagnostic source `BDD Guardian` |
-| **0.9.1-2** | i18n status labels + `showMatchScore` setting |
-| **0.9.1-3** | README settings map + CHANGELOG |
-| **0.9.1-4** | VSIX |
+| # | Status |
+|---|--------|
+| **0.9.1-1** Diagnostic source `BDD Guardian` | ✅ |
+| **0.9.1-2** i18n status labels + `showMatchScore` setting | ✅ |
+| **0.9.1-3** README settings map + CHANGELOG | ✅ |
+| **0.9.1-4** VSIX + Marketplace | ✅ |
 
-Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local). Tras v0.9.0 Java. **Gate spec:** pendiente (tras ship 0.9.0).
+Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 
 ---
 
@@ -262,4 +263,4 @@ src/
 
 ---
 
-*Last updated: 2026-06-11 — v0.9.0 Java Cucumber-JVM shipped; next v0.9.1 UX hygiene.*
+*Last updated: 2026-07-06 — v0.9.1 bindings UX hygiene shipped + Marketplace.*
