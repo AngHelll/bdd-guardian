@@ -10,7 +10,7 @@ import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getStepAtPosition, getStepAtPositionFromContent } from '../../core/references/stepContext';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
-import { getUIConfig, formatBoundCodeLensTitle } from '../../ui/stepStatus';
+import { getUIConfig, formatBoundCodeLensTitle, getCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
@@ -135,13 +135,13 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         if (result.candidates.length === 0) {
             codeLens.command = {
-                title: `$(error) ${t('codelensNoBindingFound')}`,
+                title: `${getCodeLensIcon(stepStatusFromResolve('unbound'))} ${t('codelensNoBindingFound')}`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
         } else if (result.candidates.length === 1 || result.status === 'bound') {
             const candidate = result.candidates[0];
-            const icon = result.status === 'ambiguous' ? '$(warning)' : '$(symbol-method)';
+            const icon = getCodeLensIcon(stepStatusFromResolve(result.status));
             const showScore = getUIConfig().showMatchScore;
             const title = formatBoundCodeLensTitle(
                 candidate.binding.className,
@@ -157,7 +157,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         } else {
             const best = result.candidates[0];
             codeLens.command = {
-                title: `$(symbol-method) ${best.binding.methodName} ${t('codelensAmbiguousMore', String(result.candidates.length - 1))}`,
+                title: `${getCodeLensIcon(StepStatus.Ambiguous)} ${best.binding.methodName} ${t('codelensAmbiguousMore', String(result.candidates.length - 1))}`,
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };

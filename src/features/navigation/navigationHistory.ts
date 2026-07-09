@@ -285,7 +285,7 @@ export function createNavigationHistoryCommands(
         vscode.commands.registerCommand('reqnroll-navigator.goBack', async () => {
             const success = await history.goBack();
             if (!success) {
-                vscode.window.setStatusBarMessage('$(arrow-left) No previous location', 2000);
+                vscode.window.setStatusBarMessage(`$(arrow-left) ${t('navNoPreviousLocation')}`, 2000);
             }
         })
     );
@@ -295,7 +295,7 @@ export function createNavigationHistoryCommands(
         vscode.commands.registerCommand('reqnroll-navigator.goForward', async () => {
             const success = await history.goForward();
             if (!success) {
-                vscode.window.setStatusBarMessage('$(arrow-right) No next location', 2000);
+                vscode.window.setStatusBarMessage(`$(arrow-right) ${t('navNoNextLocation')}`, 2000);
             }
         })
     );
@@ -318,7 +318,7 @@ export function createNavigationHistoryCommands(
             }));
             
             const selected = await vscode.window.showQuickPick(items, {
-                placeHolder: 'Select a location from history',
+                placeHolder: t('navHistoryPlaceholder'),
                 matchOnDescription: true,
             });
             
@@ -365,7 +365,7 @@ export function createNavigationStatusBar(): vscode.StatusBarItem {
         const forwardIcon = state.canForward ? '$(arrow-right)' : '$(circle-slash)';
         
         statusBar.text = `${backIcon} ${state.index + 1}/${state.size} ${forwardIcon}`;
-        statusBar.tooltip = `Navigation History: ${state.index + 1} of ${state.size}\nClick to show history`;
+        statusBar.tooltip = t('navHistoryTooltip', String(state.index + 1), String(state.size));
         statusBar.command = 'reqnroll-navigator.showHistory';
         statusBar.show();
     };

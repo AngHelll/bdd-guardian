@@ -1,0 +1,58 @@
+# BDD Guardian — Visual language
+
+Single reference for how step binding status appears across the extension.
+
+**Principle:** same semantics everywhere; density varies by surface (gutter = scan, CodeLens = action, hover = detail).
+
+## Status semantics
+
+| Status | Meaning |
+|--------|---------|
+| **Bound** | Exactly one binding matches (or policy resolved to one). |
+| **Unbound** | No binding matches this step. |
+| **Ambiguous** | Two or more bindings match (Reqnroll-like default). |
+| **Indexing** | Workspace index not ready yet. |
+
+## By surface
+
+| Surface | Bound | Unbound | Ambiguous | Indexing |
+|---------|-------|---------|-----------|----------|
+| **Gutter** (`resources/icons/*.svg`) | Green circle + check | Red circle + X | Orange circle + ! | (no gutter icon) |
+| **CodeLens** | `$(check)` + `Class.Method` | `$(error)` + message | `$(warning)` + candidates | `$(warning)` reindex CTA |
+| **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + top matches | ⏳ emoji |
+| **Problems** | — | Diagnostic warning | Diagnostic warning | — |
+| **Border / ruler** | `charts.green` | `charts.red` | `charts.yellow` | — |
+
+Implementation: `src/ui/stepStatus.ts` (`getCodeLensIcon`, `getStatusColor`, `getStatusLabel`, `getStatusEmoji`).
+
+## Gutter icons
+
+Custom SVGs under `resources/icons/` use **fixed colors** for legibility at 16px. Border and overview ruler use VS Code theme colors (`charts.green`, `charts.red`, `charts.yellow`).
+
+Toggle: `bddGuardian.gutterIcons.enabled`.
+
+## CodeLens icons
+
+CodeLens uses VS Code **codicons** aligned with gutter meaning (check / error / warning), not the SVG glyphs.
+
+Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
+
+## Hover emojis
+
+Markdown hovers intentionally use emojis (native, readable in VS Code hovers). Labels use i18n (`hoverBound`, etc.).
+
+## Diagnostics source
+
+Binding diagnostics: **`BDD Guardian`**. Coach findings: **`BDD Coach`**.
+
+## Settings
+
+| Setting | Effect |
+|---------|--------|
+| `bddGuardian.gutterIcons.enabled` | Gutter SVG icons |
+| `reqnrollNavigator.enableDecorations` | Left border + overview ruler |
+| `reqnrollNavigator.enableCodeLens` | CodeLens above steps |
+| `bddGuardian.hoverDetails.enabled` | Rich hover |
+| `bddGuardian.displayLanguage` | EN/ES labels |
+
+See [README.md](../README.md) settings map for legacy vs branding keys.

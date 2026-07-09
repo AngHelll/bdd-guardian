@@ -1,9 +1,9 @@
 # BDD Guardian 🛡️
 
-> Guard and navigate your BDD steps across Reqnroll, SpecFlow, and Cucumber!
+> Guard and navigate your BDD steps across Reqnroll, SpecFlow, Cucumber, Godog, Behave, and Java!
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-164%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
+[![Tests](https://img.shields.io/badge/tests-229%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
 
@@ -19,9 +19,23 @@
 | **Dev Containers** | ✅ |
 | **Codespaces** | ✅ |
 
-A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects using Reqnroll, SpecFlow, Cucumber, and more.
+A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects across five binding stacks.
 
-### ✨ What's improved (0.5.0)
+### ✨ What's new (1.0.0)
+
+- **Stable multi-framework release** — C# (Reqnroll/SpecFlow), JavaScript Cucumber.js, Go Godog, Python Behave, Java Cucumber-JVM.
+- **Communication polish** — Unified Spanish status labels (*Enlazado* / *Sin enlazar*); i18n for navigation and Coach UI.
+- **Visual language** — CodeLens icons aligned with gutter semantics; see [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md).
+- **First-run hint** — One-time toast when `.feature` files exist but no bindings are indexed (`bddGuardian.onboarding.enabled`).
+- **Guardian ↔ Pilot** — Navigate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot). [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) consumes the Index API for automation.
+
+### 🎬 Quick demo
+
+Open [`samples/binding-demo/`](./samples/binding-demo/) after installing the VSIX: wait for **Ready** in the status bar → CodeLens above a step → **Go to Definition** to the binding.
+
+> Maintainer: record `docs/assets/guardian-onboarding.gif` for README/Marketplace (see [docs/assets/README.md](docs/assets/README.md)).
+
+### ✨ Highlights (0.5.x–0.9.x)
 
 - **Reqnroll & SpecFlow — same binding engine** — Shared C# parser; SpecFlow-only projects index and navigate like Reqnroll. Reqnroll is the current open-source line; SpecFlow projects keep the same UX.
 - **Ambiguity aligned with runtime** — When multiple bindings match, Guardian shows ⚠️ ambiguous (Reqnroll-like), not a silent “best score” bound. Optional `bddGuardian.matching.preferSpecificBinding` restores legacy behavior.
@@ -41,9 +55,9 @@ A VS Code extension that provides intelligent navigation, visual feedback, and d
 
 ### 📊 CodeLens
 See binding status directly above each step:
-- ✅ **Bound**: Shows `ClassName.MethodName` - click to navigate
-- ⚠️ **Unbound**: Warning when no binding is found
-- ⚡ **Ambiguous**: Multiple bindings match - click to select
+- ✅ **Bound**: Shows `ClassName.MethodName` — click to navigate
+- ❌ **Unbound**: No binding found
+- ⚠️ **Ambiguous**: Multiple bindings match — click to select
 
 ### 🎯 Visual Feedback
 
@@ -170,6 +184,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
 | `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
+| `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
 
 ### Settings map (legacy vs branding)
 
@@ -183,6 +198,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.ui.showMatchScore` | branding | CodeLens debug score |
 | `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
 | `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
+| `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |
 | `bddGuardian.coach.*` | branding | Coach rules and UI |
 | `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
 | `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |
@@ -230,7 +246,7 @@ Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian
 
 ## Roadmap
 
-See [ROADMAP.md](./ROADMAP.md). Current release is **v0.5.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
+See [ROADMAP.md](./ROADMAP.md). Current release is **v1.0.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution) and [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (Index API).
 
 ## 📚 Documentation
 
@@ -238,6 +254,7 @@ See [ROADMAP.md](./ROADMAP.md). Current release is **v0.5.0**. Works alongside [
 |-----|-------------|
 | [docs/README.md](docs/README.md) | Doc index and product direction |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Extension architecture |
+| [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md) | Icons, colors, and status semantics |
 | [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md) | Step-to-binding matching |
 | [docs/PROVIDERS.md](docs/PROVIDERS.md) | Adding a framework provider |
 | [ROADMAP.md](./ROADMAP.md) | Done vs planned features |

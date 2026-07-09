@@ -35,6 +35,7 @@ import {
 } from './features/coach';
 import { t, refreshLanguage } from './i18n';
 import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
+import { showZeroBindingsHintIfNeeded } from './features/onboarding';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -133,7 +134,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
         getNavigationHistory()
     );
 
-    await performInitialIndexing();
+    await performInitialIndexing(context);
     fileWatchers.start();
 
     if (vscode.window.activeTextEditor) {
@@ -149,7 +150,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
 function registerCommands(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('reqnrollNavigator.reindex', async () => {
-            await performInitialIndexing();
+            await performInitialIndexing(context);
             refreshAllUI();
             vscode.window.showInformationMessage(t('reindexComplete'));
         })
@@ -336,7 +337,7 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
                 bindingCodeLensProvider.refresh();
                 updateAllDiagnostics();
                 if (e.affectsConfiguration('bddGuardian.providers')) {
-                    void performInitialIndexing().then(() => refreshAllUI());
+                    void performInitialIndexing(context).then(() => refreshAllUI());
                 }
             }
             if (e.affectsConfiguration('bddGuardian.displayLanguage')) {
@@ -352,7 +353,7 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
     );
 }
 
-async function performInitialIndexing(): Promise<void> {
+async function performInitialIndexing(context?: vscode.ExtensionContext): Promise<void> {
     const config = getConfig();
     getProviderManager().updateConfig({ debug: config.debug });
     indexingStatusBarItem.text = '$(loading~spin) ' + t('statusIndexing');
@@ -363,6 +364,15 @@ async function performInitialIndexing(): Promise<void> {
         indexingStatusBarItem.text = '$(check) ' + t('statusReady');
         indexingStatusBarItem.show();
         setTimeout(() => { indexingStatusBarItem.text = ''; indexingStatusBarItem.hide(); }, 2500);
+        if (context) {
+            const stats = workspaceIndex.getStats();
+            await showZeroBindingsHintIfNeeded(
+                context,
+                stats.bindingCount,
+                stats.featureCount,
+                false
+            );
+        }
     } catch {
         indexingStatusBarItem.text = '$(warning) ' + t('statusIndexingFailed');
         indexingStatusBarItem.show();

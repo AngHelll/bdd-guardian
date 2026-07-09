@@ -92,13 +92,13 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
         }
         
         const action = new vscode.CodeAction(
-            `Disable Coach rule: ${ruleId}`,
+            t('coachDisableRuleAction', ruleId),
             vscode.CodeActionKind.QuickFix
         );
         
         action.command = {
             command: 'bddGuardian.coach.disableRule',
-            title: 'Disable Rule',
+            title: t('coachDisableRuleTitle'),
             arguments: [ruleId],
         };
         
@@ -117,7 +117,7 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
         }
         
         const action = new vscode.CodeAction(
-            `Ignore this line (coach-ignore)`,
+            t('coachIgnoreLineAction'),
             vscode.CodeActionKind.QuickFix
         );
         
@@ -181,12 +181,14 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
             }));
             
             const selected = await vscode.window.showQuickPick(items, {
-                title: 'BDD Coach Rules (v2: 8 rules)',
-                placeHolder: 'Select a rule to view documentation',
+                title: t('coachRulesPickerTitle'),
+                placeHolder: t('coachRulesPickerTitle'),
             });
             
             if (selected) {
-                vscode.window.showInformationMessage(`${selected.label}: ${selected.detail}`);
+                vscode.window.showInformationMessage(
+                    t('coachRuleDetailMessage', selected.label, selected.detail ?? '')
+                );
             }
         })
     );
@@ -239,7 +241,7 @@ export function registerCoachCommands(context: vscode.ExtensionContext): void {
             
             // Also show a quick notification
             vscode.window.showInformationMessage(
-                `BDD Health Score: ${result.emoji} ${result.score}/100 (Grade: ${result.grade})`
+                t('coachHealthScoreMessage', result.emoji, String(result.score), result.grade)
             );
         })
     );

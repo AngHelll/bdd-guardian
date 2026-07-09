@@ -48,5 +48,9 @@
   "coachDisabled": "BDD Coach desactivado",
   "coachRuleDisabled": "Regla del Coach desactivada: {0}",
   "coachApplyQuickFixesFile": "BDD Guardian: Aplicar quick fixes del Coach (archivo)",
-  "debugReportCopied": "Informe de depuración copiado al portapapeles"
+  "debugReportCopied": "Informe de depuración copiado al portapapeles",
+  "onboardingZeroBindings": "No se indexaron bindings de steps. Comprueba que existan step definitions para tu stack (C#, JavaScript, Go, Python, Java…).",
+  "onboardingShowProviderReport": "Ver informe de detección",
+  "onboardingReindex": "Reindexar workspace",
+  "onboardingDismiss": "No volver a mostrar"
 }

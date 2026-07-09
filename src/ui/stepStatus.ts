@@ -133,6 +133,40 @@ export function formatBoundCodeLensTitle(
 }
 
 /**
+ * Codicon for CodeLens titles (aligned with gutter semantics — see docs/VISUAL_LANGUAGE.md).
+ */
+export function getCodeLensIcon(status: StepStatus): string {
+    switch (status) {
+        case StepStatus.Bound:
+            return '$(check)';
+        case StepStatus.Ambiguous:
+            return '$(warning)';
+        case StepStatus.Unbound:
+            return '$(error)';
+        case StepStatus.Indexing:
+            return '$(sync~spin)';
+        default:
+            return '$(question)';
+    }
+}
+
+/**
+ * Map resolver status string to StepStatus.
+ */
+export function stepStatusFromResolve(status: string): StepStatus {
+    if (status === 'unbound') {
+        return StepStatus.Unbound;
+    }
+    if (status === 'ambiguous') {
+        return StepStatus.Ambiguous;
+    }
+    if (status === 'indexing') {
+        return StepStatus.Indexing;
+    }
+    return StepStatus.Bound;
+}
+
+/**
  * Get status emoji for markdown.
  */
 export function getStatusEmoji(status: StepStatus): string {

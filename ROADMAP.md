@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v0.9.1** · **229 unit tests** · Marketplace **v0.9.0** → publish 0.9.1
+> **Current release: v1.0.0** · **237 unit tests** · Marketplace **v1.0.0** (publicado 2026-07-09)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v0.9.1** (repo; Marketplace publish 0.9.1 en curso) |
-| 🎯 Next | **v0.9.2** — framework-aware hover (Track B, backlog) · camino **v1.0.0** |
-| 📋 Gate | v1.0 polish / Track B spec |
-| 🏁 Goal | **v1.0.0** — stable public release with multi-framework navigation |
+| ✅ Shipped | v0.1.0 → **v1.0.0** Marketplace |
+| 🎯 Next | **v0.9.2** — framework-aware hover (backlog P3) |
+| 📋 Gate | Track B hover spec |
+| 🏁 Goal | **v1.x** — polish, onboarding GIF, step autocomplete |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
@@ -186,6 +186,23 @@ Spec: `docs-internal/specs/guardian-index-api-v0.8.2.md` (local).
 
 Spec: `docs-internal/specs/java-cucumber-provider-v0.9.0.md` (local).
 
+Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
+
+---
+
+## Plan v1.0.0 — ✅ shipped (2026-07-09)
+
+| # | Status |
+|---|--------|
+| **1.0.0-A** Communication polish (i18n ES, README, Marketplace copy) | ✅ |
+| **1.0.0-B** Visual identity (`VISUAL_LANGUAGE.md`, CodeLens icons, icon optimize) | ✅ |
+| **1.0.0-C** Marketplace onboarding (zero-bindings hint) | ✅ |
+| **1.0.0-4** CHANGELOG + VSIX + Marketplace | ✅ |
+
+Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketplace-onboarding-v1.0.0.md` (local).
+
+---
+
 ## Plan v0.9.1 — ✅ shipped (2026-07-06)
 
 | # | Status |
@@ -263,4 +280,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-06 — v0.9.1 bindings UX hygiene shipped + Marketplace.*
+*Last updated: 2026-07-09 — v1.0.0 communication polish, visual language, onboarding hint shipped + Marketplace.*

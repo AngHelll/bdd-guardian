@@ -22,7 +22,9 @@ import {
     StepStatus,
     formatBoundCodeLensTitle,
     getAmbiguousStatusLabel,
+    getCodeLensIcon,
     getStatusLabel,
+    stepStatusFromResolve,
 } from '../ui/stepStatus';
 import { refreshLanguage } from '../i18n';
 
@@ -43,8 +45,8 @@ describe('getStatusLabel', () => {
         (globalThis as { __testLang?: string }).__testLang = 'es';
         refreshLanguage();
 
-        expect(getStatusLabel(StepStatus.Bound)).toBe('Vinculado');
-        expect(getStatusLabel(StepStatus.Unbound)).toBe('Sin vincular');
+        expect(getStatusLabel(StepStatus.Bound)).toBe('Enlazado');
+        expect(getStatusLabel(StepStatus.Unbound)).toBe('Sin enlazar');
         expect(getStatusLabel(StepStatus.Ambiguous)).toBe('Ambiguo');
         expect(getStatusLabel(StepStatus.Indexing)).toBe('Indexando…');
     });
@@ -65,5 +67,21 @@ describe('formatBoundCodeLensTitle', () => {
         expect(formatBoundCodeLensTitle('SampleSteps', 'GivenValidUser', 120, true)).toBe(
             'SampleSteps.GivenValidUser (120)'
         );
+    });
+});
+
+describe('getCodeLensIcon', () => {
+    it('maps bound to check and ambiguous to warning', () => {
+        expect(getCodeLensIcon(StepStatus.Bound)).toBe('$(check)');
+        expect(getCodeLensIcon(StepStatus.Unbound)).toBe('$(error)');
+        expect(getCodeLensIcon(StepStatus.Ambiguous)).toBe('$(warning)');
+    });
+});
+
+describe('stepStatusFromResolve', () => {
+    it('maps resolver status strings', () => {
+        expect(stepStatusFromResolve('bound')).toBe(StepStatus.Bound);
+        expect(stepStatusFromResolve('ambiguous')).toBe(StepStatus.Ambiguous);
+        expect(stepStatusFromResolve('unbound')).toBe(StepStatus.Unbound);
     });
 });

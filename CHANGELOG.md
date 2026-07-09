@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-09
+
+**Highlights:** Stable public release — communication polish, visual language, marketplace onboarding hint.
+
+### Added
+
+- **`bddGuardian.onboarding.enabled`** — one-time hint when `.feature` files exist but no bindings are indexed
+- **`docs/VISUAL_LANGUAGE.md`** — status semantics across gutter, CodeLens, hover, Problems
+- i18n: navigation status bar, Coach quick-fix labels, onboarding toast (EN/ES)
+- Vitest: `zeroBindingsHint.test.ts`; extended `stepStatus.test.ts` (`getCodeLensIcon`)
+
+### Changed
+
+- **Spanish glossary** — unified *Enlazado* / *Sin enlazar* / *Ambiguo* for all status labels
+- **CodeLens icons** — `$(check)` bound, `$(error)` unbound, `$(warning)` ambiguous (aligned with gutter)
+- **Marketplace** — description and keywords list all five framework stacks
+- **README** — v1.0.0, corrected CodeLens legend, quick demo section, settings map
+- Removed legacy `icon_placeholder.svg` (Reqnroll Navigator)
+
+### Notes
+
+- Record `docs/assets/guardian-onboarding.gif` manually for README/Marketplace (see `docs/assets/README.md`)
+
 ## [0.9.1] - 2026-07-06
 
 **Highlights:** Bindings **UX hygiene** — consistent BDD Guardian branding in Problems, i18n status labels, optional CodeLens match score.
