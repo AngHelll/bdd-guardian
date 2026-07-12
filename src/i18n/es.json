@@ -52,5 +52,8 @@
   "onboardingZeroBindings": "No se indexaron bindings de steps. Comprueba que existan step definitions para tu stack (C#, JavaScript, Go, Python, Java…).",
   "onboardingShowProviderReport": "Ver informe de detección",
   "onboardingReindex": "Reindexar workspace",
-  "onboardingDismiss": "No volver a mostrar"
+  "onboardingDismiss": "No volver a mostrar",
+  "hoverSuggestedForFramework": "(para {0})",
+  "hoverDetectedFramework": "Stack detectado: {0}",
+  "hoverShowDetectionReport": "Ver informe de detección"
 }

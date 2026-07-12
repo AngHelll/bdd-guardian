@@ -84,6 +84,9 @@ export const en: Record<string, string> = {
   onboardingShowProviderReport: 'Show detection report',
   onboardingReindex: 'Reindex workspace',
   onboardingDismiss: "Don't show again",
+  hoverSuggestedForFramework: '(for {0})',
+  hoverDetectedFramework: 'Detected stack: {0}',
+  hoverShowDetectionReport: 'Show detection report',
 };
 
 export const es: Record<string, string> = {
@@ -167,4 +170,7 @@ export const es: Record<string, string> = {
   onboardingShowProviderReport: 'Ver informe de detección',
   onboardingReindex: 'Reindexar workspace',
   onboardingDismiss: 'No volver a mostrar',
+  hoverSuggestedForFramework: '(para {0})',
+  hoverDetectedFramework: 'Stack detectado: {0}',
+  hoverShowDetectionReport: 'Ver informe de detección',
 };

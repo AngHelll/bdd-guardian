@@ -19,11 +19,17 @@ import {
     getUIConfig, 
     getStatusEmoji, 
     getStatusLabel,
-    formatBinding,
     sortCandidatesByScore 
 } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { getStepAtPosition } from '../../core/references/stepContext';
+import { getProviderManager } from '../../providers/bindings';
+import {
+    buildUnboundBindingSnippet,
+    getPreviewFenceLanguage,
+    resolveHoverFrameworkContext,
+    suggestBindingPattern,
+} from './bindingSnippets';
 
 // Cache for code previews
 const codePreviewCache = new Map<string, { code: string; timestamp: number }>();
@@ -106,10 +112,10 @@ export class HoverProvider implements vscode.HoverProvider {
         } else {
             await this.buildBoundContent(contents, result.best!, step.rawText);
         }
-        
+
         return new vscode.Hover(contents, new vscode.Range(position.line, 0, position.line, line.length));
     }
-    
+
     /**
      * Build content for unbound steps.
      */
@@ -119,15 +125,18 @@ export class HoverProvider implements vscode.HoverProvider {
         keyword: ResolvedKeyword = 'When'
     ): Promise<void> {
         contents.appendMarkdown(t('hoverNoBindingFound') + '\n\n');
-        
-        const suggestedPattern = this.suggestBindingPattern(stepText);
-        contents.appendMarkdown(`**${t('hoverSuggestedBinding')}**\n`);
-        contents.appendMarkdown('```csharp\n');
-        contents.appendMarkdown(`[${keyword}(@"${suggestedPattern}")]\n`);
-        contents.appendMarkdown('public void Step() { }\n');
-        contents.appendMarkdown('```\n');
+
+        const selection = getProviderManager().getCachedSelection();
+        const framework = resolveHoverFrameworkContext({ selection });
+        const pattern = suggestBindingPattern(stepText);
+        const snippet = buildUnboundBindingSnippet(framework.snippetKind, keyword, pattern);
+
+        contents.appendMarkdown(`**${t('hoverSuggestedBinding')}** ${t('hoverSuggestedForFramework', framework.displayName)}\n`);
+        contents.appendMarkdown(`\`\`\`${snippet.fenceLanguage}\n`);
+        contents.appendMarkdown(snippet.code);
+        contents.appendMarkdown('\n```\n');
     }
-    
+
     /**
      * Build content for ambiguous steps (top 3 candidates).
      */
@@ -193,8 +202,9 @@ export class HoverProvider implements vscode.HoverProvider {
         // Code preview: short snippet so the hover fits without scroll; user can open file for full method
         const codePreview = await this.getCodePreview(binding);
         if (codePreview) {
+            const fence = getPreviewFenceLanguage(binding.uri.fsPath);
             contents.appendMarkdown(`**${t('hoverPreview')}:**\n`);
-            contents.appendMarkdown('```csharp\n');
+            contents.appendMarkdown(`\`\`\`${fence}\n`);
             contents.appendMarkdown(codePreview);
             contents.appendMarkdown('\n```\n');
             contents.appendMarkdown('_' + t('hoverClickFileLink') + '_\n');
@@ -211,7 +221,14 @@ export class HoverProvider implements vscode.HoverProvider {
         contents.appendMarkdown(`**${t('hoverStatus')}:** ${getStatusEmoji(StepStatus.Unbound)} ${getStatusLabel(StepStatus.Unbound)}\n\n`);
         contents.appendMarkdown('---\n\n');
         contents.appendMarkdown(t('hoverNoBindingsIndexed') + '\n\n');
-        contents.appendMarkdown(`[${t('hoverReindexNow')}](command:reqnrollNavigator.reindex)`);
+
+        const selection = getProviderManager().getCachedSelection();
+        if (selection?.primary) {
+            contents.appendMarkdown(t('hoverDetectedFramework', selection.primary.displayName) + '\n\n');
+        }
+
+        contents.appendMarkdown(`[${t('hoverReindexNow')}](command:reqnrollNavigator.reindex) · `);
+        contents.appendMarkdown(`[${t('hoverShowDetectionReport')}](command:reqnroll-navigator.showProviderReport)`);
         return new vscode.Hover(contents, new vscode.Range(position.line, 0, position.line, line.length));
     }
 
@@ -308,21 +325,7 @@ export class HoverProvider implements vscode.HoverProvider {
         
         return null;
     }
-    
-    /**
-     * Suggest a binding pattern from step text.
-     */
-    private suggestBindingPattern(stepText: string): string {
-        const pattern = stepText
-            .replace(/"([^"]+)"/g, '"(.*)"')
-            .replace(/'([^']+)'/g, "'(.*)'")
-            .replace(/\b\d+\b/g, '(\\d+)')
-            .replace(/\./g, '\\.')
-            .replace(/\?/g, '\\?');
-        
-        return pattern;
-    }
-    
+
     /**
      * Truncate string for display.
      */

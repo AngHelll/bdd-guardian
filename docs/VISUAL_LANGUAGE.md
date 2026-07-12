@@ -41,6 +41,8 @@ Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 
 Markdown hovers intentionally use emojis (native, readable in VS Code hovers). Labels use i18n (`hoverBound`, etc.).
 
+**Unbound snippets** follow the workspace **primary detected provider** (or binding file extension when bound preview applies): C# attribute, Cucumber.js `Given()`, Behave `@given`, Java `@Given`, Godog `ctx.Given` — see `src/features/hovers/bindingSnippets.ts`.
+
 ## Diagnostics source
 
 Binding diagnostics: **`BDD Guardian`**. Coach findings: **`BDD Coach`**.

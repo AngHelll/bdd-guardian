@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-12
+
+**Highlights:** Framework-aware hover snippets and preview fences; zero-bindings hover shows detected stack.
+
+### Added
+
+- **`bindingSnippets.ts`** — unbound binding templates per provider (C#, JS, Java, Python, Go)
+- i18n: `hoverSuggestedForFramework`, `hoverDetectedFramework`, `hoverShowDetectionReport`
+- Vitest: `bindingSnippets.test.ts`
+- README embed for `docs/assets/guardian-onboarding.gif` (record manually)
+
+### Changed
+
+- Hover **unbound** suggests snippet for primary detected framework (not always C#)
+- Hover **bound** code preview uses correct fence language (`.ts` → typescript, etc.)
+- Zero-bindings hover links to provider detection report when stack is detected
+
 ## [1.0.0] - 2026-07-09
 
 **Highlights:** Stable public release — communication polish, visual language, marketplace onboarding hint.

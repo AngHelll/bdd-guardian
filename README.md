@@ -33,7 +33,9 @@ A VS Code extension that provides intelligent navigation, visual feedback, and d
 
 Open [`samples/binding-demo/`](./samples/binding-demo/) after installing the VSIX: wait for **Ready** in the status bar → CodeLens above a step → **Go to Definition** to the binding.
 
-> Maintainer: record `docs/assets/guardian-onboarding.gif` for README/Marketplace (see [docs/assets/README.md](docs/assets/README.md)).
+![Quick demo — binding-demo: CodeLens and Go to Definition](docs/assets/guardian-onboarding.gif)
+
+> Maintainer: if the GIF is missing locally, record per [docs/assets/README.md](docs/assets/README.md) before Marketplace publish.
 
 ### ✨ Highlights (0.5.x–0.9.x)
 
