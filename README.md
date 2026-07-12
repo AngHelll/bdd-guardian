@@ -187,8 +187,20 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
 | `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
 | `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
+| `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS) |
 
-### Settings map (legacy vs branding)
+### Author actions
+
+On **unbound** steps (Problems panel or lightbulb), BDD Guardian offers:
+
+- **Copy binding snippet** — framework-aware step definition text (same as hover v1.0.1)
+- **Copy suggested pattern** — regex/Cucumber pattern only
+- **Generate binding (insert)** — inserts scaffold into an indexed step-definition file, or creates `StepDefinitions/GuardianGeneratedSteps.cs` / `features/step_definitions/guardian-generated.steps.ts` (C# Reqnroll/SpecFlow and Cucumber.js only; Python/Go/Java: copy actions only)
+
+After generate, **reindex** the workspace to verify the step is bound. Run tests with **BDD Pilot** when ready.
+
+Disable with `bddGuardian.authorActions.enabled: false`.
+
 
 Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibility — do not rename in settings JSON. New UX settings use `bddGuardian.*`.
 
@@ -201,6 +213,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
 | `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
 | `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |
+| `bddGuardian.authorActions.enabled` | branding | Unbound step copy/generate quick fixes |
 | `bddGuardian.coach.*` | branding | Coach rules and UI |
 | `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
 | `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |

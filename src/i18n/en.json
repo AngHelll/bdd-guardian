@@ -55,5 +55,12 @@
   "onboardingDismiss": "Don't show again",
   "hoverSuggestedForFramework": "(for {0})",
   "hoverDetectedFramework": "Detected stack: {0}",
-  "hoverShowDetectionReport": "Show detection report"
+  "hoverShowDetectionReport": "Show detection report",
+  "codeActionCopySnippet": "BDD Guardian: Copy binding snippet",
+  "codeActionCopyPattern": "BDD Guardian: Copy suggested pattern",
+  "codeActionGenerateBinding": "BDD Guardian: Generate binding (insert)",
+  "bindingSnippetCopied": "Binding snippet copied to clipboard",
+  "bindingPatternCopied": "Suggested pattern copied to clipboard",
+  "bindingScaffoldGenerated": "Binding scaffold inserted — reindex to verify",
+  "bindingScaffoldNoTarget": "No step definition file found to insert binding"
 }

@@ -36,6 +36,7 @@ import {
 import { t, refreshLanguage } from './i18n';
 import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
 import { showZeroBindingsHintIfNeeded } from './features/onboarding';
+import { BindingCodeActionsProvider, registerAuthorCommands } from './features/author';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -122,6 +123,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
     
     // Coach Mode: Register commands
     registerCoachCommands(context);
+
+    registerAuthorCommands(context, indexManager);
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { language: 'gherkin', scheme: 'file' },
+            new BindingCodeActionsProvider(),
+            { providedCodeActionKinds: BindingCodeActionsProvider.providedCodeActionKinds }
+        ),
+        vscode.languages.registerCodeActionsProvider(
+            { language: 'feature', scheme: 'file' },
+            new BindingCodeActionsProvider(),
+            { providedCodeActionKinds: BindingCodeActionsProvider.providedCodeActionKinds }
+        )
+    );
 
     registerCommands(context);
     registerEventHandlers(context);
@@ -330,7 +345,8 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
             if (
                 e.affectsConfiguration('reqnrollNavigator') ||
                 e.affectsConfiguration('bddGuardian.providers') ||
-                e.affectsConfiguration('bddGuardian.ui')
+                e.affectsConfiguration('bddGuardian.ui') ||
+                e.affectsConfiguration('bddGuardian.authorActions')
             ) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();

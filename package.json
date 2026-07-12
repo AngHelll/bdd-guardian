@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, Cucumber (JS/TS), Godog, Behave, and Java Cucumber-JVM with CodeLens, Go to Definition, and diagnostics",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -103,6 +103,18 @@
       {
         "command": "bddGuardian.coach.showHealthScore",
         "title": "BDD Guardian: Show Health Score"
+      },
+      {
+        "command": "bddGuardian.author.copySnippet",
+        "title": "BDD Guardian: Copy Binding Snippet"
+      },
+      {
+        "command": "bddGuardian.author.copyPattern",
+        "title": "BDD Guardian: Copy Suggested Pattern"
+      },
+      {
+        "command": "bddGuardian.author.generateBinding",
+        "title": "BDD Guardian: Generate Binding (Insert)"
       }
     ],
     "keybindings": [
@@ -153,6 +165,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show a one-time hint when the workspace has .feature files but no indexed step bindings"
+        },
+        "bddGuardian.authorActions.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show code actions on unbound steps (copy snippet/pattern, generate binding scaffold for C# and JS/TS)"
         },
         "bddGuardian.matching.preferSpecificBinding": {
           "type": "boolean",

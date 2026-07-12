@@ -19,6 +19,12 @@ export const DEBOUNCE_DELAY_MS = 200;
 /** Debounce delay for file watcher events (ms) */
 export const FILE_WATCHER_DEBOUNCE_MS = 300;
 
+/** Problems panel source label for binding diagnostics */
+export const BINDINGS_DIAGNOSTIC_SOURCE = 'BDD Guardian';
+
+/** Diagnostic code for unbound step quick fixes */
+export const UNBOUND_STEP_DIAGNOSTIC_CODE = 'bddGuardian/unbound-step';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // SCORING CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════

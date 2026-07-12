@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-12
+
+**Highlights:** Author DX — copy binding snippets from unbound steps and generate scaffolds (C# / JS/TS).
+
+### Added
+
+- **Code actions** on unbound steps: copy binding snippet, copy suggested pattern, generate binding (insert)
+- **`bddGuardian.authorActions.enabled`** — master toggle for author quick fixes
+- **`scaffoldInsert.ts`** — pure insert logic for C# `[Binding]` classes and Cucumber.js append
+- Diagnostic code `bddGuardian/unbound-step` for robust quick-fix filtering
+- Vitest: `scaffoldInsert.test.ts`, `bindingCodeActions.test.ts`
+
+### Changed
+
+- README: **Author actions** section under Configuration
+
 ## [1.0.1] - 2026-07-12
 
 **Highlights:** Framework-aware hover snippets and preview fences; zero-bindings hover shows detected stack.

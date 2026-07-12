@@ -87,6 +87,13 @@ export const en: Record<string, string> = {
   hoverSuggestedForFramework: '(for {0})',
   hoverDetectedFramework: 'Detected stack: {0}',
   hoverShowDetectionReport: 'Show detection report',
+  codeActionCopySnippet: 'BDD Guardian: Copy binding snippet',
+  codeActionCopyPattern: 'BDD Guardian: Copy suggested pattern',
+  codeActionGenerateBinding: 'BDD Guardian: Generate binding (insert)',
+  bindingSnippetCopied: 'Binding snippet copied to clipboard',
+  bindingPatternCopied: 'Suggested pattern copied to clipboard',
+  bindingScaffoldGenerated: 'Binding scaffold inserted — reindex to verify',
+  bindingScaffoldNoTarget: 'No step definition file found to insert binding',
 };
 
 export const es: Record<string, string> = {
@@ -173,4 +180,11 @@ export const es: Record<string, string> = {
   hoverSuggestedForFramework: '(para {0})',
   hoverDetectedFramework: 'Stack detectado: {0}',
   hoverShowDetectionReport: 'Ver informe de detección',
+  codeActionCopySnippet: 'BDD Guardian: Copiar snippet de binding',
+  codeActionCopyPattern: 'BDD Guardian: Copiar patrón sugerido',
+  codeActionGenerateBinding: 'BDD Guardian: Generar binding (insertar)',
+  bindingSnippetCopied: 'Snippet de binding copiado al portapapeles',
+  bindingPatternCopied: 'Patrón sugerido copiado al portapapeles',
+  bindingScaffoldGenerated: 'Scaffold de binding insertado — reindexa para verificar',
+  bindingScaffoldNoTarget: 'No se encontró archivo de step definitions para insertar el binding',
 };

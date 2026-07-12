@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.0.1** · **245 unit tests** · Marketplace **v1.0.0** → publish 1.0.1
+> **Current release: v1.0.1** · **247 unit tests** · Marketplace **v1.0.1** (publicado 2026-07-12)
 
 ---
 
@@ -11,7 +11,7 @@
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.0.0** Marketplace |
 | 🎯 Next | **v1.1.0** — binding author DX (copy pattern, generate scaffold) |
-| 📋 Gate | v1.1 spec |
+| 📋 Gate | Spec `author-dx-v1.1.0.md` — implementado, pendiente verify/ship |
 | 🏁 Goal | **v1.x** — v1.1 author DX → v1.2 productivity → v1.3+ platform |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
@@ -29,7 +29,8 @@
 | **VS Code UX** | CodeLens, go to definition, diagnostics, decorations, history |
 | **Coach** | Optional `.feature` quality rules (non-blocking) |
 
-**Explicitly not MVP:** step autocomplete, generate binding from step, copy-as-pattern — see [backlog](#post-v050-backlog).
+**Explicitly not MVP (v1.0):** step autocomplete — see v1.2.  
+**v1.1.0:** copy-as-pattern + generate binding scaffold — see [Plan v1.1.0](#plan-v110--spec-lista-2026-07-12).
 
 ---
 
@@ -49,7 +50,7 @@
 | **0.9.1** | Bindings UX hygiene — diagnostic source, i18n labels, `showMatchScore` |
 | **1.0.0** | Stable API, marketplace-ready docs, communication + visual polish |
 | **1.0.1** | Framework-aware hover + onboarding GIF *(shipped 2026-07-12)* |
-| **1.1.0** | Binding author DX — copy pattern, generate scaffold *(backlog)* |
+| **1.1.0** | Binding author DX — copy pattern, generate scaffold *(spec lista)* |
 
 ---
 
@@ -217,6 +218,20 @@ Spec: `docs-internal/specs/polish-v1.0.1.md` (local).
 
 ---
 
+## Plan v1.1.0 — 📋 spec lista (2026-07-12)
+
+| # | Status |
+|---|--------|
+| **1.1.0-A** Copy binding snippet + copy pattern (clipboard) | ✅ |
+| **1.1.0-B** Generate scaffold insert (C# + JS/TS) | ✅ |
+| **1.1.0-3** README + CHANGELOG + VSIX | ✅ |
+
+Spec: `docs-internal/specs/author-dx-v1.1.0.md` (local).
+
+**Exit criteria:** unbound step → copy + generate en `binding-demo` y `cucumber-demo`; reindex → bound.
+
+---
+
 ## Plan v0.9.1 — ✅ shipped (2026-07-06)
 
 | # | Status |
@@ -266,8 +281,8 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | P2 | ~~**Godog provider**~~ | ✅ v0.7.0 |
 | P3 | ~~Framework-aware hover (Track B)~~ | → **v1.0.1** spec `polish-v1.0.1.md` |
 | P3 | Step autocomplete | Productivity v1.2 — needs index API |
-| P3 | Generate binding from unbound step | v1.1 — complements Pilot `PENDING_STEPS` |
-| P3 | Copy as pattern code action | v1.1 — DX binding authors |
+| P3 | ~~Copy as pattern code action~~ | → **v1.1.0** Track A |
+| P3 | ~~Generate binding from unbound step~~ | → **v1.1.0** Track B (C#/JS); Behave/Go/Java v1.1.1 |
 | P4 | Shared `@anghelll/bdd-gherkin-lite` with Pilot | v1.3+ — wait parsers stable |
 | P4 | ~~Onboarding GIF / empty workspace hint~~ | Hint ✅ v1.0.0 · GIF → **v1.0.1** |
 | P2 | ~~**Java Cucumber provider**~~ | ✅ v0.9.0 — `samples/java-cucumber-demo` |
@@ -294,4 +309,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-12 — v1.0.1 framework-aware hover shipped.*
+*Last updated: 2026-07-12 — v1.1.0 author DX spec alineada.*

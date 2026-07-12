@@ -7,8 +7,10 @@ import { IndexManager } from '../../core/index';
 import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getConfig, shouldShowStep } from '../../config';
-import { ResolvedKeyword } from '../../core/domain';
+import { ResolvedKeyword, BINDINGS_DIAGNOSTIC_SOURCE, UNBOUND_STEP_DIAGNOSTIC_CODE } from '../../core/domain';
 import { t } from '../../i18n';
+
+export { BINDINGS_DIAGNOSTIC_SOURCE } from '../../core/domain/constants';
 
 export interface DiagnosticsResult {
     readonly uri: vscode.Uri;
@@ -17,8 +19,6 @@ export interface DiagnosticsResult {
     readonly ambiguous: number;
     readonly bound: number;
 }
-
-export const BINDINGS_DIAGNOSTIC_SOURCE = 'BDD Guardian';
 
 export class DiagnosticsEngine {
     private diagnosticCollection: vscode.DiagnosticCollection;
@@ -89,6 +89,7 @@ export class DiagnosticsEngine {
                     vscode.DiagnosticSeverity.Warning
                 );
                 diagnostic.source = BINDINGS_DIAGNOSTIC_SOURCE;
+                diagnostic.code = UNBOUND_STEP_DIAGNOSTIC_CODE;
                 diagnostics.push(diagnostic);
             } else if (result.status === 'ambiguous') {
                 ambiguous++;
