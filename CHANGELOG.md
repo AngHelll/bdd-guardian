@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-15
+
+**Highlights:** Coach rules oleada — dominant Then + redundant Feature→Scenario tags.
+
+### Added
+
+- **`coach/dominant-then`** — warn on missing Then or more than `bddGuardian.coach.dominantThen.max` (default 1)
+- **`coach/redundant-tags`** — info when Scenario repeats a Feature tag; Quick Fix removes the tag
+- Vitest coverage in `coach.test.ts`
+
+### Changed
+
+- README Coach section lists the two new rules
+
 ## [1.3.0] - 2026-07-15
 
 **Highlights:** Orphan / unused binding diagnostics — mapa 360° (feature unbound + binding unused).

@@ -13,6 +13,15 @@ export { outlineExamplesRule } from './outlineExamplesRule';
 export { DuplicateStepsRule } from './duplicateStepsRule';
 export { VagueThenRule } from './vagueThenRule';
 export { TooManyStepsRule } from './tooManyStepsRule';
+export { DominantThenRule, createDominantThenRule, dominantThenRule } from './dominantThenRule';
+export {
+    RedundantTagsRule,
+    redundantTagsRule,
+    normalizeCoachTag,
+    removeTagFromLine,
+    findTagLineAbove,
+    parseRedundantTagFromMessage,
+} from './redundantTagsRule';
 
 import { CoachRule, CoachConfig } from './types';
 import { scenarioNameRule } from './scenarioNameRule';
@@ -23,6 +32,8 @@ import { outlineExamplesRule } from './outlineExamplesRule';
 import { DuplicateStepsRule } from './duplicateStepsRule';
 import { VagueThenRule } from './vagueThenRule';
 import { TooManyStepsRule } from './tooManyStepsRule';
+import { createDominantThenRule } from './dominantThenRule';
+import { redundantTagsRule } from './redundantTagsRule';
 
 /**
  * Get all default rules with the given configuration.
@@ -39,6 +50,9 @@ export function getDefaultRules(config?: CoachConfig): CoachRule[] {
         new DuplicateStepsRule(),
         new VagueThenRule(),
         new TooManyStepsRule(),
+        // v1.4.0
+        createDominantThenRule(config),
+        redundantTagsRule,
     ];
 }
 
@@ -55,5 +69,7 @@ export function getAllRuleInfo(): { id: string; name: string; description: strin
         { id: 'coach/duplicate-steps', name: 'Duplicate Steps', description: 'Detects repeated step text that could indicate copy-paste errors or missing abstractions.' },
         { id: 'coach/vague-then', name: 'Vague Then Assertion', description: 'Then steps should assert specific, observable outcomes, not vague statements.' },
         { id: 'coach/too-many-steps', name: 'Too Many Steps', description: 'Scenarios should be focused and have a reasonable number of steps.' },
+        { id: 'coach/dominant-then', name: 'Dominant Then', description: 'Scenarios should have a clear Then outcome (at least one, capped by max).' },
+        { id: 'coach/redundant-tags', name: 'Redundant Tags', description: 'Scenario tags that already appear on Feature are redundant.' },
     ];
 }

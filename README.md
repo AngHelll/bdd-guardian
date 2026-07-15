@@ -124,12 +124,15 @@ Works with any indexed framework (Reqnroll, SpecFlow, and future Cucumber.js, Be
 
 ### 🏥 BDD Coach (optional)
 
-Best-practice hints for `.feature` files (duplicate steps, GWT structure, vague Then, step length, UI leakage, etc.).
+Best-practice hints for `.feature` files (duplicate steps, GWT structure, vague Then, dominant Then, redundant Feature→Scenario tags, step length, UI leakage, etc.).
 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `bddGuardian.coach.enabled` | `false` | Enable Coach diagnostics in the Problems panel |
 | `bddGuardian.coach.statusBar.enabled` | `true` | Health score in the status bar when Coach is on |
+| `bddGuardian.coach.dominantThen.max` | `1` | Max Then steps per scenario before `coach/dominant-then` warns |
+
+Quick Fix: remove redundant scenario tags that already exist on Feature.
 
 Commands: **BDD Guardian: Toggle Coach Mode**, **Show Coach Rules**, **Show Health Score**.
 

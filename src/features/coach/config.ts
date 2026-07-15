@@ -27,6 +27,9 @@ export function getCoachConfig(): CoachConfig {
     
     // Parse step length max
     const stepLengthMax = config.get<number>('stepLength.max', 120);
+
+    // Parse dominant Then max
+    const dominantThenMax = config.get<number>('dominantThen.max', 1);
     
     // Parse disabled rules
     const disabled = config.get<string[]>('disabled', []);
@@ -35,6 +38,7 @@ export function getCoachConfig(): CoachConfig {
         severityOverrides,
         disabled,
         stepLength: { max: stepLengthMax },
+        dominantThen: { max: dominantThenMax },
     };
     
     // Only add uiLeakage if keywords are provided

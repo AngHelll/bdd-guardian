@@ -11,6 +11,13 @@ import { outlineExamplesRule } from '../features/coach/rules/outlineExamplesRule
 import { DuplicateStepsRule } from '../features/coach/rules/duplicateStepsRule';
 import { VagueThenRule } from '../features/coach/rules/vagueThenRule';
 import { TooManyStepsRule } from '../features/coach/rules/tooManyStepsRule';
+import { createDominantThenRule } from '../features/coach/rules/dominantThenRule';
+import {
+    redundantTagsRule,
+    removeTagFromLine,
+    findTagLineAbove,
+    parseRedundantTagFromMessage,
+} from '../features/coach/rules/redundantTagsRule';
 import { GherkinModel, GherkinScenario, GherkinStep } from '../features/coach/rules/types';
 
 // Helper to create test models
@@ -448,5 +455,126 @@ describe('TooManyStepsRule', () => {
         const findings = rule.run(model);
         const warnings = findings.filter(f => f.severity === 'warning');
         expect(warnings.length).toBe(0);
+    });
+});
+
+describe('DominantThenRule', () => {
+    it('flags scenarios with no Then', () => {
+        const rule = createDominantThenRule({ dominantThen: { max: 1 } });
+        const findings = rule.run(
+            createModel([
+                createScenario('User logs in successfully', [
+                    createStep('Given', 'I am on login', 'Given', 2),
+                    createStep('When', 'I submit', 'When', 3),
+                ]),
+            ])
+        );
+        expect(findings).toHaveLength(1);
+        expect(findings[0].ruleId).toBe('coach/dominant-then');
+        expect(findings[0].message).toContain('no Then');
+    });
+
+    it('accepts exactly one Then when max is 1', () => {
+        const rule = createDominantThenRule({ dominantThen: { max: 1 } });
+        const findings = rule.run(
+            createModel([
+                createScenario('User logs in successfully', [
+                    createStep('Given', 'I am on login', 'Given', 2),
+                    createStep('When', 'I submit', 'When', 3),
+                    createStep('Then', 'I see the dashboard', 'Then', 4),
+                ]),
+            ])
+        );
+        expect(findings).toHaveLength(0);
+    });
+
+    it('flags extra Then steps when over max', () => {
+        const rule = createDominantThenRule({ dominantThen: { max: 1 } });
+        const findings = rule.run(
+            createModel([
+                createScenario('User logs in successfully', [
+                    createStep('Given', 'I am on login', 'Given', 2),
+                    createStep('When', 'I submit', 'When', 3),
+                    createStep('Then', 'I see the dashboard', 'Then', 4),
+                    createStep('Then', 'I see my name', 'Then', 5),
+                ]),
+            ])
+        );
+        expect(findings).toHaveLength(1);
+        expect(findings[0].line).toBe(5);
+    });
+
+    it('allows two Then steps when max is 2', () => {
+        const rule = createDominantThenRule({ dominantThen: { max: 2 } });
+        const findings = rule.run(
+            createModel([
+                createScenario('User logs in successfully', [
+                    createStep('Then', 'first outcome here', 'Then', 4),
+                    createStep('Then', 'second outcome here', 'Then', 5),
+                ]),
+            ])
+        );
+        expect(findings).toHaveLength(0);
+    });
+});
+
+describe('RedundantTagsRule', () => {
+    it('flags scenario tags that duplicate feature tags', () => {
+        const model: GherkinModel = {
+            scenarios: [
+                {
+                    title: 'User can search catalogue',
+                    line: 5,
+                    isOutline: false,
+                    steps: [createStep('Given', 'I am home', 'Given')],
+                    examples: [],
+                    tags: ['@smoke', '@login'],
+                },
+            ],
+            featureTags: ['@smoke'],
+        };
+        const findings = redundantTagsRule.run(model);
+        expect(findings).toHaveLength(1);
+        expect(findings[0].ruleId).toBe('coach/redundant-tags');
+        expect(findings[0].message).toContain('@smoke');
+        expect(findings[0].message).not.toContain('@login');
+    });
+
+    it('ignores scenario-only tags', () => {
+        const model: GherkinModel = {
+            scenarios: [
+                {
+                    title: 'User can search catalogue',
+                    line: 5,
+                    isOutline: false,
+                    steps: [],
+                    examples: [],
+                    tags: ['@login'],
+                },
+            ],
+            featureTags: ['@smoke'],
+        };
+        expect(redundantTagsRule.run(model)).toHaveLength(0);
+    });
+});
+
+describe('removeTagFromLine / findTagLineAbove', () => {
+    it('removes one tag and keeps others', () => {
+        expect(removeTagFromLine('  @smoke @login', '@smoke')).toBe('  @login');
+    });
+
+    it('returns null when line would be empty', () => {
+        expect(removeTagFromLine('  @smoke', '@smoke')).toBeNull();
+    });
+
+    it('finds tag line above scenario', () => {
+        const lines = ['Feature: X', '', '  @smoke @login', '  Scenario: Hello world here', '    Given x'];
+        expect(findTagLineAbove(lines, 3, '@smoke')).toBe(2);
+    });
+
+    it('parses tag from finding message', () => {
+        expect(
+            parseRedundantTagFromMessage('Redundant tag "@smoke": already declared on Feature.')
+        ).toBe('@smoke');
     });
 });

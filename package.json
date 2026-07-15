@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, Cucumber (JS/TS), Godog, Behave, and Java Cucumber-JVM with CodeLens, Go to Definition, and diagnostics",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -305,6 +305,13 @@
           "minimum": 50,
           "maximum": 300,
           "description": "Maximum step length before warning"
+        },
+        "bddGuardian.coach.dominantThen.max": {
+          "type": "number",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Maximum Then steps per scenario before coach/dominant-then warns (And/But resolving to Then count)"
         },
         "bddGuardian.coach.statusBar.enabled": {
           "type": "boolean",

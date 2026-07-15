@@ -151,6 +151,9 @@ export interface CoachConfig {
     stepLength?: {
         max: number;
     };
+    dominantThen?: {
+        max: number;
+    };
 }
 
 /**

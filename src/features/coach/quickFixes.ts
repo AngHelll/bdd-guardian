@@ -10,6 +10,11 @@ import { CoachDiagnosticsProvider } from './coachDiagnostics';
 import { calculateHealthScore, formatHealthReport } from './healthScore';
 import { getAllRuleInfo } from './rules';
 import { computeCoachQuickFixInserts } from './quickFixBatch';
+import {
+    findTagLineAbove,
+    parseRedundantTagFromMessage,
+    removeTagFromLine,
+} from './rules/redundantTagsRule';
 import { t } from '../../i18n';
 
 export class CoachQuickFixProvider implements vscode.CodeActionProvider {
@@ -37,6 +42,11 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
         }
 
         for (const diagnostic of coachDiagnostics) {
+            const removeTagAction = this.createRemoveRedundantTagAction(document, diagnostic);
+            if (removeTagAction) {
+                actions.push(removeTagAction);
+            }
+
             // Create "Disable this rule" action
             const disableAction = this.createDisableRuleAction(diagnostic);
             if (disableAction) {
@@ -51,6 +61,47 @@ export class CoachQuickFixProvider implements vscode.CodeActionProvider {
         }
         
         return actions;
+    }
+
+    private createRemoveRedundantTagAction(
+        document: vscode.TextDocument,
+        diagnostic: vscode.Diagnostic
+    ): vscode.CodeAction | undefined {
+        if (diagnostic.code !== 'coach/redundant-tags') {
+            return undefined;
+        }
+        const tag = parseRedundantTagFromMessage(diagnostic.message);
+        if (!tag) {
+            return undefined;
+        }
+
+        const lines = document.getText().split(/\r?\n/);
+        const tagLine = findTagLineAbove(lines, diagnostic.range.start.line, tag);
+        if (tagLine === null) {
+            return undefined;
+        }
+
+        const original = lines[tagLine];
+        const next = removeTagFromLine(original, tag);
+        if (next === original) {
+            return undefined;
+        }
+
+        const action = new vscode.CodeAction(
+            t('coachRemoveRedundantTag', tag),
+            vscode.CodeActionKind.QuickFix
+        );
+        const edit = new vscode.WorkspaceEdit();
+        if (next === null) {
+            const lineRange = document.lineAt(tagLine).rangeIncludingLineBreak;
+            edit.delete(document.uri, lineRange);
+        } else {
+            const lineRange = document.lineAt(tagLine).range;
+            edit.replace(document.uri, lineRange, next);
+        }
+        action.edit = edit;
+        action.isPreferred = true;
+        return action;
     }
 
     private createApplyQuickFixesFileAction(

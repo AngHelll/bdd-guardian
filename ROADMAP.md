@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.3.0** · Marketplace **v1.2.0** (local v1.3.0 pending ship)
+> **Current release: v1.4.0** · Marketplace **v1.3.0** (local v1.4.0 pending ship)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.2.0** Marketplace |
-| 🎯 Next | **v1.3.0** — orphan bindings *(implementado; pendiente verify/ship)* |
-| 📋 Gate | Spec `orphan-bindings-v1.3.0.md` — Capa B |
-| 🏁 Goal | **v1.x** — mapa 360° (unbound + orphan) → platform |
+| ✅ Shipped | v0.1.0 → **v1.3.0** Marketplace |
+| 🎯 Next | **v1.4.0** — Coach rules *(implementado; pendiente verify/ship)* |
+| 📋 Gate | Spec `coach-rules-v1.4.0.md` — Capa B |
+| 🏁 Goal | **v1.x** — mapa 360° ✅ → calidad Coach → platform |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
@@ -30,7 +30,8 @@
 | **Coach** | Optional `.feature` quality rules (non-blocking) |
 
 **v1.2.0:** step autocomplete — ✅ shipped.  
-**v1.3.0:** orphan / unused bindings — see [Plan v1.3.0](#plan-v130--spec-lista-2026-07-15).
+**v1.3.0:** orphan / unused bindings — ✅ shipped.  
+**v1.4.0:** Coach rules oleada — see [Plan v1.4.0](#plan-v140--spec-lista-2026-07-15).
 
 ---
 
@@ -52,7 +53,8 @@
 | **1.0.1** | Framework-aware hover + onboarding GIF *(shipped 2026-07-12)* |
 | **1.1.0** | Binding author DX — copy pattern, generate scaffold *(shipped 2026-07-12)* |
 | **1.2.0** | Step autocomplete from indexed bindings *(shipped 2026-07-15)* |
-| **1.3.0** | Orphan / unused binding diagnostics *(implementado)* |
+| **1.3.0** | Orphan / unused binding diagnostics *(shipped 2026-07-15)* |
+| **1.4.0** | Coach rules — dominant Then + redundant tags *(implementado)* |
 
 ---
 
@@ -208,17 +210,31 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
-## Plan v1.3.0 — 🔄 implementado (2026-07-15)
+## Plan v1.4.0 — 🔄 implementado (2026-07-15)
+
+| # | Status |
+|---|--------|
+| **1.4.0-A** Rule `coach/dominant-then` + setting `max` | ✅ |
+| **1.4.0-B** Rule `coach/redundant-tags` + Quick Fix | ✅ |
+| **1.4.0-3** Wire + tests + CHANGELOG + VSIX | ✅ (verify pending) |
+
+Spec: `docs-internal/specs/coach-rules-v1.4.0.md` (local).
+
+**Exit criteria:** missing/too-many Then y tags Feature→Scenario detectados; Quick Fix tags; Coach toggle OK.
+
+---
+
+## Plan v1.3.0 — ✅ shipped (2026-07-15)
 
 | # | Status |
 |---|--------|
 | **1.3.0-A** `listOrphanBindings` + tests | ✅ |
 | **1.3.0-B** Diagnostics Information on binding files | ✅ |
-| **1.3.0-3** Setting + VISUAL_LANGUAGE + README + VSIX | ✅ (verify pending) |
+| **1.3.0-3** Setting + VISUAL_LANGUAGE + README + VSIX | ✅ |
 
 Spec: `docs-internal/specs/orphan-bindings-v1.3.0.md` (local).
 
-**Exit criteria:** binding sin usos → Problems Information; setting off limpia; CodeLens “No usages” intacto.
+**Exit criteria met:** orphan en Problems; setting off limpia; CodeLens “No usages” intacto.
 
 ---
 
@@ -307,7 +323,7 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | P1 | ~~**Cucumber JS provider**~~ | ✅ v0.6.1 — `cucumber-demo` |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
 | P2 | ~~**Behave provider**~~ | ✅ v0.7.1 — `samples/behave-demo` |
-| P2 | Coach: more rules + quick fixes | un Then dominante, imperativo, tags redundantes |
+| P2 | Coach: more rules + quick fixes | → **v1.4.0** spec `coach-rules-v1.4.0.md` |
 | P2 | ~~**Godog provider**~~ | ✅ v0.7.0 |
 | P3 | ~~Framework-aware hover (Track B)~~ | → **v1.0.1** spec `polish-v1.0.1.md` |
 | P3 | Step autocomplete | → **v1.2.0** spec `step-autocomplete-v1.2.0.md` |
@@ -339,4 +355,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-15 — v1.3.0 orphan bindings spec alineada.*
+*Last updated: 2026-07-15 — v1.4.0 Coach rules spec alineada.*
