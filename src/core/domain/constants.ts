@@ -25,6 +25,12 @@ export const BINDINGS_DIAGNOSTIC_SOURCE = 'BDD Guardian';
 /** Diagnostic code for unbound step quick fixes */
 export const UNBOUND_STEP_DIAGNOSTIC_CODE = 'bddGuardian/unbound-step';
 
+/** Diagnostic code for unused (orphan) bindings */
+export const ORPHAN_BINDING_DIAGNOSTIC_CODE = 'bddGuardian/orphan-binding';
+
+/** Skip orphan scan when indexed bindings exceed this count */
+export const MAX_ORPHAN_BINDING_SCAN = 2000;
+
 // ═══════════════════════════════════════════════════════════════════════════
 // SCORING CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════

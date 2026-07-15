@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.2.0** · Marketplace **v1.1.0** (local v1.2.0 pending ship)
+> **Current release: v1.3.0** · Marketplace **v1.2.0** (local v1.3.0 pending ship)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.1.0** Marketplace |
-| 🎯 Next | **v1.2.0** — step autocomplete *(implementado; pendiente verify/ship)* |
-| 📋 Gate | Spec `step-autocomplete-v1.2.0.md` — Capa B |
-| 🏁 Goal | **v1.x** — v1.1 author DX ✅ → v1.2 productivity → v1.3+ platform |
+| ✅ Shipped | v0.1.0 → **v1.2.0** Marketplace |
+| 🎯 Next | **v1.3.0** — orphan bindings *(implementado; pendiente verify/ship)* |
+| 📋 Gate | Spec `orphan-bindings-v1.3.0.md` — Capa B |
+| 🏁 Goal | **v1.x** — mapa 360° (unbound + orphan) → platform |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
@@ -29,9 +29,8 @@
 | **VS Code UX** | CodeLens, go to definition, diagnostics, decorations, history |
 | **Coach** | Optional `.feature` quality rules (non-blocking) |
 
-**Explicitly not MVP (v1.0):** step autocomplete — now **v1.2.0**.  
-**v1.1.0:** copy-as-pattern + generate binding scaffold — ✅ shipped.  
-**v1.2.0:** step autocomplete — see [Plan v1.2.0](#plan-v120--spec-lista-2026-07-15).
+**v1.2.0:** step autocomplete — ✅ shipped.  
+**v1.3.0:** orphan / unused bindings — see [Plan v1.3.0](#plan-v130--spec-lista-2026-07-15).
 
 ---
 
@@ -52,7 +51,8 @@
 | **1.0.0** | Stable API, marketplace-ready docs, communication + visual polish |
 | **1.0.1** | Framework-aware hover + onboarding GIF *(shipped 2026-07-12)* |
 | **1.1.0** | Binding author DX — copy pattern, generate scaffold *(shipped 2026-07-12)* |
-| **1.2.0** | Step autocomplete from indexed bindings *(implementado)* |
+| **1.2.0** | Step autocomplete from indexed bindings *(shipped 2026-07-15)* |
+| **1.3.0** | Orphan / unused binding diagnostics *(implementado)* |
 
 ---
 
@@ -208,17 +208,31 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
-## Plan v1.2.0 — 🔄 implementado (2026-07-15)
+## Plan v1.3.0 — 🔄 implementado (2026-07-15)
+
+| # | Status |
+|---|--------|
+| **1.3.0-A** `listOrphanBindings` + tests | ✅ |
+| **1.3.0-B** Diagnostics Information on binding files | ✅ |
+| **1.3.0-3** Setting + VISUAL_LANGUAGE + README + VSIX | ✅ (verify pending) |
+
+Spec: `docs-internal/specs/orphan-bindings-v1.3.0.md` (local).
+
+**Exit criteria:** binding sin usos → Problems Information; setting off limpia; CodeLens “No usages” intacto.
+
+---
+
+## Plan v1.2.0 — ✅ shipped (2026-07-15)
 
 | # | Status |
 |---|--------|
 | **1.2.0-A** Completion provider + keyword/prefix filter | ✅ |
 | **1.2.0-B** Pattern humanize → insertText | ✅ |
-| **1.2.0-3** README + CHANGELOG + VSIX | ✅ (verify pending) |
+| **1.2.0-3** README + CHANGELOG + VSIX | ✅ |
 
 Spec: `docs-internal/specs/step-autocomplete-v1.2.0.md` (local).
 
-**Exit criteria:** en `binding-demo`, `Given ` → IntelliSense bindings; accept → step bound (heurística); setting off silencia.
+**Exit criteria met:** IntelliSense desde índice en `binding-demo`; setting off silencia.
 
 ---
 
@@ -325,4 +339,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-15 — v1.2.0 step autocomplete spec alineada.*
+*Last updated: 2026-07-15 — v1.3.0 orphan bindings spec alineada.*

@@ -65,6 +65,23 @@ export function findReferencesForBinding(
 }
 
 /**
+ * Bindings with zero feature-step usages (same rules as binding CodeLens).
+ */
+export function listOrphanBindings(
+    bindings: readonly Binding[],
+    allSteps: readonly FeatureStep[],
+    resolve: ResolveStep
+): Binding[] {
+    const orphans: Binding[] = [];
+    for (const binding of bindings) {
+        if (findReferencesForBinding(binding, allSteps, resolve).length === 0) {
+            orphans.push(binding);
+        }
+    }
+    return orphans;
+}
+
+/**
  * Other steps related to the source: same binding (if bound) and/or same normalized step text.
  */
 export function findReferencesForStep(

@@ -189,12 +189,19 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
 | `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
+| `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on step bindings that no feature step resolves to |
 
 ### Autocomplete
 
 While typing a Gherkin step (`Given` / `When` / `Then` / `And` / `But`), IntelliSense suggests steps from the **same index** used by CodeLens and diagnostics (keyword + prefix filter; patterns are humanized for insert). Autocomplete does not invent steps and does not run tests — use [BDD Pilot](https://github.com/AngHelll/bdd-pilot) to execute.
 
 Disable with `bddGuardian.autocomplete.enabled: false`.
+
+### Orphan bindings
+
+Bindings that no indexed feature step resolves to appear in the Problems panel as **Information** diagnostics on the binding file (dual of unbound steps). CodeLens “No usages” on step definitions remains unchanged.
+
+Disable with `bddGuardian.orphanBindings.enabled: false`. Workspaces with more than 2000 indexed bindings skip the orphan scan (see Output channel).
 
 ### Author actions
 
@@ -222,6 +229,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |
 | `bddGuardian.authorActions.enabled` | branding | Unbound step copy/generate quick fixes |
 | `bddGuardian.autocomplete.enabled` | branding | Step IntelliSense from indexed bindings |
+| `bddGuardian.orphanBindings.enabled` | branding | Unused binding Problems (Information) |
 | `bddGuardian.coach.*` | branding | Coach rules and UI |
 | `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
 | `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |

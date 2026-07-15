@@ -21,6 +21,7 @@ import {
     getNavigationHistory,
     copyDebugReportToClipboard,
     recordIndexDuration,
+    OrphanBindingsDiagnostics,
 } from './features';
 import { getProviderManager } from './providers/bindings';
 import { BindingCodeLensProvider } from './providers/bindingCodeLensProvider';
@@ -41,6 +42,7 @@ import { BindingCodeActionsProvider, registerAuthorCommands, StepCompletionProvi
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
 let diagnosticsEngine: DiagnosticsEngine;
+let orphanBindingsDiagnostics: OrphanBindingsDiagnostics;
 let decorationsManager: DecorationsManager;
 let fileWatchers: FileWatchers;
 let outputChannel: vscode.OutputChannel;
@@ -57,6 +59,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
     workspaceIndex = new WorkspaceIndex();
     indexManager = new IndexManager(workspaceIndex, outputChannel);
     diagnosticsEngine = new DiagnosticsEngine(indexManager);
+    orphanBindingsDiagnostics = new OrphanBindingsDiagnostics(indexManager, outputChannel);
     decorationsManager = new DecorationsManager(indexManager);
 
     fileWatchers = new FileWatchers(
@@ -152,7 +155,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
 
     context.subscriptions.push(
         outputChannel, 
-        diagnosticsEngine, 
+        diagnosticsEngine,
+        orphanBindingsDiagnostics,
         decorationsManager, 
         fileWatchers,
         getNavigationHistory()
@@ -311,6 +315,7 @@ let featureEditDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 function refreshFeatureFileUI(doc: vscode.TextDocument): void {
     codeLensProvider.refresh();
     diagnosticsEngine.analyzeFile(doc);
+    orphanBindingsDiagnostics.refresh();
     const editor = vscode.window.activeTextEditor;
     if (editor && editor.document.uri.toString() === doc.uri.toString()) {
         decorationsManager.updateDecorations(editor);
@@ -355,12 +360,14 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
                 e.affectsConfiguration('reqnrollNavigator') ||
                 e.affectsConfiguration('bddGuardian.providers') ||
                 e.affectsConfiguration('bddGuardian.ui') ||
-                e.affectsConfiguration('bddGuardian.authorActions')
+                e.affectsConfiguration('bddGuardian.authorActions') ||
+                e.affectsConfiguration('bddGuardian.orphanBindings')
             ) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
                 updateAllDiagnostics();
+                orphanBindingsDiagnostics.refresh();
                 if (e.affectsConfiguration('bddGuardian.providers')) {
                     void performInitialIndexing(context).then(() => refreshAllUI());
                 }
@@ -369,6 +376,7 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
                 refreshLanguage();
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
+                orphanBindingsDiagnostics.refresh();
                 const editor = vscode.window.activeTextEditor;
                 if (editor && isFeatureFile(editor.document)) {
                     decorationsManager.updateDecorationsImmediate(editor);
@@ -415,6 +423,7 @@ function refreshAllUI(): void {
     codeLensProvider.refresh();
     bindingCodeLensProvider.refresh();
     updateAllDiagnostics();
+    orphanBindingsDiagnostics.refresh();
     if (vscode.window.activeTextEditor) {
         decorationsManager.updateDecorations(vscode.window.activeTextEditor);
     }
@@ -460,6 +469,7 @@ function showProviderDetectionReport(): void {
 export function deactivate(): void {
     fileWatchers?.dispose();
     diagnosticsEngine?.dispose();
+    orphanBindingsDiagnostics?.dispose();
     decorationsManager?.dispose();
     navigationStatusBar?.dispose();
     indexingStatusBarItem?.dispose();

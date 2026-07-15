@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-15
+
+**Highlights:** Orphan / unused binding diagnostics — mapa 360° (feature unbound + binding unused).
+
+### Added
+
+- **`listOrphanBindings`** — pure detection via `findReferencesForBinding`
+- **Problems** Information diagnostics on binding files (`bddGuardian/orphan-binding`)
+- **`bddGuardian.orphanBindings.enabled`** — master toggle (default `true`)
+- Vitest: `orphanBindings.test.ts`
+- `docs/VISUAL_LANGUAGE.md` — Orphan status row
+
+### Changed
+
+- README: Orphan bindings section under Configuration
+
 ## [1.2.0] - 2026-07-15
 
 **Highlights:** Step autocomplete from indexed bindings while typing in `.feature` files.

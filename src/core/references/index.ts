@@ -8,6 +8,7 @@ export {
     collectAllIndexedSteps,
     findReferencesForBinding,
     findReferencesForStep,
+    listOrphanBindings,
     stepLocationKey,
     type ResolveStep,
 } from './referenceFinder';

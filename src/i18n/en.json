@@ -62,5 +62,6 @@
   "bindingSnippetCopied": "Binding snippet copied to clipboard",
   "bindingPatternCopied": "Suggested pattern copied to clipboard",
   "bindingScaffoldGenerated": "Binding scaffold inserted — reindex to verify",
-  "bindingScaffoldNoTarget": "No step definition file found to insert binding"
+  "bindingScaffoldNoTarget": "No step definition file found to insert binding",
+  "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\""
 }

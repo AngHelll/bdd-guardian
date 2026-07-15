@@ -26,6 +26,7 @@ export {
 export {
     DiagnosticsEngine,
     DecorationsManager,
+    OrphanBindingsDiagnostics,
     type DiagnosticsResult,
     type DecorationStats,
     // Debug Report
