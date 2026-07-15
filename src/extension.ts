@@ -36,7 +36,7 @@ import {
 import { t, refreshLanguage } from './i18n';
 import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
 import { showZeroBindingsHintIfNeeded } from './features/onboarding';
-import { BindingCodeActionsProvider, registerAuthorCommands } from './features/author';
+import { BindingCodeActionsProvider, registerAuthorCommands, StepCompletionProvider } from './features/author';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -125,6 +125,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
     registerCoachCommands(context);
 
     registerAuthorCommands(context, indexManager);
+    const stepCompletionProvider = new StepCompletionProvider(indexManager);
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             { language: 'gherkin', scheme: 'file' },
@@ -135,6 +136,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
             { language: 'feature', scheme: 'file' },
             new BindingCodeActionsProvider(),
             { providedCodeActionKinds: BindingCodeActionsProvider.providedCodeActionKinds }
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            { language: 'gherkin', scheme: 'file' },
+            stepCompletionProvider
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            { language: 'feature', scheme: 'file' },
+            stepCompletionProvider
         )
     );
 

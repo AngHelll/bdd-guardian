@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.0.1** · **247 unit tests** · Marketplace **v1.0.1** (publicado 2026-07-12)
+> **Current release: v1.2.0** · Marketplace **v1.1.0** (local v1.2.0 pending ship)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.0.0** Marketplace |
-| 🎯 Next | **v1.1.0** — binding author DX (copy pattern, generate scaffold) |
-| 📋 Gate | Spec `author-dx-v1.1.0.md` — implementado, pendiente verify/ship |
-| 🏁 Goal | **v1.x** — v1.1 author DX → v1.2 productivity → v1.3+ platform |
+| ✅ Shipped | v0.1.0 → **v1.1.0** Marketplace |
+| 🎯 Next | **v1.2.0** — step autocomplete *(implementado; pendiente verify/ship)* |
+| 📋 Gate | Spec `step-autocomplete-v1.2.0.md` — Capa B |
+| 🏁 Goal | **v1.x** — v1.1 author DX ✅ → v1.2 productivity → v1.3+ platform |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
@@ -29,8 +29,9 @@
 | **VS Code UX** | CodeLens, go to definition, diagnostics, decorations, history |
 | **Coach** | Optional `.feature` quality rules (non-blocking) |
 
-**Explicitly not MVP (v1.0):** step autocomplete — see v1.2.  
-**v1.1.0:** copy-as-pattern + generate binding scaffold — see [Plan v1.1.0](#plan-v110--spec-lista-2026-07-12).
+**Explicitly not MVP (v1.0):** step autocomplete — now **v1.2.0**.  
+**v1.1.0:** copy-as-pattern + generate binding scaffold — ✅ shipped.  
+**v1.2.0:** step autocomplete — see [Plan v1.2.0](#plan-v120--spec-lista-2026-07-15).
 
 ---
 
@@ -50,7 +51,8 @@
 | **0.9.1** | Bindings UX hygiene — diagnostic source, i18n labels, `showMatchScore` |
 | **1.0.0** | Stable API, marketplace-ready docs, communication + visual polish |
 | **1.0.1** | Framework-aware hover + onboarding GIF *(shipped 2026-07-12)* |
-| **1.1.0** | Binding author DX — copy pattern, generate scaffold *(spec lista)* |
+| **1.1.0** | Binding author DX — copy pattern, generate scaffold *(shipped 2026-07-12)* |
+| **1.2.0** | Step autocomplete from indexed bindings *(implementado)* |
 
 ---
 
@@ -206,19 +208,21 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
-## Plan v1.0.1 — ✅ shipped (2026-07-12)
+## Plan v1.2.0 — 🔄 implementado (2026-07-15)
 
 | # | Status |
 |---|--------|
-| **1.0.1-A** Framework-aware hover (snippets + preview language) | ✅ |
-| **1.0.1-B** Onboarding GIF + README embed | ✅ (embed; GIF manual pre-publish) |
-| **1.0.1-3** CHANGELOG + VSIX | ✅ |
+| **1.2.0-A** Completion provider + keyword/prefix filter | ✅ |
+| **1.2.0-B** Pattern humanize → insertText | ✅ |
+| **1.2.0-3** README + CHANGELOG + VSIX | ✅ (verify pending) |
 
-Spec: `docs-internal/specs/polish-v1.0.1.md` (local).
+Spec: `docs-internal/specs/step-autocomplete-v1.2.0.md` (local).
+
+**Exit criteria:** en `binding-demo`, `Given ` → IntelliSense bindings; accept → step bound (heurística); setting off silencia.
 
 ---
 
-## Plan v1.1.0 — 📋 spec lista (2026-07-12)
+## Plan v1.1.0 — ✅ shipped (2026-07-12)
 
 | # | Status |
 |---|--------|
@@ -228,7 +232,19 @@ Spec: `docs-internal/specs/polish-v1.0.1.md` (local).
 
 Spec: `docs-internal/specs/author-dx-v1.1.0.md` (local).
 
-**Exit criteria:** unbound step → copy + generate en `binding-demo` y `cucumber-demo`; reindex → bound.
+**Exit criteria met:** unbound step → copy + generate en `binding-demo` / `cucumber-demo`; reindex → bound.
+
+---
+
+## Plan v1.0.1 — ✅ shipped (2026-07-12)
+
+| # | Status |
+|---|--------|
+| **1.0.1-A** Framework-aware hover (snippets + preview language) | ✅ |
+| **1.0.1-B** Onboarding GIF + README embed | ✅ (embed; GIF manual pre-publish) |
+| **1.0.1-3** CHANGELOG + VSIX | ✅ |
+
+Spec: `docs-internal/specs/polish-v1.0.1.md` (local).
 
 ---
 
@@ -280,9 +296,9 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | P2 | Coach: more rules + quick fixes | un Then dominante, imperativo, tags redundantes |
 | P2 | ~~**Godog provider**~~ | ✅ v0.7.0 |
 | P3 | ~~Framework-aware hover (Track B)~~ | → **v1.0.1** spec `polish-v1.0.1.md` |
-| P3 | Step autocomplete | Productivity v1.2 — needs index API |
-| P3 | ~~Copy as pattern code action~~ | → **v1.1.0** Track A |
-| P3 | ~~Generate binding from unbound step~~ | → **v1.1.0** Track B (C#/JS); Behave/Go/Java v1.1.1 |
+| P3 | Step autocomplete | → **v1.2.0** spec `step-autocomplete-v1.2.0.md` |
+| P3 | ~~Copy as pattern code action~~ | → **v1.1.0** Track A ✅ |
+| P3 | ~~Generate binding from unbound step~~ | → **v1.1.0** Track B ✅; Behave/Go/Java **pospuesto** v1.1.1 |
 | P4 | Shared `@anghelll/bdd-gherkin-lite` with Pilot | v1.3+ — wait parsers stable |
 | P4 | ~~Onboarding GIF / empty workspace hint~~ | Hint ✅ v1.0.0 · GIF → **v1.0.1** |
 | P2 | ~~**Java Cucumber provider**~~ | ✅ v0.9.0 — `samples/java-cucumber-demo` |
@@ -309,4 +325,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-12 — v1.1.0 author DX spec alineada.*
+*Last updated: 2026-07-15 — v1.2.0 step autocomplete spec alineada.*

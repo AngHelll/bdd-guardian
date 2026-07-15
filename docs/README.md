@@ -6,7 +6,7 @@
 
 **Shipped today:** C# Reqnroll and SpecFlow (full), Cucumber.js (JS/TS), Godog (Go), Python Behave, binding usages CodeLens, diagnostics, decorations, Coach mode (incl. batch quick fixes), en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** v1.1.0 author DX — copy snippet/pattern + generate binding (C#/JS).
+**Next (see [ROADMAP.md](../ROADMAP.md)):** v1.2.0 step autocomplete *(implementado; pendiente verify/ship)*.
 
 ## Documents
 

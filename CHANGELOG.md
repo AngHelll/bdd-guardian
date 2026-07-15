@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-15
+
+**Highlights:** Step autocomplete from indexed bindings while typing in `.feature` files.
+
+### Added
+
+- **Completion provider** on `gherkin` / `feature` — suggestions from workspace bindings (keyword + prefix)
+- **`bddGuardian.autocomplete.enabled`** — master toggle (default `true`)
+- Pure helpers: `humanizePatternForCompletion`, `filterBindingsForCompletion` (`src/core/autocomplete/`)
+- Vitest: `stepCompletion.test.ts`
+
+### Changed
+
+- README: **Autocomplete** section under Configuration
+
 ## [1.1.0] - 2026-07-12
 
 **Highlights:** Author DX — copy binding snippets from unbound steps and generate scaffolds (C# / JS/TS).
