@@ -6,7 +6,7 @@
 
 **Shipped today:** C# Reqnroll and SpecFlow (full), Cucumber.js (JS/TS), Godog (Go), Python Behave, binding usages CodeLens, diagnostics, decorations, Coach mode (incl. batch quick fixes), en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** generate stacks · `guardian-cli` (backlog).
+**Next (see [ROADMAP.md](../ROADMAP.md)):** v1.6.0 `guardian-cli`.
 
 ## Documents
 

@@ -149,6 +149,18 @@ export function buildAuthorSnippetText(
     if (methodName && snippet.code.includes('public void Step()')) {
         return snippet.code.replace('public void Step()', `public void ${methodName}()`);
     }
+    if (methodName && snippet.code.includes('public void stepDefinition()')) {
+        return snippet.code.replace(
+            'public void stepDefinition()',
+            `public void ${methodName}()`
+        );
+    }
+    if (methodName && snippet.code.includes('def step_definition(context)')) {
+        return snippet.code.replace(
+            'def step_definition(context)',
+            `def ${methodName}(context)`
+        );
+    }
     if (methodName && snippet.code.includes('function ()')) {
         return snippet.code.replace('function ()', `function ${methodName}()`);
     }

@@ -190,7 +190,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
 | `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
 | `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
-| `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS) |
+| `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS / Behave / Godog / Java) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
 | `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on step bindings that no feature step resolves to |
 | `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding |
@@ -213,7 +213,12 @@ On **unbound** steps (Problems panel or lightbulb), BDD Guardian offers:
 
 - **Copy binding snippet** — framework-aware step definition text (same as hover v1.0.1)
 - **Copy suggested pattern** — regex/Cucumber pattern only
-- **Generate binding (insert)** — inserts scaffold into an indexed step-definition file, or creates `StepDefinitions/GuardianGeneratedSteps.cs` / `features/step_definitions/guardian-generated.steps.ts` (C# Reqnroll/SpecFlow and Cucumber.js only; Python/Go/Java: copy actions only)
+- **Generate binding (insert)** — inserts scaffold into an indexed step-definition file, or creates a conventional new file:
+  - C#: `StepDefinitions/GuardianGeneratedSteps.cs`
+  - JS/TS: `features/step_definitions/guardian-generated.steps.ts`
+  - Behave: `features/steps/guardian_generated_steps.py`
+  - Godog: `features/guardian_generated_steps_test.go` (or insert into existing `InitializeScenario`)
+  - Java: `src/test/java/generated/GuardianGeneratedSteps.java`
 
 After generate, **reindex** the workspace to verify the step is bound. When **BDD Pilot** is installed, the toast also offers **Run with BDD Pilot** (opens Pilot’s dashboard — Pilot runs tests; Guardian does not). On unbound steps, the lightbulb includes **Open BDD Pilot** or **Install BDD Pilot** if Pilot is missing.
 

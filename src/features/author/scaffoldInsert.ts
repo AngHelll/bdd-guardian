@@ -21,8 +21,16 @@ export function supportsScaffoldInsert(snippetKind: SnippetKind): boolean {
     return (
         snippetKind === 'csharp-reqnroll' ||
         snippetKind === 'csharp-specflow' ||
-        snippetKind === 'js-cucumber'
+        snippetKind === 'js-cucumber' ||
+        snippetKind === 'python-behave' ||
+        snippetKind === 'go-godog' ||
+        snippetKind === 'java-cucumber'
     );
+}
+
+/** Stacks that append snippet at end of an existing file. */
+export function usesAppendInsert(snippetKind: SnippetKind): boolean {
+    return snippetKind === 'js-cucumber' || snippetKind === 'python-behave';
 }
 
 export function sanitizeMethodName(keyword: string, stepText: string): string {
@@ -37,14 +45,45 @@ export function sanitizeMethodName(keyword: string, stepText: string): string {
  * Find line index to insert a new method before the closing brace of the first [Binding] class.
  */
 export function findCSharpBindingInsertLine(fileContent: string): number | null {
+    return findClosingBraceLineAfterMarker(fileContent, (line) => line.includes('[Binding]'));
+}
+
+/**
+ * Insert before closing brace of first class that looks like Cucumber step defs.
+ */
+export function findJavaStepClassInsertLine(fileContent: string): number | null {
+    const hasStepAnnotation = /@(Given|When|Then|And|But)\b/.test(fileContent);
+    if (hasStepAnnotation) {
+        return findClosingBraceLineAfterMarker(fileContent, (line) =>
+            /\b(public|protected|private)?\s*(final\s+)?class\b/.test(line)
+        );
+    }
+    return findClosingBraceLineAfterMarker(fileContent, (line) =>
+        /\b(public|protected|private)?\s*(final\s+)?class\b/.test(line)
+    );
+}
+
+/**
+ * Insert before closing brace of `InitializeScenario` (Godog registration site).
+ */
+export function findGoInitializeScenarioInsertLine(fileContent: string): number | null {
+    return findClosingBraceLineAfterMarker(fileContent, (line) =>
+        /func\s+InitializeScenario\s*\(/.test(line)
+    );
+}
+
+function findClosingBraceLineAfterMarker(
+    fileContent: string,
+    isMarker: (line: string) => boolean
+): number | null {
     const lines = fileContent.split('\n');
 
     for (let i = 0; i < lines.length; i++) {
-        if (!lines[i].includes('[Binding]')) {
+        if (!isMarker(lines[i])) {
             continue;
         }
 
-        let braceLine = i + 1;
+        let braceLine = i;
         while (braceLine < lines.length && !lines[braceLine].includes('{')) {
             braceLine++;
         }
@@ -85,6 +124,15 @@ export function formatSnippetForInsert(snippetCode: string, baseIndent: string):
     return `\n${body}\n`;
 }
 
+/** Strip leading guidance comment from Godog hover/generate snippets. */
+export function stripGoScaffoldComment(snippetCode: string): string {
+    return snippetCode
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('// In InitializeScenario'))
+        .join('\n')
+        .trim();
+}
+
 export function buildCSharpNewFileContent(
     snippetCode: string,
     snippetKind: 'csharp-reqnroll' | 'csharp-specflow'
@@ -115,10 +163,80 @@ ${snippetCode}
 `;
 }
 
+export function buildPythonNewFileContent(snippetCode: string): string {
+    return `from behave import given, when, then
+
+
+${snippetCode}
+`;
+}
+
+export function buildGoNewFileContent(snippetCode: string): string {
+    const body = stripGoScaffoldComment(snippetCode)
+        .split('\n')
+        .map((l) => `\t${l}`)
+        .join('\n');
+    return `package features
+
+import (
+	"context"
+
+	"github.com/cucumber/godog"
+)
+
+func InitializeScenario(ctx *godog.ScenarioContext) {
+${body}
+}
+`;
+}
+
+export function buildJavaNewFileContent(snippetCode: string): string {
+    const indented = snippetCode
+        .split('\n')
+        .map((l) => `    ${l}`)
+        .join('\n');
+    return `package generated;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+
+public class GuardianGeneratedSteps {
+${indented}
+}
+`;
+}
+
 export function formatJsAppend(snippetCode: string, existingContent: string): string {
     const trimmed = existingContent.trimEnd();
     const prefix = trimmed.endsWith('\n') ? '' : '\n\n';
     return `${prefix}${snippetCode}\n`;
+}
+
+export const formatSnippetAppend = formatJsAppend;
+
+function pickByExtension(
+    bindingFilePaths: readonly string[],
+    extensions: readonly string[],
+    preferSubstrings: readonly string[] = []
+): string | null {
+    const lower = bindingFilePaths.map((p) => p.toLowerCase());
+    const matches = bindingFilePaths.filter((_, i) =>
+        extensions.some((ext) => lower[i].endsWith(ext))
+    );
+    if (matches.length === 0) {
+        return null;
+    }
+    if (preferSubstrings.length > 0) {
+        const preferred = matches.find((p) => {
+            const lp = p.toLowerCase();
+            return preferSubstrings.some((s) => lp.includes(s));
+        });
+        if (preferred) {
+            return preferred;
+        }
+    }
+    return matches[0];
 }
 
 /**
@@ -128,16 +246,24 @@ export function pickScaffoldTargetPath(
     snippetKind: SnippetKind,
     bindingFilePaths: readonly string[]
 ): string | null {
-    const lower = bindingFilePaths.map((p) => p.toLowerCase());
-
     if (snippetKind === 'js-cucumber') {
-        const ts = bindingFilePaths.find((_, i) => lower[i].endsWith('.ts') || lower[i].endsWith('.js'));
-        return ts ?? null;
+        return pickByExtension(bindingFilePaths, ['.ts', '.js'], ['step_definitions', 'steps']);
     }
 
     if (snippetKind === 'csharp-reqnroll' || snippetKind === 'csharp-specflow') {
-        const cs = bindingFilePaths.find((_, i) => lower[i].endsWith('.cs'));
-        return cs ?? null;
+        return pickByExtension(bindingFilePaths, ['.cs']);
+    }
+
+    if (snippetKind === 'python-behave') {
+        return pickByExtension(bindingFilePaths, ['.py'], ['features/steps', '/steps/', 'step']);
+    }
+
+    if (snippetKind === 'go-godog') {
+        return pickByExtension(bindingFilePaths, ['.go'], ['_test.go', 'steps']);
+    }
+
+    if (snippetKind === 'java-cucumber') {
+        return pickByExtension(bindingFilePaths, ['.java'], ['steps', 'stepdefinitions']);
     }
 
     return null;
@@ -150,5 +276,37 @@ export function defaultNewScaffoldPath(snippetKind: SnippetKind): string | null 
     if (snippetKind === 'js-cucumber') {
         return 'features/step_definitions/guardian-generated.steps.ts';
     }
+    if (snippetKind === 'python-behave') {
+        return 'features/steps/guardian_generated_steps.py';
+    }
+    if (snippetKind === 'go-godog') {
+        return 'features/guardian_generated_steps_test.go';
+    }
+    if (snippetKind === 'java-cucumber') {
+        return 'src/test/java/generated/GuardianGeneratedSteps.java';
+    }
     return null;
+}
+
+export function buildNewScaffoldFileContent(
+    snippetKind: SnippetKind,
+    snippetCode: string
+): string | null {
+    switch (snippetKind) {
+        case 'js-cucumber':
+            return buildJsNewFileContent(snippetCode);
+        case 'python-behave':
+            return buildPythonNewFileContent(snippetCode);
+        case 'go-godog':
+            return buildGoNewFileContent(snippetCode);
+        case 'java-cucumber':
+            return buildJavaNewFileContent(snippetCode);
+        case 'csharp-specflow':
+            return buildCSharpNewFileContent(snippetCode, 'csharp-specflow');
+        case 'csharp-reqnroll':
+        case 'generic-csharp-fallback':
+            return buildCSharpNewFileContent(snippetCode, 'csharp-reqnroll');
+        default:
+            return null;
+    }
 }

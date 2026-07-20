@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-20
+
+**Highlights:** Generate binding scaffold for Behave, Godog, and Java Cucumber-JVM (parity with C#/JS).
+
+### Added
+
+- **Generate binding** for `python-behave`, `go-godog`, `java-cucumber` (append / class insert / `InitializeScenario`)
+- Default new-file paths for the three stacks
+- Vitest coverage in `scaffoldInsert.test.ts`
+
+### Changed
+
+- README Author actions lists all five stacks
+
 ## [1.4.1] - 2026-07-20
 
 **Highlights:** Guardian ↔ BDD Pilot handoff — suite glue without running tests in Guardian.

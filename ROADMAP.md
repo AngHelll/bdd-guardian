@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.4.1** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.5.0** (publicado 2026-07-20)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.4.1** Marketplace |
-| 🎯 Next | backlog / generate stacks · `guardian-cli` (opcionales) |
-| 📋 Gate | — |
+| ✅ Shipped | v0.1.0 → **v1.5.0** Marketplace |
+| 🎯 Next | **v1.6.0** `guardian-cli` (spec lista) |
+| 📋 Gate | Spec `guardian-cli-v1.6.0.md` |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
@@ -30,7 +30,9 @@
 | **Coach** | Optional `.feature` quality rules (non-blocking) |
 
 **v1.4.0:** Coach rules oleada — ✅ shipped.  
-**v1.4.1:** Guardian ↔ Pilot handoff — ✅ shipped.
+**v1.4.1:** Guardian ↔ Pilot handoff — ✅ shipped.  
+**v1.5.0:** Generate Behave/Go/Java — ✅ shipped.  
+**v1.6.0:** `guardian-cli` — see [Plan v1.6.0](#plan-v160--spec-lista-2026-07-20).
 
 ---
 
@@ -55,6 +57,8 @@
 | **1.3.0** | Orphan / unused binding diagnostics *(shipped 2026-07-15)* |
 | **1.4.0** | Coach rules — dominant Then + redundant tags *(shipped 2026-07-15)* |
 | **1.4.1** | Guardian ↔ Pilot handoff ✅ |
+| **1.5.0** | Generate binding Behave / Godog / Java ✅ |
+| **1.6.0** | `guardian-cli` discover / analyze *(spec lista)* |
 
 ---
 
@@ -210,6 +214,36 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
+## Plan v1.6.0 — 📋 spec lista (2026-07-20)
+
+| # | Status |
+|---|--------|
+| **1.6.0-A** CLI entry + `discover` JSON | ☐ |
+| **1.6.0-B** `analyze` counts (bound/unbound/ambiguous/orphan) | ☐ |
+| **1.6.0-3** Docs CLI + CHANGELOG + VSIX regresión | ☐ |
+
+Spec: `docs-internal/specs/guardian-cli-v1.6.0.md` (local).  
+**Después de** v1.5.0. Tech: T-D05.
+
+**Exit criteria:** `npm run guardian -- analyze samples/binding-demo` JSON OK; Capa B fijos OK.
+
+---
+
+## Plan v1.5.0 — ✅ shipped (2026-07-20)
+
+| # | Status |
+|---|--------|
+| **1.5.0-A** `supportsScaffoldInsert` + paths Behave/Go/Java | ☑ |
+| **1.5.0-B** New-file builders + wire authorCommands | ☑ |
+| **1.5.0-3** README + CHANGELOG + VSIX | ☑ |
+
+Spec: `docs-internal/specs/generate-stacks-v1.5.0.md` (local).  
+**Antes de** v1.6.0 CLI.
+
+**Exit criteria:** generate en ≥1 demo no-C#/JS; C#/JS regresión; Capa B fijos OK.
+
+---
+
 ## Plan v1.4.1 — ✅ shipped (2026-07-20)
 
 | # | Status |
@@ -342,9 +376,10 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | P3 | ~~Framework-aware hover (Track B)~~ | → **v1.0.1** spec `polish-v1.0.1.md` |
 | P3 | Step autocomplete | → **v1.2.0** spec `step-autocomplete-v1.2.0.md` |
 | P3 | ~~Copy as pattern code action~~ | → **v1.1.0** Track A ✅ |
-| P3 | ~~Generate binding from unbound step~~ | → **v1.1.0** Track B ✅; Behave/Go/Java **pospuesto** v1.1.1 |
+| P3 | ~~Generate binding from unbound step~~ | → **v1.1.0** Track B ✅; Behave/Go/Java → **v1.5.0** spec `generate-stacks-v1.5.0.md` |
 | P4 | Shared `@anghelll/bdd-gherkin-lite` with Pilot | v1.3+ — wait parsers stable |
 | P4 | ~~Onboarding GIF / empty workspace hint~~ | Hint ✅ v1.0.0 · GIF → **v1.0.1** |
+| P4 | `guardian-cli` | → **v1.6.0** spec `guardian-cli-v1.6.0.md` · T-D05 |
 | P2 | ~~**Java Cucumber provider**~~ | ✅ v0.9.0 — `samples/java-cucumber-demo` |
 
 ---
@@ -369,4 +404,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.4.1 Pilot handoff shipped + Marketplace.*
+*Last updated: 2026-07-20 — v1.5.0 generate stacks shipped + Marketplace.*

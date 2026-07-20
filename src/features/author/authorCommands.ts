@@ -12,16 +12,19 @@ import {
     resolveAuthorStepContext,
 } from './bindingCodeActionsProvider';
 import {
-    buildCSharpNewFileContent,
-    buildJsNewFileContent,
+    buildNewScaffoldFileContent,
     defaultNewScaffoldPath,
     findCSharpBindingInsertLine,
-    formatJsAppend,
+    findGoInitializeScenarioInsertLine,
+    findJavaStepClassInsertLine,
+    formatSnippetAppend,
     formatSnippetForInsert,
     getIndentForLine,
     pickScaffoldTargetPath,
     sanitizeMethodName,
+    stripGoScaffoldComment,
     supportsScaffoldInsert,
+    usesAppendInsert,
 } from './scaffoldInsert';
 import { resolveHoverFrameworkContext, suggestBindingPattern } from '../hovers/bindingSnippets';
 import {
@@ -135,18 +138,22 @@ async function generateBinding(ref: AuthorStepRef, indexManager: IndexManager): 
             const targetDoc = await vscode.workspace.openTextDocument(targetUri);
             const content = targetDoc.getText();
 
-            if (framework.snippetKind === 'js-cucumber') {
-                const appendText = formatJsAppend(snippetCode, content);
+            if (usesAppendInsert(framework.snippetKind)) {
+                const appendText = formatSnippetAppend(snippetCode, content);
                 const pos = new vscode.Position(targetDoc.lineCount, 0);
                 edit.insert(targetUri, pos, appendText);
             } else {
-                const insertLine = findCSharpBindingInsertLine(content);
+                const insertLine = resolveBraceInsertLine(framework.snippetKind, content);
                 if (insertLine === null) {
                     vscode.window.showInformationMessage(t('bindingScaffoldNoTarget'));
                     return;
                 }
+                const codeForInsert =
+                    framework.snippetKind === 'go-godog'
+                        ? stripGoScaffoldComment(snippetCode)
+                        : snippetCode;
                 const indent = getIndentForLine(content, insertLine);
-                const insertText = formatSnippetForInsert(snippetCode, indent);
+                const insertText = formatSnippetForInsert(codeForInsert, indent);
                 edit.insert(targetUri, new vscode.Position(insertLine, 0), insertText);
             }
 
@@ -154,10 +161,10 @@ async function generateBinding(ref: AuthorStepRef, indexManager: IndexManager): 
             const updated = await vscode.workspace.openTextDocument(targetUri);
             await vscode.window.showTextDocument(updated, { preview: false });
         } catch {
-            await createNewScaffoldFile(edit, workspaceFolder, framework.snippetKind, snippetCode, methodName);
+            await createNewScaffoldFile(edit, workspaceFolder, framework.snippetKind, snippetCode);
         }
     } else {
-        await createNewScaffoldFile(edit, workspaceFolder, framework.snippetKind, snippetCode, methodName);
+        await createNewScaffoldFile(edit, workspaceFolder, framework.snippetKind, snippetCode);
     }
 
     const reindexLabel = t('onboardingReindex');
@@ -180,8 +187,7 @@ async function createNewScaffoldFile(
     edit: vscode.WorkspaceEdit,
     workspaceFolder: vscode.WorkspaceFolder,
     snippetKind: ReturnType<typeof resolveHoverFrameworkContext>['snippetKind'],
-    snippetCode: string,
-    methodName: string
+    snippetCode: string
 ): Promise<void> {
     const relative = defaultNewScaffoldPath(snippetKind);
     if (!relative) {
@@ -189,18 +195,29 @@ async function createNewScaffoldFile(
         return;
     }
 
-    const uri = vscode.Uri.joinPath(workspaceFolder.uri, relative);
-    const content =
-        snippetKind === 'js-cucumber'
-            ? buildJsNewFileContent(snippetCode)
-            : buildCSharpNewFileContent(
-                  snippetCode,
-                  snippetKind === 'csharp-specflow' ? 'csharp-specflow' : 'csharp-reqnroll'
-              );
+    const content = buildNewScaffoldFileContent(snippetKind, snippetCode);
+    if (!content) {
+        vscode.window.showInformationMessage(t('bindingScaffoldNoTarget'));
+        return;
+    }
 
+    const uri = vscode.Uri.joinPath(workspaceFolder.uri, relative);
     edit.createFile(uri, { ignoreIfExists: false });
     edit.insert(uri, new vscode.Position(0, 0), content);
     await vscode.workspace.applyEdit(edit);
     const doc = await vscode.workspace.openTextDocument(uri);
     await vscode.window.showTextDocument(doc, { preview: false });
+}
+
+function resolveBraceInsertLine(
+    snippetKind: ReturnType<typeof resolveHoverFrameworkContext>['snippetKind'],
+    content: string
+): number | null {
+    if (snippetKind === 'java-cucumber') {
+        return findJavaStepClassInsertLine(content);
+    }
+    if (snippetKind === 'go-godog') {
+        return findGoInitializeScenarioInsertLine(content);
+    }
+    return findCSharpBindingInsertLine(content);
 }
