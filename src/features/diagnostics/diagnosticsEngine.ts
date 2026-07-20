@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n, truncateForDiagnostic } from '../../core/matching';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, BINDINGS_DIAGNOSTIC_SOURCE, UNBOUND_STEP_DIAGNOSTIC_CODE } from '../../core/domain';
@@ -95,9 +95,14 @@ export class DiagnosticsEngine {
                 ambiguous++;
                 const names = result.candidates.slice(0, 3).map(c => c.binding.methodName).join(', ');
                 const moreSuffix = result.candidates.length > 3 ? t('diagnosticAmbiguousStepMore', String(result.candidates.length - 3)) : '';
+                const why = ambiguityI18n(explainAmbiguity(result.candidates));
+                const whyArgs = why.args.map((a) => truncateForDiagnostic(a));
+                const whyHint = t(why.key, ...whyArgs);
+                const message =
+                    t('diagnosticAmbiguousStep', names) + moreSuffix + ' — ' + whyHint;
                 const diagnostic = new vscode.Diagnostic(
                     step.range,
-                    t('diagnosticAmbiguousStep', names) + moreSuffix,
+                    message.length > 280 ? message.slice(0, 279) + '…' : message,
                     vscode.DiagnosticSeverity.Information
                 );
                 diagnostic.source = BINDINGS_DIAGNOSTIC_SOURCE;

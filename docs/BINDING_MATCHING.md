@@ -20,6 +20,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Literal `$` / `^`** — Treated as characters when not at start/end of the pattern.
 - **Fallback to literal** — Invalid regex pattern still produces a binding that matches the exact text.
 - **Ambiguity policy (v0.5.0+)** — Overlapping patterns (e.g. `\d+` vs `.*`) → **ambiguous**, not silent bound. Enable `bddGuardian.matching.preferSpecificBinding` for score-based winner.
+- **Ambiguity explained (v1.6.1+)** — Hover and Problems show a short *why* (duplicate pattern, score tie, or broad vs specific). Matching status and scores are unchanged.
 - **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
 
 ## Optional improvements (good practice, no relaxation of BDD)

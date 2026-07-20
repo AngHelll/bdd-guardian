@@ -12,7 +12,7 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n } from '../../core/matching';
 import { ResolvedKeyword, Binding, MatchCandidate } from '../../core/domain';
 import { 
     StepStatus, 
@@ -147,22 +147,38 @@ export class HoverProvider implements vscode.HoverProvider {
     ): Promise<void> {
         const sorted = sortCandidatesByScore(candidates);
         const topCandidates = sorted.slice(0, 3);
-        
+        const explanation = explainAmbiguity(sorted);
+        const why = ambiguityI18n(explanation);
+        const showScore = getUIConfig().showMatchScore;
+
         contents.appendMarkdown(`**${t('hoverBindingsMatch', String(candidates.length))}**\n\n`);
-        
+        contents.appendMarkdown(
+            `**${t('hoverAmbiguityWhy')}** ${t(why.key, ...why.args)}\n\n`
+        );
+        if (explanation.topPatterns.length > 0) {
+            const patternLine = explanation.topPatterns
+                .map((p) => `\`${this.truncate(p, 40)}\``)
+                .join(' · ');
+            contents.appendMarkdown(`${t('hoverAmbiguityPatterns')}: ${patternLine}\n\n`);
+        }
+
         for (let i = 0; i < topCandidates.length; i++) {
             const candidate = topCandidates[i];
             const binding = candidate.binding;
             const relativePath = vscode.workspace.asRelativePath(binding.uri);
             const isBest = i === 0;
-            
+
             if (isBest) {
                 contents.appendMarkdown(`🏆 **${t('hoverBestMatch')}**\n`);
             }
-            
+
             contents.appendMarkdown(`- \`${binding.className}.${binding.methodName}\`\n`);
             contents.appendMarkdown(`  - File: \`${relativePath}:${binding.lineNumber + 1}\`\n`);
-            contents.appendMarkdown(`  - Pattern: \`${this.truncate(binding.patternRaw, 40)}\`\n\n`);
+            contents.appendMarkdown(`  - Pattern: \`${this.truncate(binding.patternRaw, 40)}\`\n`);
+            if (showScore) {
+                contents.appendMarkdown(`  - Score: \`${candidate.score}\`\n`);
+            }
+            contents.appendMarkdown('\n');
         }
         
         if (candidates.length > 3) {

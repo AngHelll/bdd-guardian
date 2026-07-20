@@ -10,7 +10,7 @@ Single reference for how step binding status appears across the extension.
 |--------|---------|
 | **Bound** | Exactly one binding matches (or policy resolved to one). |
 | **Unbound** | No binding matches this step. |
-| **Ambiguous** | Two or more bindings match (Reqnroll-like default). |
+| **Ambiguous** | Two or more bindings match (Reqnroll-like default). Hover/Problems explain *why* (v1.6.1+). |
 | **Orphan** | Binding exists but no feature step resolves to it (unused). |
 | **Indexing** | Workspace index not ready yet. |
 
@@ -21,8 +21,8 @@ Single reference for how step binding status appears across the extension.
 | **Gutter** (`resources/icons/*.svg`) | Green circle + check | Red circle + X | Orange circle + ! | — | (no gutter icon) |
 | **CodeLens** (feature) | `$(check)` + `Class.Method` | `$(error)` + message | `$(warning)` + candidates | — | `$(warning)` reindex CTA |
 | **CodeLens** (binding file) | usage count | — | — | “No usages” (existing) | — |
-| **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + top matches | — | ⏳ emoji |
-| **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** (step) | Diagnostic **Information** (binding) | — |
+| **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + why + top matches | — | ⏳ emoji |
+| **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** + why hint (step) | Diagnostic **Information** (binding) | — |
 | **Border / ruler** | `charts.green` | `charts.red` | `charts.yellow` | — | — |
 
 Implementation: `src/ui/stepStatus.ts` (`getCodeLensIcon`, `getStatusColor`, `getStatusLabel`, `getStatusEmoji`).

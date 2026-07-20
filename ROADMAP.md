@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.6.0** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.6.1** (publicado 2026-07-20)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.6.0** Marketplace |
+| ✅ Shipped | v0.1.0 → **v1.6.1** Marketplace |
 | 🎯 Next | backlog (post-platform) |
 | 📋 Gate | — |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
@@ -32,7 +32,8 @@
 **v1.4.0:** Coach rules oleada — ✅ shipped.  
 **v1.4.1:** Guardian ↔ Pilot handoff — ✅ shipped.  
 **v1.5.0:** Generate Behave/Go/Java — ✅ shipped.  
-**v1.6.0:** `guardian-cli` — ✅ shipped.
+**v1.6.0:** `guardian-cli` — ✅ shipped.  
+**v1.6.1:** Ambiguous explicado — ✅ shipped.
 
 ---
 
@@ -59,6 +60,7 @@
 | **1.4.1** | Guardian ↔ Pilot handoff ✅ |
 | **1.5.0** | Generate binding Behave / Godog / Java ✅ |
 | **1.6.0** | `guardian-cli` discover / analyze ✅ |
+| **1.6.1** | Ambiguous explicado ✅ |
 
 ---
 
@@ -211,6 +213,20 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | **1.0.0-4** CHANGELOG + VSIX + Marketplace | ✅ |
 
 Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketplace-onboarding-v1.0.0.md` (local).
+
+---
+
+## Plan v1.6.1 — ✅ shipped (2026-07-20)
+
+| # | Status |
+|---|--------|
+| **1.6.1-A** `explainAmbiguity` puro + tests | ☑ |
+| **1.6.1-B** Hover + Problems why line | ☑ |
+| **1.6.1-3** i18n + BINDING_MATCHING/CHANGELOG + VSIX | ☑ |
+
+Spec: `docs-internal/specs/ambiguous-explained-v1.6.1.md` (local).
+
+**Exit criteria:** binding-demo ambiguous hover/Problems muestran why; matching policy intacta; Capa B fijos OK.
 
 ---
 
@@ -370,6 +386,7 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | P1 | ~~**Portfolio alternation matching**~~ | ✅ v0.5.1 — precision corpus enabled |
 | P1 | ~~**Cucumber JS provider**~~ | ✅ v0.6.1 — `cucumber-demo` |
 | P1 | Matching edge cases (optional) | `countCaptureGroups`, alternations — see BINDING_MATCHING.md |
+| P2 | Ambiguous explicado | → **v1.6.1** spec `ambiguous-explained-v1.6.1.md` |
 | P2 | ~~**Behave provider**~~ | ✅ v0.7.1 — `samples/behave-demo` |
 | P2 | Coach: more rules + quick fixes | → **v1.4.0** spec `coach-rules-v1.4.0.md` |
 | P2 | ~~**Godog provider**~~ | ✅ v0.7.0 |
@@ -404,4 +421,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.6.0 guardian-cli shipped + Marketplace.*
+*Last updated: 2026-07-20 — v1.6.1 Ambiguous explicado shipped + Marketplace.*

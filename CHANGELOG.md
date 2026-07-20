@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-07-20
+
+**Highlights:** Ambiguous steps explain *why* bindings collide (hover + Problems).
+
+### Added
+
+- **`explainAmbiguity`** — pure heuristics: same pattern, score tie, broad vs specific
+- Hover **Why ambiguous** + patterns line; Problems message includes short why hint
+- Vitest: `ambiguityExplain.test.ts`
+
+### Changed
+
+- Docs: BINDING_MATCHING + VISUAL_LANGUAGE note ambiguity explanation (policy unchanged)
+
 ## [1.6.0] - 2026-07-20
 
 **Highlights:** Headless `guardian-cli` — discover / analyze the binding map without VS Code.
