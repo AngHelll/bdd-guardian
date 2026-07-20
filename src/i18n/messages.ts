@@ -96,6 +96,10 @@ export const en: Record<string, string> = {
   bindingPatternCopied: 'Suggested pattern copied to clipboard',
   bindingScaffoldGenerated: 'Binding scaffold inserted — reindex to verify',
   bindingScaffoldNoTarget: 'No step definition file found to insert binding',
+  pilotHandoffRun: 'Run with BDD Pilot',
+  codeActionOpenPilot: 'BDD Guardian: Open BDD Pilot',
+  codeActionInstallPilot: 'BDD Guardian: Install BDD Pilot',
+  pilotHandoffFailed: 'Could not open BDD Pilot — is it installed and enabled?',
 };
 
 export const es: Record<string, string> = {
@@ -191,4 +195,8 @@ export const es: Record<string, string> = {
   bindingPatternCopied: 'Patrón sugerido copiado al portapapeles',
   bindingScaffoldGenerated: 'Scaffold de binding insertado — reindexa para verificar',
   bindingScaffoldNoTarget: 'No se encontró archivo de step definitions para insertar el binding',
+  pilotHandoffRun: 'Ejecutar con BDD Pilot',
+  codeActionOpenPilot: 'BDD Guardian: Abrir BDD Pilot',
+  codeActionInstallPilot: 'BDD Guardian: Instalar BDD Pilot',
+  pilotHandoffFailed: 'No se pudo abrir BDD Pilot — ¿está instalado y activado?',
 };

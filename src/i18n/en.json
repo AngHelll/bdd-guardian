@@ -63,5 +63,9 @@
   "bindingPatternCopied": "Suggested pattern copied to clipboard",
   "bindingScaffoldGenerated": "Binding scaffold inserted — reindex to verify",
   "bindingScaffoldNoTarget": "No step definition file found to insert binding",
+  "pilotHandoffRun": "Run with BDD Pilot",
+  "codeActionOpenPilot": "BDD Guardian: Open BDD Pilot",
+  "codeActionInstallPilot": "BDD Guardian: Install BDD Pilot",
+  "pilotHandoffFailed": "Could not open BDD Pilot — is it installed and enabled?",
   "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\""
 }

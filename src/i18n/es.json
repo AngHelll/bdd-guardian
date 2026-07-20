@@ -63,5 +63,9 @@
   "bindingPatternCopied": "Patrón sugerido copiado al portapapeles",
   "bindingScaffoldGenerated": "Scaffold de binding insertado — reindexa para verificar",
   "bindingScaffoldNoTarget": "No se encontró archivo de step definitions para insertar el binding",
+  "pilotHandoffRun": "Ejecutar con BDD Pilot",
+  "codeActionOpenPilot": "BDD Guardian: Abrir BDD Pilot",
+  "codeActionInstallPilot": "BDD Guardian: Instalar BDD Pilot",
+  "pilotHandoffFailed": "No se pudo abrir BDD Pilot — ¿está instalado y activado?",
   "diagnosticOrphanBinding": "Binding sin uso: ningún step de feature resuelve a \"{0}\""
 }

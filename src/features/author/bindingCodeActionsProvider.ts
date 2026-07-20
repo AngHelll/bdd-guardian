@@ -15,6 +15,11 @@ import {
     isUnboundBindingDiagnostic,
     supportsScaffoldInsert,
 } from './scaffoldInsert';
+import {
+    isPilotExtensionInstalled,
+    isPilotHandoffEnabled,
+    resolvePilotHandoffAction,
+} from '../ecosystem';
 
 export { isUnboundBindingDiagnostic } from './scaffoldInsert';
 
@@ -80,6 +85,32 @@ export class BindingCodeActionsProvider implements vscode.CodeActionProvider {
                 arguments: [args],
             };
             actions.push(generate);
+        }
+
+        const handoff = resolvePilotHandoffAction({
+            handoffEnabled: isPilotHandoffEnabled(),
+            pilotInstalled: isPilotExtensionInstalled(),
+        });
+        if (handoff === 'open') {
+            const openPilot = new vscode.CodeAction(
+                t('codeActionOpenPilot'),
+                vscode.CodeActionKind.QuickFix
+            );
+            openPilot.command = {
+                command: 'bddGuardian.pilot.open',
+                title: t('codeActionOpenPilot'),
+            };
+            actions.push(openPilot);
+        } else if (handoff === 'install') {
+            const installPilot = new vscode.CodeAction(
+                t('codeActionInstallPilot'),
+                vscode.CodeActionKind.QuickFix
+            );
+            installPilot.command = {
+                command: 'bddGuardian.pilot.install',
+                title: t('codeActionInstallPilot'),
+            };
+            actions.push(installPilot);
         }
 
         return actions;

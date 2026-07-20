@@ -24,6 +24,13 @@ import {
     supportsScaffoldInsert,
 } from './scaffoldInsert';
 import { resolveHoverFrameworkContext, suggestBindingPattern } from '../hovers/bindingSnippets';
+import {
+    handoffOpenPilot,
+    isPilotExtensionInstalled,
+    isPilotHandoffEnabled,
+    openPilotMarketplaceSearch,
+    resolvePostGenerateToastButtons,
+} from '../ecosystem';
 
 export function registerAuthorCommands(context: vscode.ExtensionContext, indexManager: IndexManager): void {
     context.subscriptions.push(
@@ -38,7 +45,13 @@ export function registerAuthorCommands(context: vscode.ExtensionContext, indexMa
         vscode.commands.registerCommand(
             'bddGuardian.author.generateBinding',
             async (ref: AuthorStepRef) => generateBinding(ref, indexManager)
-        )
+        ),
+        vscode.commands.registerCommand('bddGuardian.pilot.open', async () => {
+            await handoffOpenPilot();
+        }),
+        vscode.commands.registerCommand('bddGuardian.pilot.install', async () => {
+            await openPilotMarketplaceSearch();
+        })
     );
 }
 
@@ -148,13 +161,19 @@ async function generateBinding(ref: AuthorStepRef, indexManager: IndexManager): 
     }
 
     const reindexLabel = t('onboardingReindex');
-    void vscode.window
-        .showInformationMessage(t('bindingScaffoldGenerated'), reindexLabel)
-        .then((choice) => {
-            if (choice === reindexLabel) {
-                void vscode.commands.executeCommand('reqnrollNavigator.reindex');
-            }
-        });
+    const pilotLabel = t('pilotHandoffRun');
+    const { showPilotRun } = resolvePostGenerateToastButtons({
+        handoffEnabled: isPilotHandoffEnabled(),
+        pilotInstalled: isPilotExtensionInstalled(),
+    });
+    const buttons = showPilotRun ? [reindexLabel, pilotLabel] : [reindexLabel];
+    void vscode.window.showInformationMessage(t('bindingScaffoldGenerated'), ...buttons).then((choice) => {
+        if (choice === reindexLabel) {
+            void vscode.commands.executeCommand('reqnrollNavigator.reindex');
+        } else if (choice === pilotLabel) {
+            void handoffOpenPilot();
+        }
+    });
 }
 
 async function createNewScaffoldFile(

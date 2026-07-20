@@ -193,6 +193,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
 | `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on step bindings that no feature step resolves to |
+| `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding |
 
 ### Autocomplete
 
@@ -214,10 +215,11 @@ On **unbound** steps (Problems panel or lightbulb), BDD Guardian offers:
 - **Copy suggested pattern** — regex/Cucumber pattern only
 - **Generate binding (insert)** — inserts scaffold into an indexed step-definition file, or creates `StepDefinitions/GuardianGeneratedSteps.cs` / `features/step_definitions/guardian-generated.steps.ts` (C# Reqnroll/SpecFlow and Cucumber.js only; Python/Go/Java: copy actions only)
 
-After generate, **reindex** the workspace to verify the step is bound. Run tests with **BDD Pilot** when ready.
+After generate, **reindex** the workspace to verify the step is bound. When **BDD Pilot** is installed, the toast also offers **Run with BDD Pilot** (opens Pilot’s dashboard — Pilot runs tests; Guardian does not). On unbound steps, the lightbulb includes **Open BDD Pilot** or **Install BDD Pilot** if Pilot is missing.
 
-Disable with `bddGuardian.authorActions.enabled: false`.
+Disable author actions with `bddGuardian.authorActions.enabled: false`. Disable Pilot CTAs with `bddGuardian.pilotHandoff.enabled: false`.
 
+### Settings reference
 
 Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibility — do not rename in settings JSON. New UX settings use `bddGuardian.*`.
 
@@ -233,6 +235,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.authorActions.enabled` | branding | Unbound step copy/generate quick fixes |
 | `bddGuardian.autocomplete.enabled` | branding | Step IntelliSense from indexed bindings |
 | `bddGuardian.orphanBindings.enabled` | branding | Unused binding Problems (Information) |
+| `bddGuardian.pilotHandoff.enabled` | branding | Open/Install Pilot CTAs + post-generate Run with Pilot |
 | `bddGuardian.coach.*` | branding | Coach rules and UI |
 | `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
 | `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |

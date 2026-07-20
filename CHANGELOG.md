@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-07-20
+
+**Highlights:** Guardian ↔ BDD Pilot handoff — suite glue without running tests in Guardian.
+
+### Added
+
+- **Pilot handoff** — detect `anghelll.bdd-pilot`; open dashboard via `bddPilot.showDashboard`
+- Post-generate toast button **Run with BDD Pilot** when Pilot is installed
+- Unbound quick fixes: **Open BDD Pilot** / **Install BDD Pilot** (Marketplace search)
+- Setting `bddGuardian.pilotHandoff.enabled` (default `true`)
+- Vitest: `pilotHandoff.test.ts`
+
+### Changed
+
+- README Author actions documents Pilot CTAs
+
 ## [1.4.0] - 2026-07-15
 
 **Highlights:** Coach rules oleada — dominant Then + redundant Feature→Scenario tags.

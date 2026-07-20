@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate your BDD steps across Reqnroll, SpecFlow, Cucumber (JS/TS), Godog, Behave, and Java Cucumber-JVM with CodeLens, Go to Definition, and diagnostics",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -115,6 +115,14 @@
       {
         "command": "bddGuardian.author.generateBinding",
         "title": "BDD Guardian: Generate Binding (Insert)"
+      },
+      {
+        "command": "bddGuardian.pilot.open",
+        "title": "BDD Guardian: Open BDD Pilot"
+      },
+      {
+        "command": "bddGuardian.pilot.install",
+        "title": "BDD Guardian: Install BDD Pilot"
       }
     ],
     "keybindings": [
@@ -180,6 +188,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show Information diagnostics on step bindings that no feature step resolves to"
+        },
+        "bddGuardian.pilotHandoff.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding"
         },
         "bddGuardian.matching.preferSpecificBinding": {
           "type": "boolean",
