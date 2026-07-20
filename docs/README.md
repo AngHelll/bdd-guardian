@@ -6,12 +6,13 @@
 
 **Shipped today:** C# Reqnroll and SpecFlow (full), Cucumber.js (JS/TS), Godog (Go), Python Behave, binding usages CodeLens, diagnostics, decorations, Coach mode (incl. batch quick fixes), en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** v1.6.0 `guardian-cli`.
+**Next (see [ROADMAP.md](../ROADMAP.md)):** backlog / next product cycle.
 
 ## Documents
 
 | Document | Purpose |
 |----------|---------|
+| [CLI.md](./CLI.md) | Headless `guardian` CLI (discover / analyze) |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Layers, index, resolver, providers, VS Code features |
 | [BINDING_MATCHING.md](./BINDING_MATCHING.md) | Regex compile, normalization, false unbound |
 | [PROVIDERS.md](./PROVIDERS.md) | How to implement a binding provider |

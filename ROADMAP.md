@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.5.0** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.6.0** (publicado 2026-07-20)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.5.0** Marketplace |
-| 🎯 Next | **v1.6.0** `guardian-cli` (spec lista) |
-| 📋 Gate | Spec `guardian-cli-v1.6.0.md` |
-| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform |
+| ✅ Shipped | v0.1.0 → **v1.6.0** Marketplace |
+| 🎯 Next | backlog (post-platform) |
+| 📋 Gate | — |
+| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
 
@@ -32,7 +32,7 @@
 **v1.4.0:** Coach rules oleada — ✅ shipped.  
 **v1.4.1:** Guardian ↔ Pilot handoff — ✅ shipped.  
 **v1.5.0:** Generate Behave/Go/Java — ✅ shipped.  
-**v1.6.0:** `guardian-cli` — see [Plan v1.6.0](#plan-v160--spec-lista-2026-07-20).
+**v1.6.0:** `guardian-cli` — ✅ shipped.
 
 ---
 
@@ -58,7 +58,7 @@
 | **1.4.0** | Coach rules — dominant Then + redundant tags *(shipped 2026-07-15)* |
 | **1.4.1** | Guardian ↔ Pilot handoff ✅ |
 | **1.5.0** | Generate binding Behave / Godog / Java ✅ |
-| **1.6.0** | `guardian-cli` discover / analyze *(spec lista)* |
+| **1.6.0** | `guardian-cli` discover / analyze ✅ |
 
 ---
 
@@ -214,13 +214,13 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
-## Plan v1.6.0 — 📋 spec lista (2026-07-20)
+## Plan v1.6.0 — ✅ shipped (2026-07-20)
 
 | # | Status |
 |---|--------|
-| **1.6.0-A** CLI entry + `discover` JSON | ☐ |
-| **1.6.0-B** `analyze` counts (bound/unbound/ambiguous/orphan) | ☐ |
-| **1.6.0-3** Docs CLI + CHANGELOG + VSIX regresión | ☐ |
+| **1.6.0-A** CLI entry + `discover` JSON | ☑ |
+| **1.6.0-B** `analyze` counts (bound/unbound/ambiguous/orphan) | ☑ |
+| **1.6.0-3** Docs CLI + CHANGELOG + VSIX regresión | ☑ |
 
 Spec: `docs-internal/specs/guardian-cli-v1.6.0.md` (local).  
 **Después de** v1.5.0. Tech: T-D05.
@@ -404,4 +404,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.5.0 generate stacks shipped + Marketplace.*
+*Last updated: 2026-07-20 — v1.6.0 guardian-cli shipped + Marketplace.*

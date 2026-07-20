@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-07-20
+
+**Highlights:** Headless `guardian-cli` — discover / analyze the binding map without VS Code.
+
+### Added
+
+- `npm run guardian -- discover <dir>` / `analyze <dir>` → JSON (`schemaVersion: 1`)
+- Pure load + report helpers under `src/cli/`
+- Vitest: `guardianCli.test.ts`
+- `docs/CLI.md`
+
+### Changed
+
+- ROADMAP / tech-backlog T-D05 ✅
+
 ## [1.5.0] - 2026-07-20
 
 **Highlights:** Generate binding scaffold for Behave, Godog, and Java Cucumber-JVM (parity with C#/JS).

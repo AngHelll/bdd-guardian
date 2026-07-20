@@ -13,6 +13,8 @@ scripts/**
 samples/**
 .github/**
 vitest.config.mts
+out/cli/**
+out/__tests__/**
 CHANGELOG.md
 ROADMAP.md
 CONTRIBUTING.md
