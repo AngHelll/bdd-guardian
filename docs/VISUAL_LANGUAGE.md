@@ -4,6 +4,15 @@ Single reference for how step binding status appears across the extension.
 
 **Principle:** same semantics everywhere; density varies by surface (gutter = scan, CodeLens = action, hover = detail).
 
+## Suite (ForgeOne)
+
+| Extension | Role |
+|-----------|------|
+| **BDD Guardian** | Navigation & binding map (this extension) |
+| **BDD Pilot** | Test execution |
+
+Marketplace brand tile may align with Pilot’s navy Opción B in **v1.7.0**; gutter / `charts.*` status colors stay as below.
+
 ## Status semantics
 
 | Status | Meaning |

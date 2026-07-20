@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.6.1** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.6.2** (publicado 2026-07-20)
 
 ---
 
@@ -9,12 +9,12 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.6.1** Marketplace |
-| 🎯 Next | backlog (post-platform) |
-| 📋 Gate | — |
+| ✅ Shipped | v0.1.0 → **v1.6.2** Marketplace |
+| 🎯 Next | **v1.7.0** Marketplace tile Opción B (spec lista) |
+| 📋 Gate | Spec `marketplace-tile-v1.7.0.md` |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
 
-**Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution) · [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (automation intelligence, consumes Index API v1). Guardian = navigation, bindings & index API.
+**Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
 
 **Deep docs:** [docs/README.md](./docs/README.md) · [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · [docs/BINDING_MATCHING.md](./docs/BINDING_MATCHING.md)
 
@@ -33,7 +33,9 @@
 **v1.4.1:** Guardian ↔ Pilot handoff — ✅ shipped.  
 **v1.5.0:** Generate Behave/Go/Java — ✅ shipped.  
 **v1.6.0:** `guardian-cli` — ✅ shipped.  
-**v1.6.1:** Ambiguous explicado — ✅ shipped.
+**v1.6.1:** Ambiguous explicado — ✅ shipped.  
+**v1.6.2:** ForgeOne README family + Iconography — ✅ shipped (Guardian↔Pilot; sin Jarvis).  
+**v1.7.0:** Marketplace tile Opción B — see [Plan v1.7.0](#plan-v170--spec-lista-2026-07-20).
 
 ---
 
@@ -61,6 +63,8 @@
 | **1.5.0** | Generate binding Behave / Godog / Java ✅ |
 | **1.6.0** | `guardian-cli` discover / analyze ✅ |
 | **1.6.1** | Ambiguous explicado ✅ |
+| **1.6.2** | ForgeOne README family + Iconography ✅ (sin Jarvis) |
+| **1.7.0** | Marketplace tile Opción B (navy + Guardian glyph) *(spec lista)* |
 
 ---
 
@@ -213,6 +217,36 @@ Spec: `docs-internal/specs/bindings-ux-hygiene-v0.9.1.md` (local).
 | **1.0.0-4** CHANGELOG + VSIX + Marketplace | ✅ |
 
 Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketplace-onboarding-v1.0.0.md` (local).
+
+---
+
+## Plan v1.7.0 — 📋 spec lista (2026-07-20)
+
+| # | Status |
+|---|--------|
+| **1.7.0-A** SVG tile + glyph Guardian (Opción B) | ☐ |
+| **1.7.0-B** `icon.png` + galleryBanner navy + archive ladybug | ☐ |
+| **1.7.0-3** README Iconography + CHANGELOG + VSIX | ☐ |
+
+Spec: `docs-internal/specs/marketplace-tile-v1.7.0.md` (local).  
+**Después de** v1.6.2 docs.
+
+**Exit criteria:** shelf familia con Pilot; gutter sin regresión; Capa B fijos OK.
+
+---
+
+## Plan v1.6.2 — ✅ shipped (2026-07-20)
+
+| # | Status |
+|---|--------|
+| **1.6.2-A** README family table + ForgeOne one-liner | ☑ |
+| **1.6.2-B** README Iconography (assets actuales) | ☑ |
+| **1.6.2-3** VISUAL_LANGUAGE note + CHANGELOG + VSIX | ☑ |
+
+Spec: `docs-internal/specs/forgeone-readme-family-v1.6.2.md` (local).  
+**Antes de** v1.7.0 tile. **Sin Jarvis** (no publicado).
+
+**Exit criteria:** paridad narrativa con Pilot README (Guardian↔Pilot); Capa B fijos OK.
 
 ---
 
@@ -421,4 +455,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.6.1 Ambiguous explicado shipped + Marketplace.*
+*Last updated: 2026-07-20 — v1.6.2 ForgeOne README shipped + Marketplace.*

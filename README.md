@@ -21,13 +21,24 @@
 
 A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects across five binding stacks.
 
+## BDD extension family
+
+| Extension | Role |
+|-----------|------|
+| **BDD Guardian** (this extension) | Go to Definition, CodeLens, binding diagnostics, Coach, Index API |
+| [**BDD Pilot**](https://github.com/AngHelll/bdd-pilot) | Run tests, dashboard, TRX / failure context |
+
+Guardian answers *“where is this step implemented?”* — Pilot answers *“run this and what failed?”*
+
+**ForgeOne:** navigation & map (Guardian) → execution (Pilot).
+
 ### ✨ What's new (1.0.0)
 
 - **Stable multi-framework release** — C# (Reqnroll/SpecFlow), JavaScript Cucumber.js, Go Godog, Python Behave, Java Cucumber-JVM.
 - **Communication polish** — Unified Spanish status labels (*Enlazado* / *Sin enlazar*); i18n for navigation and Coach UI.
 - **Visual language** — CodeLens icons aligned with gutter semantics; see [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md).
 - **First-run hint** — One-time toast when `.feature` files exist but no bindings are indexed (`bddGuardian.onboarding.enabled`).
-- **Guardian ↔ Pilot** — Navigate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot). [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) consumes the Index API for automation.
+- **Guardian ↔ Pilot** — Navigate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot).
 
 ### 🎬 Quick demo
 
@@ -77,7 +88,25 @@ A subtle colored border on step lines reinforces status.
 #### Overview Ruler
 Status markers appear in the minimap/overview ruler for quick file scanning.
 
-> 💡 **Tip**: All visual feedback can be disabled via settings.
+> 💡 **Tip**: All visual feedback can be disabled via settings. Full matrix: [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md).
+
+### Iconography
+
+BDD Guardian uses **VS Code codicons** for CodeLens and chrome, plus status and brand assets:
+
+| Asset | Role |
+|-------|------|
+| **`icon.png`** | Marketplace / Extensions discovery thumbnail |
+| **`resources/icons/*.svg`** | Editor gutter — bound / unbound / ambiguous (status colors, not brand) |
+
+| Area | Icons | Meaning |
+|------|-------|---------|
+| CodeLens (feature) | `$(check)` / `$(error)` / `$(warning)` | Bound · unbound · ambiguous |
+| CodeLens (binding) | usage count / “No usages” | References / orphan signal |
+| Hover | ✅ ❌ ⚠️ ⏳ | Dense detail (same semantics) |
+| Border / overview ruler | `charts.green` / `charts.red` / `charts.yellow` | Theme-aware status chrome |
+
+**ForgeOne family:** Guardian = navigation & step bindings · [BDD Pilot](https://github.com/AngHelll/bdd-pilot) = execution — Guardian focuses on map/status icons only. Marketplace tile may move to Pilot-aligned Opción B in a later release.
 
 ### 💬 Enriched Hover
 
@@ -288,7 +317,7 @@ Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian
 
 ## Roadmap
 
-See [ROADMAP.md](./ROADMAP.md). Current release is **v1.0.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution) and [BDD Jarvis](https://github.com/AngHelll/bdd-jarvis) (Index API).
+See [ROADMAP.md](./ROADMAP.md). Current release is **v1.6.2**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
 
 ## 📚 Documentation
 

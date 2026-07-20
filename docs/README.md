@@ -6,7 +6,7 @@
 
 **Shipped today:** C# Reqnroll and SpecFlow (full), Cucumber.js (JS/TS), Godog (Go), Python Behave, binding usages CodeLens, diagnostics, decorations, Coach mode (incl. batch quick fixes), en/es UI, incremental index while editing.
 
-**Next (see [ROADMAP.md](../ROADMAP.md)):** backlog / next product cycle.
+**Next (see [ROADMAP.md](../ROADMAP.md)):** v1.7.0 Marketplace tile Opción B.
 
 ## Documents
 

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-07-20
+
+**Highlights:** ForgeOne README family (Guardian ↔ Pilot) + Iconography section — no Jarvis (not published yet).
+
+### Changed
+
+- README: **BDD extension family** table and **Iconography** (codicons + assets)
+- `docs/VISUAL_LANGUAGE.md` — Suite ForgeOne note
+- Marketplace description mentions BDD Pilot
+- Soften companion copy that presented Jarvis as shipped
+
 ## [1.6.1] - 2026-07-20
 
 **Highlights:** Ambiguous steps explain *why* bindings collide (hover + Problems).
