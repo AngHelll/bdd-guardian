@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.6.2** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.7.0** (publicado 2026-07-20)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.6.2** Marketplace |
-| 🎯 Next | **v1.7.0** Marketplace tile Opción B (spec lista) |
-| 📋 Gate | Spec `marketplace-tile-v1.7.0.md` |
+| ✅ Shipped | v0.1.0 → **v1.7.0** Marketplace |
+| 🎯 Next | (backlog / next align) |
+| 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -35,7 +35,7 @@
 **v1.6.0:** `guardian-cli` — ✅ shipped.  
 **v1.6.1:** Ambiguous explicado — ✅ shipped.  
 **v1.6.2:** ForgeOne README family + Iconography — ✅ shipped (Guardian↔Pilot; sin Jarvis).  
-**v1.7.0:** Marketplace tile Opción B — see [Plan v1.7.0](#plan-v170--spec-lista-2026-07-20).
+**v1.7.0:** Marketplace tile Opción B — see [Plan v1.7.0](#plan-v170--implementado-2026-07-20).
 
 ---
 
@@ -64,7 +64,7 @@
 | **1.6.0** | `guardian-cli` discover / analyze ✅ |
 | **1.6.1** | Ambiguous explicado ✅ |
 | **1.6.2** | ForgeOne README family + Iconography ✅ (sin Jarvis) |
-| **1.7.0** | Marketplace tile Opción B (navy + Guardian glyph) *(spec lista)* |
+| **1.7.0** | Marketplace tile Opción B (navy + Guardian glyph) ✅ |
 
 ---
 
@@ -220,13 +220,13 @@ Specs: `communication-polish-v1.0.0.md`, `visual-identity-v1.0.0.md`, `marketpla
 
 ---
 
-## Plan v1.7.0 — 📋 spec lista (2026-07-20)
+## Plan v1.7.0 — ✅ shipped (2026-07-20)
 
 | # | Status |
 |---|--------|
-| **1.7.0-A** SVG tile + glyph Guardian (Opción B) | ☐ |
-| **1.7.0-B** `icon.png` + galleryBanner navy + archive ladybug | ☐ |
-| **1.7.0-3** README Iconography + CHANGELOG + VSIX | ☐ |
+| **1.7.0-A** SVG tile + glyph Guardian (Opción B) | ☑ |
+| **1.7.0-B** `icon.png` + galleryBanner navy + archive ladybug | ☑ |
+| **1.7.0-3** README Iconography + CHANGELOG + VSIX | ☑ (VSIX via verify) |
 
 Spec: `docs-internal/specs/marketplace-tile-v1.7.0.md` (local).  
 **Después de** v1.6.2 docs.
@@ -455,4 +455,4 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.6.2 ForgeOne README shipped + Marketplace.*
+*Last updated: 2026-07-20 — v1.7.0 Marketplace tile Opción B shipped + Marketplace.*

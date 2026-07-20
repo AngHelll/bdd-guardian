@@ -2,11 +2,11 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
-    "color": "#667eea",
+    "color": "#1a2332",
     "theme": "dark"
   },
   "engines": {
@@ -150,14 +150,17 @@
       "properties": {
         "bddGuardian.displayLanguage": {
           "type": "string",
-          "enum": ["en", "es"],
+          "enum": [
+            "en",
+            "es"
+          ],
           "default": "en",
           "description": "%config.displayLanguage.description%"
         },
         "bddGuardian.gutterIcons.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Show gutter icons for step status (\u2713 bound, \u2717 unbound, ! ambiguous)"
+          "description": "Show gutter icons for step status (✓ bound, ✗ unbound, ! ambiguous)"
         },
         "bddGuardian.hoverDetails.enabled": {
           "type": "boolean",
@@ -201,7 +204,10 @@
         },
         "bddGuardian.providers.indexMode": {
           "type": "string",
-          "enum": ["all", "primary"],
+          "enum": [
+            "all",
+            "primary"
+          ],
           "default": "all",
           "description": "Binding providers to index: all detected active providers, or only the primary (highest confidence) provider."
         },
@@ -364,12 +370,14 @@
     "test:coverage": "vitest run --coverage",
     "guardian": "node scripts/guardian-cli.js",
     "package": "vsce package --no-dependencies -o bdd-guardian.vsix",
+    "icon:export": "node scripts/export-marketplace-icon.js",
     "verify:local": "bash scripts/verify-local.sh",
     "publish:check": "bash scripts/publish-check.sh",
     "publish:marketplace": "bash scripts/publish-marketplace.sh",
     "guard:secrets": "bash scripts/guard-no-secrets.sh"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^20.10.0",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",

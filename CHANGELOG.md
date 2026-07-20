@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-07-20
+
+**Highlights:** Marketplace icon aligned with ForgeOne / Pilot Opción B (navy tile); previous mascot archived.
+
+### Changed
+
+- **Marketplace tile** — navy gradient + geometric Guardian glyph (shield + linked nodes + map pin); source `media/icon-marketplace.svg` / `media/guardian.svg`
+- `galleryBanner.color` → `#1a2332` (was `#667eea`)
+- README Iconography documents Opción B silhouette parity
+- `docs/VISUAL_LANGUAGE.md` — Marketplace tile note; gutter unchanged
+
+### Added
+
+- `npm run icon:export` — regenerate `icon.png` from SVG via `@resvg/resvg-js`
+- Legacy ladybug archived at `docs/assets/icon-ladybug-legacy.png`
+
 ## [1.6.2] - 2026-07-20
 
 **Highlights:** ForgeOne README family (Guardian ↔ Pilot) + Iconography section — no Jarvis (not published yet).

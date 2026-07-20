@@ -1,5 +1,11 @@
 # Marketplace assets
 
+## Brand archive
+
+| File | Role |
+|------|------|
+| `icon-ladybug-legacy.png` | Pre–v1.7.0 Marketplace mascot (purple ladybug). Current tile: repo-root `icon.png` from `media/icon-marketplace.svg`. |
+
 ## `guardian-onboarding.gif` (manual)
 
 Record a **10–15 s** GIF (1280×720 or 800×600) showing:

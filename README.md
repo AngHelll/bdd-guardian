@@ -92,11 +92,12 @@ Status markers appear in the minimap/overview ruler for quick file scanning.
 
 ### Iconography
 
-BDD Guardian uses **VS Code codicons** for CodeLens and chrome, plus status and brand assets:
+BDD Guardian uses **VS Code codicons** for CodeLens and chrome, plus two **brand assets** that share the **same silhouette** (shield + linked nodes + map pin — Opción B, ForgeOne navy tile):
 
 | Asset | Role |
 |-------|------|
-| **`icon.png`** | Marketplace / Extensions discovery thumbnail |
+| **`icon.png`** | Marketplace / Extensions discovery — color tile from `media/guardian.svg` (`media/icon-marketplace.svg` source) |
+| **`media/guardian.svg`** | Brand mono silhouette (`currentColor`) — theme-aware if used in chrome |
 | **`resources/icons/*.svg`** | Editor gutter — bound / unbound / ambiguous (status colors, not brand) |
 
 | Area | Icons | Meaning |
@@ -106,7 +107,7 @@ BDD Guardian uses **VS Code codicons** for CodeLens and chrome, plus status and 
 | Hover | ✅ ❌ ⚠️ ⏳ | Dense detail (same semantics) |
 | Border / overview ruler | `charts.green` / `charts.red` / `charts.yellow` | Theme-aware status chrome |
 
-**ForgeOne family:** Guardian = navigation & step bindings · [BDD Pilot](https://github.com/AngHelll/bdd-pilot) = execution — Guardian focuses on map/status icons only. Marketplace tile may move to Pilot-aligned Opción B in a later release.
+**ForgeOne family:** Guardian = navigation & step bindings · [BDD Pilot](https://github.com/AngHelll/bdd-pilot) = execution — same navy Opción B shelf; Guardian glyph = map/link/shield (not Pilot radar).
 
 ### 💬 Enriched Hover
 
