@@ -4,7 +4,8 @@
  */
 
 import * as vscode from 'vscode';
-import { CoachFinding, toVSCodeSeverity } from './rules/types';
+import { CoachFinding } from './rules/types';
+import { toVSCodeSeverity } from './vscodeSeverity';
 import { parseFeatureDocumentToGherkinModel } from './featureToGherkinModel';
 import { RuleEngine, RuleEngineResult } from './ruleEngine';
 import { getCoachConfig } from './config';

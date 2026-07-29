@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -369,6 +369,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "guardian": "node scripts/guardian-cli.js",
+    "guardian:mcp": "node scripts/guardian-mcp.js",
     "package": "vsce package --no-dependencies -o bdd-guardian.vsix",
     "icon:export": "node scripts/export-marketplace-icon.js",
     "verify:local": "bash scripts/verify-local.sh",

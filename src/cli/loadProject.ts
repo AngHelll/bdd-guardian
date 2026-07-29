@@ -47,6 +47,11 @@ export function toPosixRelative(projectDir: string, absPath: string): string {
     return path.relative(projectDir, absPath).split(path.sep).join('/');
 }
 
+/** Path equality for CLI (case-insensitive — macOS/Windows volume defaults). */
+export function pathsEqual(a: string, b: string): boolean {
+    return path.normalize(a).toLowerCase() === path.normalize(b).toLowerCase();
+}
+
 export function walkProjectFiles(projectDir: string): string[] {
     const root = path.resolve(projectDir);
     const results: string[] = [];

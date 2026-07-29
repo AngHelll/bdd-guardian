@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-07-29
+
+**Highlights:** guardian-cli v2 (`resolve-step`, `coach-analyze`) + MCP stdio for agents — same map/Coach as the editor, without Extension Host.
+
+### Added
+
+- **CLI `resolve-step`** — single step (0-based line) → bound/unbound/ambiguous/no_step JSON; ambiguous includes English `why` via `explainAmbiguity`
+- **CLI `coach-analyze`** — headless Coach rules report (`findings` + `byRuleId`); optional `--feature`
+- **MCP stdio** — `npm run guardian:mcp` tools: `guardian_discover`, `guardian_analyze`, `guardian_resolve_step`, `guardian_coach_analyze`
+- Coach path usable without VS Code for CLI: `featureDocumentAdapter` + `toVSCodeSeverity` split
+
+### Changed
+
+- `docs/CLI.md` — resolve-step, coach-analyze, MCP registration notes
+
 ## [1.7.0] - 2026-07-20
 
 **Highlights:** Marketplace icon aligned with ForgeOne / Pilot Opción B (navy tile); previous mascot archived.

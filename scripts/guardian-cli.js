@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * BDD Guardian headless CLI — discover / analyze (no Extension Host).
+ * BDD Guardian headless CLI — discover / analyze / resolve-step / coach-analyze.
  */
 'use strict';
 

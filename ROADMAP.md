@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.7.0** Marketplace |
+| ✅ Shipped | v0.1.0 → **v1.8.0** Marketplace |
 | 🎯 Next | (backlog / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
@@ -64,7 +64,7 @@
 | **1.6.0** | `guardian-cli` discover / analyze ✅ |
 | **1.6.1** | Ambiguous explicado ✅ |
 | **1.6.2** | ForgeOne README family + Iconography ✅ (sin Jarvis) |
-| **1.7.0** | Marketplace tile Opción B (navy + Guardian glyph) ✅ |
+| **1.8.0** | `guardian-cli` v2 + MCP stdio ✅ |
 
 ---
 
@@ -455,4 +455,19 @@ src/
 
 ---
 
-*Last updated: 2026-07-20 — v1.7.0 Marketplace tile Opción B shipped + Marketplace.*
+## Plan v1.8.0 — ✅ shipped (2026-07-29)
+
+| # | Status |
+|---|--------|
+| **1.8.0-A** CLI `resolve-step` + `coach-analyze` JSON | ✅ |
+| **1.8.0-B** MCP stdio thin (discover/analyze/resolve/coach) | ✅ |
+| **1.8.0-3** Docs CLI/MCP + CHANGELOG + VSIX | ✅ |
+
+Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).  
+**Después de** v1.7.0 tile. North star: mapa headless para agentes.
+
+**Exit criteria met:** resolve-step bound en binding-demo; coach-analyze JSON; MCP documentado; Capa B OK.
+
+---
+
+*Last updated: 2026-07-29 — v1.8.0 guardian-cli v2 + MCP shipped + Marketplace.*

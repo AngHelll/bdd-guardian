@@ -1,13 +1,12 @@
 /**
  * Coach Mode Rule Types
  * Framework-agnostic BDD best practices validation.
+ * (No vscode import — headless CLI / MCP can use rules + RuleEngine.)
  */
-
-import * as vscode from 'vscode';
 
 /**
  * Severity levels for coach findings.
- * Maps to VS Code DiagnosticSeverity.
+ * Maps to VS Code DiagnosticSeverity via `vscodeSeverity.ts`.
  * 'off' means the rule/finding is disabled.
  */
 export type CoachSeverity = 'error' | 'warning' | 'info' | 'hint' | 'off';
@@ -154,17 +153,4 @@ export interface CoachConfig {
     dominantThen?: {
         max: number;
     };
-}
-
-/**
- * Convert CoachSeverity to VS Code DiagnosticSeverity.
- */
-export function toVSCodeSeverity(severity: CoachSeverity): vscode.DiagnosticSeverity {
-    switch (severity) {
-        case 'error': return vscode.DiagnosticSeverity.Error;
-        case 'warning': return vscode.DiagnosticSeverity.Warning;
-        case 'info': return vscode.DiagnosticSeverity.Information;
-        case 'hint': return vscode.DiagnosticSeverity.Hint;
-        case 'off': return vscode.DiagnosticSeverity.Hint; // Should never reach here
-    }
 }
