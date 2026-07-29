@@ -8,6 +8,7 @@
 import * as vscode from 'vscode';
 import { MatchCandidate, ResolvedKeyword, ResolveResult } from '../core/domain';
 import { t } from '../i18n';
+import { resolveFeedbackChannels, normalizeFeedbackLevel } from './feedbackLevel';
 
 /**
  * Step binding status enum.
@@ -31,9 +32,10 @@ export interface StepStatusInfo {
 }
 
 /**
- * UI configuration from VS Code settings.
+ * UI configuration from VS Code settings (after feedbackLevel ∧ toggles).
  */
 export interface UIConfig {
+    feedbackLevel: 'full' | 'standard' | 'minimal';
     gutterIconsEnabled: boolean;
     hoverDetailsEnabled: boolean;
     decorationsEnabled: boolean;
@@ -48,13 +50,22 @@ export interface UIConfig {
 export function getUIConfig(): UIConfig {
     const config = vscode.workspace.getConfiguration('bddGuardian');
     const legacyConfig = vscode.workspace.getConfiguration('reqnrollNavigator');
-    
+
+    const level = normalizeFeedbackLevel(config.get<string>('ui.feedbackLevel', 'full'));
+    const channels = resolveFeedbackChannels(level, {
+        gutter: config.get<boolean>('gutterIcons.enabled', true),
+        border: legacyConfig.get<boolean>('enableDecorations', true),
+        problems: legacyConfig.get<boolean>('enableDiagnostics', true),
+        codeLens: legacyConfig.get<boolean>('enableCodeLens', true),
+    });
+
     return {
-        gutterIconsEnabled: config.get<boolean>('gutterIcons.enabled', true),
+        feedbackLevel: level,
+        gutterIconsEnabled: channels.gutter,
         hoverDetailsEnabled: config.get<boolean>('hoverDetails.enabled', true),
-        decorationsEnabled: legacyConfig.get<boolean>('enableDecorations', true),
-        codeLensEnabled: legacyConfig.get<boolean>('enableCodeLens', true),
-        diagnosticsEnabled: legacyConfig.get<boolean>('enableDiagnostics', true),
+        decorationsEnabled: channels.border,
+        codeLensEnabled: channels.codeLens,
+        diagnosticsEnabled: channels.problems,
         showMatchScore: config.get<boolean>('ui.showMatchScore', false),
     };
 }

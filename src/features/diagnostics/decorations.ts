@@ -35,25 +35,29 @@ function getExtensionPath(): string {
 }
 
 /**
- * Create decoration type with optional gutter icon.
+ * Create decoration type with optional gutter icon and/or left border.
  */
 function createDecorationType(
     iconName: string,
     borderColor: string,
     overviewColor: string,
-    useGutterIcon: boolean
+    useGutterIcon: boolean,
+    useBorder: boolean
 ): vscode.TextEditorDecorationType {
     const extensionPath = getExtensionPath();
     const iconPath = path.join(extensionPath, 'resources', 'icons', `${iconName}.svg`);
     
     const options: vscode.DecorationRenderOptions = {
-        borderWidth: '0 0 0 2px',
-        borderStyle: 'solid',
-        borderColor: new vscode.ThemeColor(borderColor),
-        overviewRulerColor: new vscode.ThemeColor(overviewColor),
-        overviewRulerLane: vscode.OverviewRulerLane.Left,
         isWholeLine: false,
     };
+
+    if (useBorder) {
+        options.borderWidth = '0 0 0 2px';
+        options.borderStyle = 'solid';
+        options.borderColor = new vscode.ThemeColor(borderColor);
+        options.overviewRulerColor = new vscode.ThemeColor(overviewColor);
+        options.overviewRulerLane = vscode.OverviewRulerLane.Left;
+    }
     
     if (useGutterIcon) {
         options.gutterIconPath = iconPath;
@@ -77,15 +81,33 @@ const decorationTypes: {
 /**
  * Initialize or reinitialize decoration types based on config.
  */
-function initDecorationTypes(useGutterIcons: boolean): void {
+function initDecorationTypes(useGutterIcons: boolean, useBorder: boolean): void {
     // Dispose existing
     decorationTypes.bound?.dispose();
     decorationTypes.unbound?.dispose();
     decorationTypes.ambiguous?.dispose();
     
-    decorationTypes.bound = createDecorationType('bound', 'charts.green', 'charts.green', useGutterIcons);
-    decorationTypes.unbound = createDecorationType('unbound', 'charts.red', 'charts.red', useGutterIcons);
-    decorationTypes.ambiguous = createDecorationType('ambiguous', 'charts.yellow', 'charts.yellow', useGutterIcons);
+    decorationTypes.bound = createDecorationType(
+        'bound',
+        'charts.green',
+        'charts.green',
+        useGutterIcons,
+        useBorder
+    );
+    decorationTypes.unbound = createDecorationType(
+        'unbound',
+        'charts.red',
+        'charts.red',
+        useGutterIcons,
+        useBorder
+    );
+    decorationTypes.ambiguous = createDecorationType(
+        'ambiguous',
+        'charts.yellow',
+        'charts.yellow',
+        useGutterIcons,
+        useBorder
+    );
 }
 
 export interface DecorationStats {
@@ -96,7 +118,7 @@ export interface DecorationStats {
 
 export class DecorationsManager {
     private disposables: vscode.Disposable[] = [];
-    private lastConfig: { gutterIcons: boolean } | null = null;
+    private lastConfig: { gutterIcons: boolean; border: boolean } | null = null;
     
     constructor(private indexManager: IndexManager) {
         // Listen for config changes
@@ -114,9 +136,18 @@ export class DecorationsManager {
      */
     private onConfigChange(): void {
         const uiConfig = getUIConfig();
-        if (this.lastConfig?.gutterIcons !== uiConfig.gutterIconsEnabled) {
-            initDecorationTypes(uiConfig.gutterIconsEnabled);
-            this.lastConfig = { gutterIcons: uiConfig.gutterIconsEnabled };
+        const next = {
+            gutterIcons: uiConfig.gutterIconsEnabled,
+            border: uiConfig.decorationsEnabled,
+        };
+        if (
+            this.lastConfig?.gutterIcons !== next.gutterIcons ||
+            this.lastConfig?.border !== next.border
+        ) {
+            if (next.gutterIcons || next.border) {
+                initDecorationTypes(next.gutterIcons, next.border);
+            }
+            this.lastConfig = next;
             
             // Re-apply decorations to active editor
             const editor = vscode.window.activeTextEditor;
@@ -153,16 +184,23 @@ export class DecorationsManager {
         
         const config = getConfig();
         const uiConfig = getUIConfig();
+
+        const showGutter = uiConfig.gutterIconsEnabled;
+        const showBorder = uiConfig.decorationsEnabled;
         
-        if (!uiConfig.decorationsEnabled) {
+        if (!showGutter && !showBorder) {
             this.clearDecorations(editor);
             return stats;
         }
         
         // Initialize decoration types if needed
-        if (!decorationTypes.bound || this.lastConfig?.gutterIcons !== uiConfig.gutterIconsEnabled) {
-            initDecorationTypes(uiConfig.gutterIconsEnabled);
-            this.lastConfig = { gutterIcons: uiConfig.gutterIconsEnabled };
+        if (
+            !decorationTypes.bound ||
+            this.lastConfig?.gutterIcons !== showGutter ||
+            this.lastConfig?.border !== showBorder
+        ) {
+            initDecorationTypes(showGutter, showBorder);
+            this.lastConfig = { gutterIcons: showGutter, border: showBorder };
         }
         
         const index = this.indexManager.getIndex();

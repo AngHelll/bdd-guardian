@@ -219,6 +219,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
 | `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
+| `bddGuardian.ui.feedbackLevel` | `full` | Visual density ceiling: `full` / `standard` / `minimal` |
 | `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
 | `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS / Behave / Godog / Java) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
@@ -264,6 +265,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.gutterIcons.enabled` | branding | Gutter icons on steps |
 | `bddGuardian.hoverDetails.enabled` | branding | Rich binding hover |
 | `bddGuardian.ui.showMatchScore` | branding | CodeLens debug score |
+| `bddGuardian.ui.feedbackLevel` | branding | Visual density: `full` / `standard` / `minimal` (ceiling; toggles can lower) |
 | `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
 | `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
 | `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |
@@ -318,7 +320,7 @@ Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian
 
 ## Roadmap
 
-See [ROADMAP.md](./ROADMAP.md). Current release is **v1.6.2**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
+See [ROADMAP.md](./ROADMAP.md). Current release is **v1.9.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
 
 ## 📚 Documentation
 

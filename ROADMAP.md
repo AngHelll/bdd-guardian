@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.7.0** (publicado 2026-07-20)
+> **Current release / Marketplace: v1.9.0** (publicado 2026-07-29)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.8.0** Marketplace |
+| ✅ Shipped | v0.1.0 → **v1.9.0** Marketplace |
 | 🎯 Next | (backlog / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
-| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ |
+| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
 
@@ -65,6 +65,7 @@
 | **1.6.1** | Ambiguous explicado ✅ |
 | **1.6.2** | ForgeOne README family + Iconography ✅ (sin Jarvis) |
 | **1.8.0** | `guardian-cli` v2 + MCP stdio ✅ |
+| **1.9.0** | Map signal clarity — `feedbackLevel` presets + namespace hygiene ✅ |
 
 ---
 
@@ -455,6 +456,21 @@ src/
 
 ---
 
+## Plan v1.9.0 — ✅ shipped (2026-07-29)
+
+| # | Status |
+|---|--------|
+| **1.9.0-A** `bddGuardian.ui.feedbackLevel` full/standard/minimal | ✅ |
+| **1.9.0-B** Settings map docs (aliases code deferred) | ✅ |
+| **1.9.0-3** Tests helper + CHANGELOG + VSIX | ✅ |
+
+Spec: `docs-internal/specs/map-signal-clarity-v1.9.0.md` (local).  
+**Después de** v1.8.0. North star: señal del mapa legible sin ruido.
+
+**Exit criteria met:** default full sin regresión; minimal mantiene CodeLens+F12; Capa B OK.
+
+---
+
 ## Plan v1.8.0 — ✅ shipped (2026-07-29)
 
 | # | Status |
@@ -470,4 +486,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-07-29 — v1.8.0 guardian-cli v2 + MCP shipped + Marketplace.*
+*Last updated: 2026-07-29 — v1.9.0 Map signal clarity shipped + Marketplace.*

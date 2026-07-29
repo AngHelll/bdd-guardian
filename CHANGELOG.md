@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-07-29
+
+**Highlights:** Map signal clarity — `bddGuardian.ui.feedbackLevel` presets (`full` / `standard` / `minimal`) reduce visual noise without breaking F12 / CodeLens.
+
+### Added
+
+- **`bddGuardian.ui.feedbackLevel`** — ceiling for gutter, border, Problems, and CodeLens; granular toggles can still turn channels off
+- Pure helper `resolveFeedbackChannels` + Vitest matrix
+- Docs: VISUAL_LANGUAGE feedback table; README settings map
+
+### Changed
+
+- Decorations can show **gutter without border** (`standard`)
+- Default `full` preserves pre-v1.9 behavior
+
 ## [1.8.0] - 2026-07-29
 
 **Highlights:** guardian-cli v2 (`resolve-step`, `coach-analyze`) + MCP stdio for agents — same map/Coach as the editor, without Extension Host.

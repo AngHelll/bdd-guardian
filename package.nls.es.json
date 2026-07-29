@@ -1,3 +1,7 @@
 {
-  "config.displayLanguage.description": "Idioma de los mensajes de BDD Guardian (notificaciones, barra de estado, hover). 'en' inglés, 'es' español. Si no se define, se usa el idioma de visualización de VS Code."
+  "config.displayLanguage.description": "Idioma de los mensajes de BDD Guardian (notificaciones, barra de estado, hover). 'en' inglés, 'es' español. Si no se define, se usa el idioma de visualización de VS Code.",
+  "config.feedbackLevel.description": "Densidad del feedback visual del estado step↔binding. El preset es un techo; los toggles individuales pueden apagar canales.",
+  "config.feedbackLevel.full": "Gutter + borde + Problems + CodeLens (predeterminado, igual que antes de v1.9)",
+  "config.feedbackLevel.standard": "Gutter + Problems + CodeLens (sin borde / overview ruler)",
+  "config.feedbackLevel.minimal": "Solo CodeLens (Go to Definition sigue funcionando)"
 }

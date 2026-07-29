@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -171,6 +171,21 @@
           "type": "boolean",
           "default": false,
           "description": "Show numeric match score in bound step CodeLens titles (debug matching)"
+        },
+        "bddGuardian.ui.feedbackLevel": {
+          "type": "string",
+          "enum": [
+            "full",
+            "standard",
+            "minimal"
+          ],
+          "default": "full",
+          "description": "%config.feedbackLevel.description%",
+          "enumDescriptions": [
+            "%config.feedbackLevel.full%",
+            "%config.feedbackLevel.standard%",
+            "%config.feedbackLevel.minimal%"
+          ]
         },
         "bddGuardian.onboarding.enabled": {
           "type": "boolean",

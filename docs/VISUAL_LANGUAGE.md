@@ -48,6 +48,16 @@ CodeLens uses VS Code **codicons** aligned with gutter meaning (check / error / 
 
 Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 
+**Feedback level (v1.9.0+):** `bddGuardian.ui.feedbackLevel` sets a **ceiling** for visual channels:
+
+| Value | Gutter | Border / ruler | Problems (steps) | CodeLens |
+|-------|--------|----------------|------------------|----------|
+| `full` (default) | ✓ | ✓ | ✓ | ✓ |
+| `standard` | ✓ | — | ✓ | ✓ |
+| `minimal` | — | — | — | ✓ |
+
+Granular toggles (`gutterIcons.enabled`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
+
 ## Hover emojis
 
 Markdown hovers intentionally use emojis (native, readable in VS Code hovers). Labels use i18n (`hoverBound`, etc.).

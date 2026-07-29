@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { ExtensionConfig, TagFilterConfig, TagFilterMode, FeatureStep } from '../core/domain/types';
 import { DEFAULT_CONFIG } from '../core/domain/constants';
+import { resolveFeedbackChannels } from '../ui/feedbackLevel';
 
 /** Cached configuration */
 let cachedConfig: ExtensionConfig | null = null;
@@ -22,6 +23,13 @@ export function getConfig(): ExtensionConfig {
     const config = vscode.workspace.getConfiguration('reqnrollNavigator');
     const guardianConfig = vscode.workspace.getConfiguration('bddGuardian');
 
+    const channels = resolveFeedbackChannels(guardianConfig.get('ui.feedbackLevel', 'full'), {
+        gutter: guardianConfig.get('gutterIcons.enabled', true),
+        border: config.get('enableDecorations', DEFAULT_CONFIG.enableDecorations),
+        problems: config.get('enableDiagnostics', DEFAULT_CONFIG.enableDiagnostics),
+        codeLens: config.get('enableCodeLens', DEFAULT_CONFIG.enableCodeLens),
+    });
+
     cachedConfig = {
         caseInsensitive: config.get('caseInsensitive', DEFAULT_CONFIG.caseInsensitive),
         tagFilter: config.get('tagFilter', DEFAULT_CONFIG.tagFilter),
@@ -30,9 +38,9 @@ export function getConfig(): ExtensionConfig {
         bindingsGlob: config.get('bindingsGlob', DEFAULT_CONFIG.bindingsGlob),
         excludePatterns: config.get('excludePatterns', DEFAULT_CONFIG.excludePatterns),
         maxExampleRows: config.get('maxExampleRows', DEFAULT_CONFIG.maxExampleRows),
-        enableCodeLens: config.get('enableCodeLens', DEFAULT_CONFIG.enableCodeLens),
-        enableDiagnostics: config.get('enableDiagnostics', DEFAULT_CONFIG.enableDiagnostics),
-        enableDecorations: config.get('enableDecorations', DEFAULT_CONFIG.enableDecorations),
+        enableCodeLens: channels.codeLens,
+        enableDiagnostics: channels.problems,
+        enableDecorations: channels.border,
         debug: config.get('debug', DEFAULT_CONFIG.debug),
         maxFilesIndexed: config.get('maxFilesIndexed', 5000),
         providerIndexMode: guardianConfig.get('providers.indexMode', DEFAULT_CONFIG.providerIndexMode),
