@@ -7,10 +7,10 @@ Minimal Cucumber.js workspace for manual verification of BDD Guardian `js-cucumb
 1. Install `bdd-guardian.vsix` (Extensions → … → Install from VSIX…)
 2. **File → Open Folder…** → this directory
 3. Wait for status bar **Ready** (or run **BDD Guardian: Reindex**)
-4. Open `features/search.feature`
+4. Open `features/search.feature` (and optionally `features/home.feature` for Scenario Outline)
 5. Verify:
-   - Output channel lists JS Cucumber bindings indexed from `search.steps.ts`
+   - Output channel lists JS Cucumber bindings indexed from `*.steps.ts`
    - CodeLens shows bound step definitions on all steps
-   - **Go to Definition** (F12) navigates to `features/step_definitions/search.steps.ts`
+   - **Go to Definition** (F12) navigates to the matching file under `features/step_definitions/`
    - Hover does not stay on “Indexing…” when bindings are loaded (v0.6.2+)
 
