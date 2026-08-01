@@ -6,6 +6,7 @@
  * Currently returns empty results - rules will be added later.
  */
 
+import * as vscode from 'vscode';
 import { Rule, RuleContext, RuleResult, RuleSeverity } from './ruleTypes';
 import { FeatureDocument, ResolveResult, FeatureStep } from '../../core/domain/types';
 
@@ -123,8 +124,7 @@ export class RuleEngine {
     /**
      * Convert rule severity to VS Code diagnostic severity
      */
-    public static toVsCodeSeverity(severity: RuleSeverity): import('vscode').DiagnosticSeverity {
-        const vscode = require('vscode');
+    public static toVsCodeSeverity(severity: RuleSeverity): vscode.DiagnosticSeverity {
         switch (severity) {
             case 'error': return vscode.DiagnosticSeverity.Error;
             case 'warning': return vscode.DiagnosticSeverity.Warning;
