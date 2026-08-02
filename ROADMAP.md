@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.9.0** (publicado 2026-07-29)
+> **Current release / Marketplace: v1.10.0** (publicado 2026-08-01)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.9.0** Marketplace |
+| ✅ Shipped | v0.1.0 → **v1.10.0** Marketplace |
 | 🎯 Next | (backlog / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal |
@@ -66,6 +66,23 @@
 | **1.6.2** | ForgeOne README family + Iconography ✅ (sin Jarvis) |
 | **1.8.0** | `guardian-cli` v2 + MCP stdio ✅ |
 | **1.9.0** | Map signal clarity — `feedbackLevel` presets + namespace hygiene ✅ |
+| **1.10.0** | Cucumber Expressions Wave B — optional text, alternation CE, built-in types extras |
+
+---
+
+## Plan v1.10.0 — ✅ shipped (2026-08-01)
+
+| # | Status |
+|---|--------|
+| **1.10.0-A** Optional text + alternation in `cucumberExpression.ts` | ✅ |
+| **1.10.0-B** Built-in CE types extras (`long`/`bigdecimal`/…) + unknown stays closed | ✅ |
+| **1.10.0-C** Corpus/tests + `@v110` dogfood `binding-demo` + BINDING_MATCHING | ✅ |
+| **1.10.0-4** CHANGELOG + VSIX + Marketplace | ✅ |
+
+Spec: `docs-internal/specs/cucumber-expressions-wave-b-v1.10.0.md` (local).  
+**Anti-scope:** `[Scope]`, custom types vía settings, motor CE embebido, fallback literal resolver.
+
+**Exit criteria:** optional/alternation/tipos extras bound en tests + Capa B `@v110`; Wave A + regex sin regresión.
 
 ---
 

@@ -199,6 +199,58 @@ describe('compileBindingRegex', () => {
       expect(regex!.test('I have {int} cucumbers')).toBe(true);
     });
   });
+
+  describe('Cucumber Expressions Wave B', () => {
+    it('should compile optional text cucumber(s) for both forms', () => {
+      const regex = compileBindingRegex('I have {int} cucumber(s)', { expressionType: 'cucumber' });
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 1 cucumber')).toBe(true);
+      expect(regex!.test('I have 2 cucumbers')).toBe(true);
+      expect(regex!.test('I have 2 cucumberx')).toBe(false);
+    });
+
+    it('should compile alternation a/an', () => {
+      const regex = compileBindingRegex('I ate a/an {word}', { expressionType: 'cucumber' });
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I ate a banana')).toBe(true);
+      expect(regex!.test('I ate an apple')).toBe(true);
+      expect(regex!.test('I ate the apple')).toBe(false);
+    });
+
+    it('should compile optional text with alternation cucumber(s)/gherkin(s)', () => {
+      const regex = compileBindingRegex('I have {int} cucumber(s)/gherkin(s)', {
+        expressionType: 'cucumber',
+      });
+      expect(regex).not.toBeNull();
+      expect(regex!.test('I have 1 cucumber')).toBe(true);
+      expect(regex!.test('I have 2 cucumbers')).toBe(true);
+      expect(regex!.test('I have 1 gherkin')).toBe(true);
+      expect(regex!.test('I have 3 gherkins')).toBe(true);
+      expect(regex!.test('I have 1 tomato')).toBe(false);
+    });
+
+    it('should compile built-in type extras {long} and {bigdecimal}', () => {
+      const longRe = compileBindingRegex('value is {long}', { expressionType: 'cucumber' });
+      expect(longRe).not.toBeNull();
+      expect(longRe!.test('value is 42')).toBe(true);
+      expect(longRe!.test('value is -7')).toBe(true);
+      expect(longRe!.test('value is 3.14')).toBe(false);
+
+      const bdRe = compileBindingRegex('amount is {bigdecimal}', { expressionType: 'cucumber' });
+      expect(bdRe).not.toBeNull();
+      expect(bdRe!.test('amount is 3.14')).toBe(true);
+      expect(bdRe!.test('amount is -10')).toBe(true);
+      expect(bdRe!.test('amount is xyz')).toBe(false);
+    });
+
+    it('should not silently match unknown {MyType} as a CE wildcard', () => {
+      const forced = compileBindingRegex('I have {MyType} items', { expressionType: 'cucumber' });
+      expect(forced).not.toBeNull();
+      // Must not behave like {word}/.* — unknown CE types stay closed.
+      expect(forced!.test('I have foo items')).toBe(false);
+      expect(forced!.test('I have {MyType} items')).toBe(true);
+    });
+  });
 });
 
 describe('isPatternAnchored', () => {

@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-01
+
+**Highlights:** Cucumber Expressions Wave B — optional text, alternation, and built-in type extras for Reqnroll C# matching (fewer false unbound).
+
+### Added
+
+- **CE optional text** — `(…)` segments compile as optional (`cucumber(s)` → `cucumber` / `cucumbers`)
+- **CE alternation** — `a/b` outside placeholders → `(?:a|b)` (`a/an {word}`)
+- **Built-in CE types** — `long`, `short`, `byte`, `biginteger`, `bigdecimal` (case-insensitive)
+- Dogfood `@v110` scenarios in `samples/binding-demo`
+- Docs: `BINDING_MATCHING.md` Wave B section
+
+### Changed
+
+- `cucumberExpression.ts` tokenizer/compiler (Wave A placeholders preserved)
+
 ## [1.9.0] - 2026-07-29
 
 **Highlights:** Map signal clarity — `bddGuardian.ui.feedbackLevel` presets (`full` / `standard` / `minimal`) reduce visual noise without breaking F12 / CodeLens.

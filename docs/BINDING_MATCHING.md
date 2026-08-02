@@ -22,6 +22,12 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Ambiguity policy (v0.5.0+)** — Overlapping patterns (e.g. `\d+` vs `.*`) → **ambiguous**, not silent bound. Enable `bddGuardian.matching.preferSpecificBinding` for score-based winner.
 - **Ambiguity explained (v1.6.1+)** — Hover and Problems show a short *why* (duplicate pattern, score tie, or broad vs specific). Matching status and scores are unchanged.
 - **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
+- **Cucumber Expressions Wave A** — `{int}`, `{float|double}`, `{word}`, `{string}` compile to regex via `cucumberExpression.ts` when `ExpressionType.CucumberExpression` is set or the pattern looks like CE (`{name}` placeholders, not `\d{2}`).
+- **Cucumber Expressions Wave B (v1.10.0+)** —
+  - **Optional text** — `(…)` segments are optional (`cucumber(s)` matches `cucumber` and `cucumbers`).
+  - **Alternation** — `a/b` outside placeholders compiles to `(?:a|b)` (`a/an {word}` matches both forms).
+  - **Built-in type extras** — `long`, `short`, `byte`, `biginteger` (int-like) and `bigdecimal` (decimal-like), case-insensitive.
+  - **Unknown `{CustomType}`** — CE compile fails closed (no silent `.*`); existing regex/literal path may apply, but never a CE wildcard.
 
 ## Optional improvements (good practice, no relaxation of BDD)
 
@@ -30,10 +36,13 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 
 ## Documented limitations
 
-- **Documented limitations:** lookaheads and complex nested groups may differ from the test runner; standard alternation `(a|b)` is covered by the precision corpus.
+- Lookaheads and complex nested regex groups may differ from the test runner; regex alternation `(a|b)` is covered by the precision corpus.
+- Custom Cucumber parameter types (user-defined `{MyType}`) are not discovered from C#; they stay unbound as CE until configured elsewhere (out of scope).
+- `[Scope]`-aware matching is not applied (bindings with the same pattern in different scopes may still show as ambiguous).
 
 ## Where the code lives
 
 - **Compile pattern:** `src/core/parsing/bindingRegex.ts` (`compileBindingRegex`, `normalizePatternWhitespace`, `escapeLiteralAnchors`).
+- **Cucumber Expressions:** `src/core/parsing/cucumberExpression.ts` (`compileCucumberExpressionToRegex`, `looksLikeCucumberExpression`).
 - **Step candidates:** `src/core/matching/normalization.ts` (`generateCandidateTexts`, `normalizeWhitespace`).
 - **Match and resolve:** `src/core/matching/resolver.ts`, `scoring.ts`.

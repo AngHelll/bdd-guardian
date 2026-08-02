@@ -72,4 +72,36 @@ describe('binding-demo sample', () => {
         expect(step?.rawText).toBe('the logged amount should be <amount>');
         expect(step?.candidateTexts).toContain('the logged amount should be 100');
     });
+
+    it('Wave B CE optional / alternation / {long} resolve bound', () => {
+        const featureText = readFileSync(join(ROOT, 'Features/sample.feature'), 'utf-8');
+        const stepsText = readFileSync(join(ROOT, 'StepDefinitions/SampleSteps.cs'), 'utf-8');
+        const doc = createMockDocument(featureText, join(ROOT, 'Features/sample.feature'));
+        const parsed = parseFeatureDocument(doc as any)!;
+        const bindings = parseCSharpBindingsFromText(
+            stepsText,
+            Uri.file(join(ROOT, 'StepDefinitions/SampleSteps.cs')) as any
+        );
+
+        const resolve = createResolver({
+            getAllBindings: () => bindings,
+            getBindingsByKeyword: (kw) => bindings.filter((b) => b.keyword === kw),
+            preferSpecificBinding: false,
+        });
+
+        const cucumber = parsed.allSteps.find((s) => s.rawText === 'I own 1 cucumber');
+        const cucumbers = parsed.allSteps.find((s) => s.rawText === 'I own 2 cucumbers');
+        const ateA = parsed.allSteps.find((s) => s.rawText === 'I ate a banana');
+        const ateAn = parsed.allSteps.find((s) => s.rawText === 'I ate an apple');
+        const balance = parsed.allSteps.find((s) => s.rawText === 'the balance should be 1000');
+
+        expect(resolve(cucumber!).status).toBe('bound');
+        expect(resolve(cucumber!).best?.binding.methodName).toBe('GivenIOwnOptionalCucumbers');
+        expect(resolve(cucumbers!).status).toBe('bound');
+        expect(resolve(ateA!).status).toBe('bound');
+        expect(resolve(ateA!).best?.binding.methodName).toBe('WhenIAteAOrAn');
+        expect(resolve(ateAn!).status).toBe('bound');
+        expect(resolve(balance!).status).toBe('bound');
+        expect(resolve(balance!).best?.binding.methodName).toBe('ThenBalanceShouldBe');
+    });
 });

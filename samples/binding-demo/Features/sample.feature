@@ -80,3 +80,22 @@ Feature: Calculator Operations
     Given I do a generic step
     When I do a generic step
     Then I do a generic step
+
+  # --- v1.10.0 Wave B (CE optional / alternation / type extras) ---
+
+  @v110 @cucumber-expressions
+  Scenario: Optional text cucumber(s) binds both forms
+    # Expect: CodeLens ✅ bound (optional text); pattern distinct from Wave A
+    Given I own 1 cucumber
+    And I own 2 cucumbers
+
+  @v110 @cucumber-expressions
+  Scenario: Alternation a/an binds both forms
+    # Expect: CodeLens ✅ bound (alternation)
+    When I ate a banana
+    And I ate an apple
+
+  @v110 @cucumber-expressions
+  Scenario: Built-in type extra {long} binds
+    # Expect: CodeLens ✅ bound ({long})
+    Then the balance should be 1000

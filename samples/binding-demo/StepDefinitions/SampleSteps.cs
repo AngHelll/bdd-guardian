@@ -139,4 +139,26 @@ namespace Calculator.Steps
         {
         }
     }
+
+    [Binding]
+    public class CucumberExpressionWaveBSteps
+    {
+        // Wave B: optional text (s) — "I own" avoids colliding with Wave A "I have {int} cucumbers"
+        [Given("I own {int} cucumber(s)", ExpressionType = ExpressionType.CucumberExpression)]
+        public void GivenIOwnOptionalCucumbers(int count)
+        {
+        }
+
+        // Wave B: alternation a/an
+        [When("I ate a/an {word}", ExpressionType = ExpressionType.CucumberExpression)]
+        public void WhenIAteAOrAn(string food)
+        {
+        }
+
+        // Wave B: built-in type extra {long}
+        [Then("the balance should be {long}", ExpressionType = ExpressionType.CucumberExpression)]
+        public void ThenBalanceShouldBe(long balance)
+        {
+        }
+    }
 }
