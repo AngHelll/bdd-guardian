@@ -17,6 +17,7 @@ import {
 } from '../domain/types';
 import { calculateScore, compareScores } from './scoring';
 import { getBindingIdentity } from './bindingIdentity';
+import { isBindingInScope } from './scopeFilter';
 
 /**
  * Resolver options
@@ -59,6 +60,9 @@ export function createResolver(deps: ResolverDependencies) {
         const keywordBindings = deps.getBindingsByKeyword(step.keywordResolved);
         
         for (const binding of keywordBindings) {
+            if (!isBindingInScope(binding, step.tagsEffective)) {
+                continue;
+            }
             const matchResult = tryMatch(binding, step.candidateTexts, true);
             if (matchResult) {
                 addCandidate(matchResult);
@@ -70,6 +74,9 @@ export function createResolver(deps: ResolverDependencies) {
             const allBindings = deps.getAllBindings();
             for (const binding of allBindings) {
                 if (binding.keyword !== step.keywordResolved) {
+                    if (!isBindingInScope(binding, step.tagsEffective)) {
+                        continue;
+                    }
                     const matchResult = tryMatch(binding, step.candidateTexts, false);
                     if (matchResult) {
                         addCandidate(matchResult);

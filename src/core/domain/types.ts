@@ -148,6 +148,11 @@ export interface Binding {
     readonly lineNumber: number;
     /** Full signature: ClassName.MethodName */
     readonly signature: string;
+    /**
+     * Reqnroll/SpecFlow `[Scope(Tag=…)]` tags for this binding (method ∪ class).
+     * Empty = global (no Tag scope). Stored without requiring a leading `@`.
+     */
+    readonly scopeTags: readonly string[];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

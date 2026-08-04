@@ -99,3 +99,20 @@ Feature: Calculator Operations
   Scenario: Built-in type extra {long} binds
     # Expect: CodeLens ✅ bound ({long})
     Then the balance should be 1000
+
+  # --- v1.11.0 Scope-aware matching ---
+
+  @v111 @web
+  Scenario: Scoped login binds web method
+    # Expect: CodeLens ✅ bound to LoginWeb (not ambiguous with LoginApi)
+    Given I log in with scoped credentials
+
+  @v111 @api
+  Scenario: Scoped login binds api method
+    # Expect: CodeLens ✅ bound to LoginApi
+    Given I log in with scoped credentials
+
+  @v111
+  Scenario: Scoped login without web/api tag is unbound
+    # Expect: CodeLens unbound (scoped-only bindings excluded)
+    Given I log in with scoped credentials

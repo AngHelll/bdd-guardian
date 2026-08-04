@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release / Marketplace: v1.10.0** (publicado 2026-08-01)
+> **Current release: v1.11.0** (GitHub 2026-08-04) · Marketplace: pedir *publish* si aún no está
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.10.0** Marketplace |
+| ✅ Shipped | v0.1.0 → **v1.11.0** (tag + GitHub Release) |
 | 🎯 Next | (backlog / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal |
@@ -67,6 +67,23 @@
 | **1.8.0** | `guardian-cli` v2 + MCP stdio ✅ |
 | **1.9.0** | Map signal clarity — `feedbackLevel` presets + namespace hygiene ✅ |
 | **1.10.0** | Cucumber Expressions Wave B — optional text, alternation CE, built-in types extras |
+| **1.11.0** | Scope-aware matching — `[Scope(Tag=…)]` Reqnroll |
+
+---
+
+## Plan v1.11.0 — ✅ shipped (2026-08-04)
+
+| # | Status |
+|---|--------|
+| **1.11.0-A** Parse `[Scope(Tag=…)]` → `Binding.scopeTags` (método/clase) | ✅ |
+| **1.11.0-B** Resolver filtra por `tagsEffective` + política documentada | ✅ |
+| **1.11.0-C** Dogfood `@v111` + tests + BINDING_MATCHING | ✅ |
+| **1.11.0-4** CHANGELOG + VSIX + GitHub Release | ✅ (Marketplace: *publish* explícito) |
+
+Spec: `docs-internal/specs/scope-aware-matching-v1.11.0.md` (local).  
+**Anti-scope:** `Feature=`/`Scenario=` path scopes, cambiar `tagFilter` UI, Pilot, CE Wave C.
+
+**Exit criteria:** mismo patrón + scopes distintos → bound correcto por tags; sin Scope regresión ambiguous/CE; Capa B `@v111` OK.
 
 ---
 

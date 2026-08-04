@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-08-04
+
+**Highlights:** Scope-aware matching — Reqnroll `[Scope(Tag=…)]` so the same pattern in different scopes is no longer false-ambiguous.
+
+### Added
+
+- **`Binding.scopeTags`** from `[Scope(Tag=…)]` on method and/or class (OR union)
+- Resolver filters candidates by `step.tagsEffective` after regex match
+- Dogfood `@v111` web/api/unbound scenarios in `samples/binding-demo`
+- Docs: `BINDING_MATCHING.md` Scope policy
+
+### Changed
+
+- `BINDING_ATTRIBUTE_REGEX` accepts sibling attrs `[Given("…"), Scope(…)]`
+
 ## [1.10.0] - 2026-08-01
 
 **Highlights:** Cucumber Expressions Wave B — optional text, alternation, and built-in type extras for Reqnroll C# matching (fewer false unbound).

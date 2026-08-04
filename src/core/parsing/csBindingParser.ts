@@ -83,6 +83,7 @@ export function parseBindingDocument(document: vscode.TextDocument, caseInsensit
                     range: new vscode.Range(lineNum, bindingMatch.index || 0, lineNum, line.length),
                     lineNumber: lineNum,
                     signature: `${currentClassName}.${methodName}`,
+                    scopeTags: [],
                 };
                 
                 bindings.push(binding);

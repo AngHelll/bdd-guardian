@@ -104,4 +104,40 @@ describe('binding-demo sample', () => {
         expect(resolve(balance!).status).toBe('bound');
         expect(resolve(balance!).best?.binding.methodName).toBe('ThenBalanceShouldBe');
     });
+
+    it('Wave v1.11 Scope resolves web/api and unbound without tag', () => {
+        const featureText = readFileSync(join(ROOT, 'Features/sample.feature'), 'utf-8');
+        const stepsText = readFileSync(join(ROOT, 'StepDefinitions/SampleSteps.cs'), 'utf-8');
+        const doc = createMockDocument(featureText, join(ROOT, 'Features/sample.feature'));
+        const parsed = parseFeatureDocument(doc as any)!;
+        const bindings = parseCSharpBindingsFromText(
+            stepsText,
+            Uri.file(join(ROOT, 'StepDefinitions/SampleSteps.cs')) as any
+        );
+
+        const resolve = createResolver({
+            getAllBindings: () => bindings,
+            getBindingsByKeyword: (kw) => bindings.filter((b) => b.keyword === kw),
+            preferSpecificBinding: false,
+        });
+
+        const webStep = parsed.allSteps.find(
+            (s) => s.rawText === 'I log in with scoped credentials' && s.tagsEffective.includes('@web')
+        );
+        const apiStep = parsed.allSteps.find(
+            (s) => s.rawText === 'I log in with scoped credentials' && s.tagsEffective.includes('@api')
+        );
+        const bareStep = parsed.allSteps.find(
+            (s) =>
+                s.rawText === 'I log in with scoped credentials' &&
+                !s.tagsEffective.includes('@web') &&
+                !s.tagsEffective.includes('@api')
+        );
+
+        expect(resolve(webStep!).status).toBe('bound');
+        expect(resolve(webStep!).best?.binding.methodName).toBe('LoginWeb');
+        expect(resolve(apiStep!).status).toBe('bound');
+        expect(resolve(apiStep!).best?.binding.methodName).toBe('LoginApi');
+        expect(resolve(bareStep!).status).toBe('unbound');
+    });
 });

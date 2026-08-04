@@ -128,6 +128,7 @@ export function parsePythonBehaveBindingsFromText(
             range: new vscode.Range(lineNumber, 0, lineNumber, lineText.length),
             lineNumber,
             signature: `${uri.fsPath}:${lineNumber}:${keyword}`,
+            scopeTags: [],
         });
     }
 

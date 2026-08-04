@@ -28,6 +28,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
   - **Alternation** — `a/b` outside placeholders compiles to `(?:a|b)` (`a/an {word}` matches both forms).
   - **Built-in type extras** — `long`, `short`, `byte`, `biginteger` (int-like) and `bigdecimal` (decimal-like), case-insensitive.
   - **Unknown `{CustomType}`** — CE compile fails closed (no silent `.*`); existing regex/literal path may apply, but never a CE wildcard.
+- **Scope-aware matching (v1.11.0+)** — After regex match, bindings with `[Scope(Tag=…)]` (method and/or class, OR) are kept only if `step.tagsEffective` contains a matching tag (case-insensitive; `@` optional). Bindings with empty `scopeTags` stay global. Steps with no tags exclude all Tag-scoped bindings. UI `tagFilter` is unchanged (display only).
 
 ## Optional improvements (good practice, no relaxation of BDD)
 
@@ -38,11 +39,13 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 
 - Lookaheads and complex nested regex groups may differ from the test runner; regex alternation `(a|b)` is covered by the precision corpus.
 - Custom Cucumber parameter types (user-defined `{MyType}`) are not discovered from C#; they stay unbound as CE until configured elsewhere (out of scope).
-- `[Scope]`-aware matching is not applied (bindings with the same pattern in different scopes may still show as ambiguous).
+- `Scope(Feature=…)` / `Scope(Scenario=…)` / file-path scopes are not applied (Tag-only MVP).
 
 ## Where the code lives
 
 - **Compile pattern:** `src/core/parsing/bindingRegex.ts` (`compileBindingRegex`, `normalizePatternWhitespace`, `escapeLiteralAnchors`).
 - **Cucumber Expressions:** `src/core/parsing/cucumberExpression.ts` (`compileCucumberExpressionToRegex`, `looksLikeCucumberExpression`).
+- **Scope filter:** `src/core/matching/scopeFilter.ts` (`isBindingInScope`); wired in `resolver.ts`.
+- **C# Scope parse:** `src/core/parsing/csharpBindingParser.ts` → `Binding.scopeTags`.
 - **Step candidates:** `src/core/matching/normalization.ts` (`generateCandidateTexts`, `normalizeWhitespace`).
 - **Match and resolve:** `src/core/matching/resolver.ts`, `scoring.ts`.

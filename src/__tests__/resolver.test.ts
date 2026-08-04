@@ -24,6 +24,7 @@ function createBinding(
     range: new Range(lineNumber, 0, lineNumber, 0) as any,
     lineNumber,
     signature: `TestSteps.${methodName}`,
+    scopeTags: [],
   };
 }
 

@@ -38,6 +38,7 @@ function mockBinding(path: string): Binding {
     range: new vscode.Range(0, 0, 0, 20),
     lineNumber: 0,
     signature: 'Steps.GivenStep',
+    scopeTags: [],
   };
 }
 

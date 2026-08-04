@@ -16,6 +16,9 @@ export interface CSharpBindingParseOptions {
     caseInsensitive?: boolean;
 }
 
+/** Matches Scope(Tag = "…") / Scope(Tag = @"…") inside or as attributes. */
+const SCOPE_TAG_IN_ATTR_REGEX = /Scope\s*\(\s*Tag\s*=\s*@?"([^"]*)"\s*\)/gi;
+
 /**
  * Parse all step bindings from C# source text (Reqnroll, SpecFlow, etc.).
  */
@@ -27,6 +30,7 @@ export function parseCSharpBindingsFromText(
     const bindings: Binding[] = [];
     const lines = text.split('\n');
     const classNames = findClassNames(text);
+    const classScopeTags = buildClassScopeTagMap(text, classNames);
 
     let match: RegExpExecArray | null;
     const attributeRegex = new RegExp(BINDING_ATTRIBUTE_REGEX.source, 'g');
@@ -47,6 +51,13 @@ export function parseCSharpBindingsFromText(
         const methodName = methodMatch ? methodMatch[1] : 'Unknown';
 
         const expressionType = inferExpressionTypeOverride(fullAttributeText);
+        const methodScopeTags = extractScopeTagsFromText(
+            findMethodAttributeBlock(text, match.index, methodMatch ? match.index + match[0].length + methodMatch.index : match.index + match[0].length)
+        );
+        const scopeTags = uniqueTags([
+            ...(classScopeTags.get(className) ?? []),
+            ...methodScopeTags,
+        ]);
 
         const keywords: ResolvedKeyword[] =
             attrName === 'StepDefinition' ? ['Given', 'When', 'Then'] : [attrName as ResolvedKeyword];
@@ -70,6 +81,7 @@ export function parseCSharpBindingsFromText(
                 range: new vscode.Range(lineNumber, 0, lineNumber, lines[lineNumber]?.length ?? 0),
                 lineNumber,
                 signature: `${className}.${methodName}`,
+                scopeTags,
             });
         }
     }
@@ -105,6 +117,33 @@ export function extractCSharpPatternString(raw: string): string {
         .replace(/\x00BACKSLASH\x00/g, '\\');
 }
 
+/** Exported for unit tests. */
+export function extractScopeTagsFromText(text: string): string[] {
+    const tags: string[] = [];
+    const re = new RegExp(SCOPE_TAG_IN_ATTR_REGEX.source, 'gi');
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+        const raw = m[1].trim().replace(/^@+/, '');
+        if (raw.length > 0) {
+            tags.push(raw);
+        }
+    }
+    return uniqueTags(tags);
+}
+
+function uniqueTags(tags: readonly string[]): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const t of tags) {
+        const key = t.toLowerCase();
+        if (!seen.has(key)) {
+            seen.add(key);
+            out.push(t);
+        }
+    }
+    return out;
+}
+
 function findClassNames(text: string): Array<{ name: string; index: number }> {
     const classes: Array<{ name: string; index: number }> = [];
     const regex = new RegExp(CLASS_DECLARATION_REGEX.source, 'g');
@@ -113,6 +152,52 @@ function findClassNames(text: string): Array<{ name: string; index: number }> {
         classes.push({ name: match[1], index: match.index });
     }
     return classes;
+}
+
+function buildClassScopeTagMap(
+    text: string,
+    classes: Array<{ name: string; index: number }>
+): Map<string, string[]> {
+    const map = new Map<string, string[]>();
+    for (let i = 0; i < classes.length; i++) {
+        const cls = classes[i];
+        const prevEnd = i > 0 ? classes[i - 1].index : 0;
+        const regionStart = Math.max(prevEnd, cls.index - 800);
+        map.set(cls.name, extractScopeTagsFromText(text.slice(regionStart, cls.index)));
+    }
+    return map;
+}
+
+/**
+ * Attribute cluster from preceding `[…]` attrs through the step attribute (and siblings)
+ * up to — but not past — the method name region end.
+ */
+function findMethodAttributeBlock(text: string, attributeIndex: number, blockEnd: number): string {
+    let start = attributeIndex;
+    while (start > 0) {
+        let i = start - 1;
+        while (i >= 0 && /\s/.test(text[i])) {
+            i--;
+        }
+        if (i < 0 || text[i] !== ']') {
+            break;
+        }
+        let depth = 1;
+        let j = i - 1;
+        while (j >= 0 && depth > 0) {
+            if (text[j] === ']') {
+                depth++;
+            } else if (text[j] === '[') {
+                depth--;
+            }
+            j--;
+        }
+        if (depth !== 0) {
+            break;
+        }
+        start = j + 1;
+    }
+    return text.slice(start, Math.max(blockEnd, attributeIndex));
 }
 
 function findEnclosingClassName(

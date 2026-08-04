@@ -14,6 +14,7 @@ function makeBinding(uri: vscode.Uri, line: number, methodName: string): Binding
         keyword: 'Given',
         patternRaw: 'test',
         regex: /^test$/u,
+        scopeTags: [],
     };
 }
 

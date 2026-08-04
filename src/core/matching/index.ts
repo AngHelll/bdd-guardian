@@ -6,6 +6,7 @@ export { normalizeWhitespace, generateCandidateTexts, extractPlaceholders } from
 export { calculateScore, compareScores } from './scoring';
 export { createResolver, resolveAll, type ResolverOptions, type ResolverDependencies } from './resolver';
 export { applyMatchingSettings } from './resolverDeps';
+export { isBindingInScope, normalizeScopeTag } from './scopeFilter';
 export {
     explainAmbiguity,
     ambiguityI18n,

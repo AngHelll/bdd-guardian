@@ -161,4 +161,19 @@ namespace Calculator.Steps
         {
         }
     }
+
+    [Binding]
+    public class ScopeAwareSteps
+    {
+        // Wave B/v1.11: same pattern, different Scope(Tag) — runtime picks by scenario tags.
+        [Given("I log in with scoped credentials"), Scope(Tag = "web")]
+        public void LoginWeb()
+        {
+        }
+
+        [Given("I log in with scoped credentials"), Scope(Tag = "api")]
+        public void LoginApi()
+        {
+        }
+    }
 }

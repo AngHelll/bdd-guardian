@@ -82,15 +82,15 @@ export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;
  * Matches C# binding attributes (Reqnroll/SpecFlow):
  * - [Given(@"pattern")], [When("pattern")], [Then("pattern")]
  * - [StepDefinition("pattern")] (Reqnroll)
+ * - Extra args inside the call: ExpressionType=…
+ * - Sibling attrs in the same brackets: [Given("…"), Scope(Tag = "web")]
  *
  * Captures:
  * 1) attribute name (Given|When|Then|StepDefinition)
  * 2) first string literal argument (verbatim @"..." or regular "...")
- *
- * Note: we intentionally allow extra args after the first string (e.g. ExpressionType=...).
  */
 export const BINDING_ATTRIBUTE_REGEX =
-    /\[(Given|When|Then|StepDefinition)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*(?:,[^\]]*)?\)\s*\]/g;
+    /\[(Given|When|Then|StepDefinition)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*(?:,[^)]*)?\)(?:\s*,\s*[^[\]]+)?\s*\]/g;
 
 /** Matches C# class declaration */
 export const CLASS_DECLARATION_REGEX = /(?:public|internal|private)?\s*(?:partial\s+)?class\s+(\w+)/g;

@@ -122,6 +122,7 @@ describe('precision corpus — calculator overlap (strict ambiguity)', () => {
                 range: {} as any,
                 lineNumber: 0,
                 signature: 'Calc.GivenNumeric',
+                scopeTags: [],
             },
             {
                 keyword: 'Given' as const,
@@ -133,6 +134,7 @@ describe('precision corpus — calculator overlap (strict ambiguity)', () => {
                 range: {} as any,
                 lineNumber: 0,
                 signature: 'Calc.GivenAny',
+                scopeTags: [],
             },
         ];
         const overlapDeps: ResolverDependencies = {
