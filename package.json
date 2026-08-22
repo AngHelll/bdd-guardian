@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-  "version": "1.11.0",
+    "version": "1.13.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -123,8 +123,56 @@
       {
         "command": "bddGuardian.pilot.install",
         "title": "BDD Guardian: Install BDD Pilot"
+      },
+      {
+        "command": "bddGuardian.suiteMap.focus",
+        "title": "%command.suiteMap.focus%"
+      },
+      {
+        "command": "bddGuardian.suiteMap.generateBinding",
+        "title": "%command.suiteMap.generateBinding%",
+        "icon": "$(add)"
+      },
+      {
+        "command": "bddGuardian.suiteMap.copySnippet",
+        "title": "%command.suiteMap.copySnippet%",
+        "icon": "$(copy)"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "bddGuardian.suiteMap.generateBinding",
+          "when": "false"
+        },
+        {
+          "command": "bddGuardian.suiteMap.copySnippet",
+          "when": "false"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "bddGuardian.suiteMap.generateBinding",
+          "when": "view == bddGuardian.suiteMap && viewItem == suiteMap.unbound.generate",
+          "group": "inline"
+        },
+        {
+          "command": "bddGuardian.suiteMap.copySnippet",
+          "when": "view == bddGuardian.suiteMap && viewItem == suiteMap.unbound.copy",
+          "group": "inline"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "bddGuardian.suiteMap",
+          "name": "%view.suiteMap.name%",
+          "icon": "$(map)",
+          "when": "config.bddGuardian.suiteMap.enabled"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "reqnroll-navigator.goBack",
@@ -206,6 +254,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show Information diagnostics on step bindings that no feature step resolves to"
+        },
+        "bddGuardian.suiteMap.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.suiteMap.enabled%"
         },
         "bddGuardian.pilotHandoff.enabled": {
           "type": "boolean",

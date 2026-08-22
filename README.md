@@ -72,6 +72,12 @@ See binding status directly above each step:
 - ❌ **Unbound**: No binding found
 - ⚠️ **Ambiguous**: Multiple bindings match — click to select
 
+### 🗺️ Suite map
+
+The **BDD Map** view in Explorer lists workspace **holes** in the step↔binding map (unbound steps, ambiguous steps, unused/orphan bindings) with the same resolution as CodeLens. Holes are grouped by `.feature` (orphans by binding file). Click a row to open the file. Unbound rows offer **Generate binding** (or **Copy snippet** if generate does not apply). Bound steps are counted in the summary, not listed (less noise).
+
+Command: **BDD Guardian: Show suite map**. Disable with `bddGuardian.suiteMap.enabled: false`. Independent of `feedbackLevel`.
+
 ### 🎯 Visual Feedback
 
 BDD Guardian provides subtle, non-intrusive visual feedback:
@@ -224,6 +230,7 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 | `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS / Behave / Godog / Java) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
 | `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on step bindings that no feature step resolves to |
+| `bddGuardian.suiteMap.enabled` | `true` | Show the BDD Map Explorer view (workspace unbound / ambiguous / orphan holes) |
 | `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding |
 
 ### Autocomplete
@@ -272,6 +279,7 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | `bddGuardian.authorActions.enabled` | branding | Unbound step copy/generate quick fixes |
 | `bddGuardian.autocomplete.enabled` | branding | Step IntelliSense from indexed bindings |
 | `bddGuardian.orphanBindings.enabled` | branding | Unused binding Problems (Information) |
+| `bddGuardian.suiteMap.enabled` | branding | Explorer BDD Map (workspace holes) |
 | `bddGuardian.pilotHandoff.enabled` | branding | Open/Install Pilot CTAs + post-generate Run with Pilot |
 | `bddGuardian.coach.*` | branding | Coach rules and UI |
 | `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |

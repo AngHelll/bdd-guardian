@@ -121,6 +121,18 @@ export function isAuthorActionsEnabled(): boolean {
     return vscode.workspace.getConfiguration('bddGuardian.authorActions').get<boolean>('enabled', true);
 }
 
+/** One map-leaf action: generate if the stack supports insert, else copy snippet. */
+export type UnboundMapAuthorAction = 'generate' | 'copy';
+
+export function resolveUnboundMapAuthorAction(): UnboundMapAuthorAction | undefined {
+    if (!isAuthorActionsEnabled()) {
+        return undefined;
+    }
+    const selection = getProviderManager().getCachedSelection();
+    const framework = resolveHoverFrameworkContext({ selection });
+    return supportsScaffoldInsert(framework.snippetKind) ? 'generate' : 'copy';
+}
+
 export interface AuthorStepRef {
     documentUri: string;
     line: number;

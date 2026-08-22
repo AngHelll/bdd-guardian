@@ -106,6 +106,17 @@ export const en: Record<string, string> = {
   codeActionOpenPilot: 'BDD Guardian: Open BDD Pilot',
   codeActionInstallPilot: 'BDD Guardian: Install BDD Pilot',
   pilotHandoffFailed: 'Could not open BDD Pilot — is it installed and enabled?',
+  suiteMapSummary: '{0} bound · {1} unbound · {2} ambiguous · {3} orphan',
+  suiteMapUnbound: 'Unbound ({0})',
+  suiteMapAmbiguous: 'Ambiguous ({0})',
+  suiteMapOrphans: 'Orphans ({0})',
+  suiteMapHealthy: 'Map healthy — no holes',
+  suiteMapIndexing: 'Indexing…',
+  suiteMapNoFeatures: 'No features indexed',
+  suiteMapDisabled: 'BDD Map is disabled (bddGuardian.suiteMap.enabled)',
+  suiteMapMore: '…and {0} more',
+  suiteMapOrphansSkipped: 'Orphan scan skipped (too many bindings)',
+  suiteMapOpen: 'Open',
 };
 
 export const es: Record<string, string> = {
@@ -211,4 +222,15 @@ export const es: Record<string, string> = {
   codeActionOpenPilot: 'BDD Guardian: Abrir BDD Pilot',
   codeActionInstallPilot: 'BDD Guardian: Instalar BDD Pilot',
   pilotHandoffFailed: 'No se pudo abrir BDD Pilot — ¿está instalado y activado?',
+  suiteMapSummary: '{0} enlazados · {1} sin enlazar · {2} ambiguos · {3} huérfanos',
+  suiteMapUnbound: 'Sin enlazar ({0})',
+  suiteMapAmbiguous: 'Ambiguos ({0})',
+  suiteMapOrphans: 'Huérfanos ({0})',
+  suiteMapHealthy: 'Mapa sano — sin huecos',
+  suiteMapIndexing: 'Indexando…',
+  suiteMapNoFeatures: 'No hay features indexados',
+  suiteMapDisabled: 'El mapa BDD está desactivado (bddGuardian.suiteMap.enabled)',
+  suiteMapMore: '…y {0} más',
+  suiteMapOrphansSkipped: 'Escaneo de huérfanos omitido (demasiados bindings)',
+  suiteMapOpen: 'Abrir',
 };

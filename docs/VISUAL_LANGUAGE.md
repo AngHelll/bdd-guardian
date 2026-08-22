@@ -32,6 +32,7 @@ Single reference for how step binding status appears across the extension.
 | **CodeLens** (binding file) | usage count | — | — | “No usages” (existing) | — |
 | **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + why + top matches | — | ⏳ emoji |
 | **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** + why hint (step) | Diagnostic **Information** (binding) | — |
+| **Suite map (Explorer)** | count in summary only | Group + jump to step | Group + jump to step | Group + jump to binding | “Indexing…” |
 | **Border / ruler** | `charts.green` | `charts.red` | `charts.yellow` | — | — |
 
 Implementation: `src/ui/stepStatus.ts` (`getCodeLensIcon`, `getStatusColor`, `getStatusLabel`, `getStatusEmoji`).
@@ -58,6 +59,8 @@ Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 
 Granular toggles (`gutterIcons.enabled`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
 
+**Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb).
+
 ## Hover emojis
 
 Markdown hovers intentionally use emojis (native, readable in VS Code hovers). Labels use i18n (`hoverBound`, etc.).
@@ -78,5 +81,6 @@ Binding step diagnostics and orphan bindings: **`BDD Guardian`** (`bddGuardian/u
 | `bddGuardian.hoverDetails.enabled` | Rich hover |
 | `bddGuardian.displayLanguage` | EN/ES labels |
 | `bddGuardian.orphanBindings.enabled` | Unused binding Problems (Information) |
+| `bddGuardian.suiteMap.enabled` | Explorer BDD Map (workspace holes) |
 
 See [README.md](../README.md) settings map for legacy vs branding keys.

@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-08-21
+
+**Highlights:** Suite map ola 2 — holes grouped by file; Generate/Copy on unbound rows (same author commands as the lightbulb).
+
+### Added
+
+- BDD Map nests Unbound/Ambiguous by `.feature` and Orphans by binding file
+- Inline **Generate binding** (or **Copy snippet**) on unbound leaves; `bddGuardian.authorActions.enabled` hides the action
+- Core helper `groupHolesByUri`
+
+### Changed
+
+- Unbound/ambiguous/orphan leaves show `line — text` (filename lives on the file group)
+
+## [1.12.0] - 2026-08-16
+
+**Highlights:** Suite map — Explorer view of workspace map holes (unbound / ambiguous / orphan), same resolution as CodeLens.
+
+### Added
+
+- **BDD Map** view in Explorer — counts + clickable holes; command **Show suite map**
+- Setting `bddGuardian.suiteMap.enabled` (default `true`); independent of `feedbackLevel`
+- Core helper `summarizeSuiteMap` (same resolver path as the editor)
+
 ## [1.11.0] - 2026-08-04
 
 **Highlights:** Scope-aware matching — Reqnroll `[Scope(Tag=…)]` so the same pattern in different scopes is no longer false-ambiguous.

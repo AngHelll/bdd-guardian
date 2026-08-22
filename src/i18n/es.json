@@ -73,5 +73,16 @@
   "codeActionOpenPilot": "BDD Guardian: Abrir BDD Pilot",
   "codeActionInstallPilot": "BDD Guardian: Instalar BDD Pilot",
   "pilotHandoffFailed": "No se pudo abrir BDD Pilot — ¿está instalado y activado?",
-  "diagnosticOrphanBinding": "Binding sin uso: ningún step de feature resuelve a \"{0}\""
+  "diagnosticOrphanBinding": "Binding sin uso: ningún step de feature resuelve a \"{0}\"",
+  "suiteMapSummary": "{0} enlazados · {1} sin enlazar · {2} ambiguos · {3} huérfanos",
+  "suiteMapUnbound": "Sin enlazar ({0})",
+  "suiteMapAmbiguous": "Ambiguos ({0})",
+  "suiteMapOrphans": "Huérfanos ({0})",
+  "suiteMapHealthy": "Mapa sano — sin huecos",
+  "suiteMapIndexing": "Indexando…",
+  "suiteMapNoFeatures": "No hay features indexados",
+  "suiteMapDisabled": "El mapa BDD está desactivado (bddGuardian.suiteMap.enabled)",
+  "suiteMapMore": "…y {0} más",
+  "suiteMapOrphansSkipped": "Escaneo de huérfanos omitido (demasiados bindings)",
+  "suiteMapOpen": "Abrir"
 }

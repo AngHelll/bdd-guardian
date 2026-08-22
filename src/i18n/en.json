@@ -73,5 +73,16 @@
   "codeActionOpenPilot": "BDD Guardian: Open BDD Pilot",
   "codeActionInstallPilot": "BDD Guardian: Install BDD Pilot",
   "pilotHandoffFailed": "Could not open BDD Pilot — is it installed and enabled?",
-  "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\""
+  "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\"",
+  "suiteMapSummary": "{0} bound · {1} unbound · {2} ambiguous · {3} orphan",
+  "suiteMapUnbound": "Unbound ({0})",
+  "suiteMapAmbiguous": "Ambiguous ({0})",
+  "suiteMapOrphans": "Orphans ({0})",
+  "suiteMapHealthy": "Map healthy — no holes",
+  "suiteMapIndexing": "Indexing…",
+  "suiteMapNoFeatures": "No features indexed",
+  "suiteMapDisabled": "BDD Map is disabled (bddGuardian.suiteMap.enabled)",
+  "suiteMapMore": "…and {0} more",
+  "suiteMapOrphansSkipped": "Orphan scan skipped (too many bindings)",
+  "suiteMapOpen": "Open"
 }

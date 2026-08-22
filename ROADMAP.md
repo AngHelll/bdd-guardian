@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.11.0** (GitHub 2026-08-04) · Marketplace: pedir *publish* si aún no está
+> **Current release: v1.13.0** (GitHub + Marketplace en curso 2026-08-21)
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.11.0** (tag + GitHub Release) |
-| 🎯 Next | (backlog / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
-| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal |
+| ✅ Shipped | v0.1.0 → **v1.13.0** |
+| 🎯 Next | (dogfood mapa / next align) |
+| 📋 Gate | *publish* Marketplace |
+| 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
 
@@ -68,6 +68,40 @@
 | **1.9.0** | Map signal clarity — `feedbackLevel` presets + namespace hygiene ✅ |
 | **1.10.0** | Cucumber Expressions Wave B — optional text, alternation CE, built-in types extras |
 | **1.11.0** | Scope-aware matching — `[Scope(Tag=…)]` Reqnroll |
+| **1.12.0** | Suite map — Explorer view of unbound / ambiguous / orphan holes |
+| **1.13.0** | Suite map ola 2 — group holes by file + generate/copy from unbound |
+
+---
+
+## Plan v1.13.0 — verificado (2026-08-21)
+
+| # | Status |
+|---|--------|
+| **1.13.0-A** `groupHolesByUri` + TreeView anidado por archivo | ✅ |
+| **1.13.0-B** Acción inline Generate/Copy en unbound (comandos author) | ✅ |
+| **1.13.0-C** i18n / docs / CHANGELOG | ✅ |
+| **1.13.0-4** VSIX + Marketplace | VSIX ✅; Marketplace ☐ |
+
+Spec: `docs-internal/specs/suite-map-ola2-v1.13.0.md` (local).  
+**Anti-scope:** matching, Activity Bar, webview, listar bound, árbol por escenario, Coach, Pilot Run, MCP/CLI schema, Index API v2, rename.
+
+**Exit criteria:** `binding-demo` agrupa unbound bajo `sample.feature`; Generate desde el mapa reusa author; `authorActions.enabled: false` oculta la acción; Capa B fijos OK.
+
+---
+
+## Plan v1.12.0 — verificado (2026-08-16)
+
+| # | Status |
+|---|--------|
+| **1.12.0-A** `summarizeSuiteMap` puro + tests (binding-demo `@v111` unbound) | ✅ |
+| **1.12.0-B** TreeView Explorer “BDD Map” + jump + refresh | ✅ |
+| **1.12.0-C** Setting / comando / i18n / docs | ✅ |
+| **1.12.0-4** CHANGELOG + VSIX + Marketplace | ✅ Marketplace; tag GitHub Stage 6 |
+
+Spec: `docs-internal/specs/suite-map-v1.12.0.md` (local).  
+**Anti-scope:** matching, Activity Bar, webview, listar bound, árbol por feature, Coach, Pilot, CLI/MCP schema, Index API v2.
+
+**Exit criteria:** vista en `binding-demo` muestra huecos alineados con CodeLens; click abre línea; setting off; `feedbackLevel` no oculta la vista.
 
 ---
 
@@ -520,4 +554,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-07-29 — v1.9.0 Map signal clarity shipped + Marketplace.*
+*Last updated: 2026-08-21 — v1.13.0 Suite map ola 2 verified (Capa B OK); GitHub/Marketplace ship in progress.*

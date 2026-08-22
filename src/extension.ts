@@ -38,6 +38,7 @@ import { t, refreshLanguage } from './i18n';
 import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
 import { showZeroBindingsHintIfNeeded } from './features/onboarding';
 import { BindingCodeActionsProvider, registerAuthorCommands, StepCompletionProvider } from './features/author';
+import { registerSuiteMap } from './features/suiteMap';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -51,6 +52,7 @@ let bindingCodeLensProvider: BindingCodeLensProvider;
 let navigationStatusBar: vscode.StatusBarItem;
 let indexingStatusBarItem: vscode.StatusBarItem;
 let coachDiagnosticsProvider: CoachDiagnosticsProvider;
+let refreshSuiteMap: () => void = () => { /* registered in activate */ };
 
 export async function activate(context: vscode.ExtensionContext): Promise<GuardianIndexApiV1> {
     outputChannel = vscode.window.createOutputChannel('BDD Guardian');
@@ -128,6 +130,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
     registerCoachCommands(context);
 
     registerAuthorCommands(context, indexManager);
+    refreshSuiteMap = registerSuiteMap(context, indexManager).refresh;
     const stepCompletionProvider = new StepCompletionProvider(indexManager);
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
@@ -316,6 +319,7 @@ function refreshFeatureFileUI(doc: vscode.TextDocument): void {
     codeLensProvider.refresh();
     diagnosticsEngine.analyzeFile(doc);
     orphanBindingsDiagnostics.refresh();
+    refreshSuiteMap();
     const editor = vscode.window.activeTextEditor;
     if (editor && editor.document.uri.toString() === doc.uri.toString()) {
         decorationsManager.updateDecorations(editor);
@@ -361,13 +365,16 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
                 e.affectsConfiguration('bddGuardian.providers') ||
                 e.affectsConfiguration('bddGuardian.ui') ||
                 e.affectsConfiguration('bddGuardian.authorActions') ||
-                e.affectsConfiguration('bddGuardian.orphanBindings')
+                e.affectsConfiguration('bddGuardian.orphanBindings') ||
+                e.affectsConfiguration('bddGuardian.matching') ||
+                e.affectsConfiguration('bddGuardian.suiteMap')
             ) {
                 invalidateConfigCache();
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
                 updateAllDiagnostics();
                 orphanBindingsDiagnostics.refresh();
+                refreshSuiteMap();
                 if (e.affectsConfiguration('bddGuardian.providers')) {
                     void performInitialIndexing(context).then(() => refreshAllUI());
                 }
@@ -377,6 +384,7 @@ function registerEventHandlers(context: vscode.ExtensionContext): void {
                 codeLensProvider.refresh();
                 bindingCodeLensProvider.refresh();
                 orphanBindingsDiagnostics.refresh();
+                refreshSuiteMap();
                 const editor = vscode.window.activeTextEditor;
                 if (editor && isFeatureFile(editor.document)) {
                     decorationsManager.updateDecorationsImmediate(editor);
@@ -394,6 +402,7 @@ async function performInitialIndexing(context?: vscode.ExtensionContext): Promis
     try {
         await indexManager.indexAll(config);
         updateAllDiagnostics();
+        refreshSuiteMap();
         indexingStatusBarItem.text = '$(check) ' + t('statusReady');
         indexingStatusBarItem.show();
         setTimeout(() => { indexingStatusBarItem.text = ''; indexingStatusBarItem.hide(); }, 2500);
@@ -424,6 +433,7 @@ function refreshAllUI(): void {
     bindingCodeLensProvider.refresh();
     updateAllDiagnostics();
     orphanBindingsDiagnostics.refresh();
+    refreshSuiteMap();
     if (vscode.window.activeTextEditor) {
         decorationsManager.updateDecorations(vscode.window.activeTextEditor);
     }

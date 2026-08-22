@@ -3,5 +3,10 @@
   "config.feedbackLevel.description": "Densidad del feedback visual del estado step↔binding. El preset es un techo; los toggles individuales pueden apagar canales.",
   "config.feedbackLevel.full": "Gutter + borde + Problems + CodeLens (predeterminado, igual que antes de v1.9)",
   "config.feedbackLevel.standard": "Gutter + Problems + CodeLens (sin borde / overview ruler)",
-  "config.feedbackLevel.minimal": "Solo CodeLens (Go to Definition sigue funcionando)"
+  "config.feedbackLevel.minimal": "Solo CodeLens (Go to Definition sigue funcionando)",
+  "view.suiteMap.name": "Mapa BDD",
+  "command.suiteMap.focus": "BDD Guardian: Mostrar mapa de la suite",
+  "command.suiteMap.generateBinding": "Generar binding",
+  "command.suiteMap.copySnippet": "Copiar snippet",
+  "config.suiteMap.enabled": "Mostrar la vista Mapa BDD en Explorer (huecos unbound / ambiguous / orphan del workspace). Independiente de feedbackLevel."
 }
