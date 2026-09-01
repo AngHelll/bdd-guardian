@@ -21,7 +21,7 @@ Please be respectful and constructive in all interactions. We welcome contributo
 
 ### Prerequisites
 
-- **Node.js** 18.x or higher
+- **Node.js** 20.x or higher
 - **VS Code** 1.85.0 or higher
 - **Git**
 
