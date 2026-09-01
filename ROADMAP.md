@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.13.0** Marketplace 2026-08-21 · GitHub: [v1.13.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.13.0)
+> **Current release: v1.14.0** (GitHub + Marketplace en curso 2026-09-01)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.13.0** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.14.0** |
 | 🎯 Next | (dogfood mapa / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 📋 Gate | *publish* Marketplace |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -70,6 +70,23 @@
 | **1.11.0** | Scope-aware matching — `[Scope(Tag=…)]` Reqnroll |
 | **1.12.0** | Suite map — Explorer view of unbound / ambiguous / orphan holes |
 | **1.13.0** | Suite map ola 2 — group holes by file + generate/copy from unbound |
+| **1.14.0** | Suite map ola 3 — Explain ambiguous holes from the map |
+
+---
+
+## Plan v1.14.0 — verificado (2026-09-01)
+
+| # | Status |
+|---|--------|
+| **1.14.0-A** `explainAmbiguousHole` puro + tests | ✅ |
+| **1.14.0-B** Acción inline Explain en ambiguous (QuickPick + why) | ✅ |
+| **1.14.0-C** i18n / docs / CHANGELOG | ✅ |
+| **1.14.0-4** VSIX + Marketplace | ☐ GitHub Stage 6; Marketplace con *publish* |
+
+Spec: `docs-internal/specs/suite-map-ola3-v1.14.0.md` (local).  
+**Anti-scope:** matching, Activity Bar, webview, listar bound, árbol por escenario, Coach, Pilot Run, generate en ambiguous, orphan actions, MCP/CLI schema, Index API v2, rename.
+
+**Exit criteria:** `binding-demo` `@v050` ambiguous tiene Explain; why = hover; pick abre binding; Generate unbound intacto; `authorActions.enabled: false` no oculta Explain; Capa B fijos OK.
 
 ---
 
@@ -554,4 +571,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-08-21 — v1.13.0 Suite map ola 2 shipped (Marketplace + GitHub).*
+*Last updated: 2026-09-01 — v1.14.0 Suite map ola 3 (GitHub + Marketplace en curso).*

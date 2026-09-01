@@ -84,5 +84,6 @@
   "suiteMapDisabled": "BDD Map is disabled (bddGuardian.suiteMap.enabled)",
   "suiteMapMore": "…and {0} more",
   "suiteMapOrphansSkipped": "Orphan scan skipped (too many bindings)",
-  "suiteMapOpen": "Open"
+  "suiteMapOpen": "Open",
+  "suiteMapExplainStale": "This step is no longer ambiguous"
 }

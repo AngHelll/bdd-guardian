@@ -84,5 +84,6 @@
   "suiteMapDisabled": "El mapa BDD está desactivado (bddGuardian.suiteMap.enabled)",
   "suiteMapMore": "…y {0} más",
   "suiteMapOrphansSkipped": "Escaneo de huérfanos omitido (demasiados bindings)",
-  "suiteMapOpen": "Abrir"
+  "suiteMapOpen": "Abrir",
+  "suiteMapExplainStale": "Este paso ya no es ambiguo"
 }

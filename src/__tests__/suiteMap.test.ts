@@ -12,6 +12,7 @@ import {
     summarizeSuiteMap,
     isSuiteMapHealthy,
     groupHolesByUri,
+    explainAmbiguousHole,
     SUITE_MAP_LIST_CAP,
 } from '../core/map/suiteMap';
 import { Binding, FeatureStep, ResolvedKeyword } from '../core/domain/types';
@@ -234,5 +235,41 @@ describe('groupHolesByUri', () => {
         expect(groups).toHaveLength(2);
         expect(groups[0].holes.map((h) => h.rawText)).toEqual(['login a', 'login b']);
         expect(groups[1].holes.map((h) => h.rawText)).toEqual(['cart']);
+    });
+});
+
+describe('explainAmbiguousHole', () => {
+    const used = createBinding('Given', 'user is logged in', 'UserIsLoggedIn', 10);
+    const broad = createBinding('Then', 'the result should be (.*)', 'ThenBroad', 30);
+    const specific = createBinding('Then', 'the result should be 15 on the screen', 'ThenSpecific', 40);
+    const bindings = [used, broad, specific];
+    const steps = [
+        createStep('Given', 'user is logged in', 5),
+        createStep('Given', 'no such binding exists', 6),
+        createStep('Then', 'the result should be 15 on the screen', 7),
+    ];
+    const resolve = resolveFor(bindings);
+
+    it('returns an explanation when the hole is still ambiguous', () => {
+        const hole = { uri: steps[2].uri, lineNumber: 7, rawText: steps[2].rawText };
+        const explanation = explainAmbiguousHole(hole, steps, resolve);
+        expect(explanation).toBeDefined();
+        expect(explanation?.summaryKey).toBeTruthy();
+        expect(explanation?.matchCount).toBe(2);
+    });
+
+    it('returns undefined for an unbound hole', () => {
+        const hole = { uri: steps[1].uri, lineNumber: 6, rawText: steps[1].rawText };
+        expect(explainAmbiguousHole(hole, steps, resolve)).toBeUndefined();
+    });
+
+    it('returns undefined for a bound hole', () => {
+        const hole = { uri: steps[0].uri, lineNumber: 5, rawText: steps[0].rawText };
+        expect(explainAmbiguousHole(hole, steps, resolve)).toBeUndefined();
+    });
+
+    it('returns undefined when the step is missing', () => {
+        const hole = { uri: steps[0].uri, lineNumber: 99, rawText: 'ghost' };
+        expect(explainAmbiguousHole(hole, steps, resolve)).toBeUndefined();
     });
 });

@@ -8,5 +8,6 @@
   "command.suiteMap.focus": "BDD Guardian: Show suite map",
   "command.suiteMap.generateBinding": "Generate binding",
   "command.suiteMap.copySnippet": "Copy snippet",
+  "command.suiteMap.explainAmbiguity": "Explain",
   "config.suiteMap.enabled": "Show the BDD Map view in Explorer (workspace unbound / ambiguous / orphan holes). Independent of feedbackLevel."
 }

@@ -2,6 +2,8 @@ export {
     summarizeSuiteMap,
     isSuiteMapHealthy,
     groupHolesByUri,
+    explainAmbiguousHole,
+    findHoleStep,
     SUITE_MAP_LIST_CAP,
     type SuiteMapSummary,
     type SuiteMapCounts,

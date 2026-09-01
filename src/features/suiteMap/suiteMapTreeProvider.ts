@@ -6,12 +6,14 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { FILE_WATCHER_DEBOUNCE_MS, ResolvedKeyword } from '../../core/domain';
-import { createResolver, applyMatchingSettings, ResolverDependencies } from '../../core/matching';
+import { createResolver, applyMatchingSettings, ResolverDependencies, ambiguityI18n } from '../../core/matching';
 import { collectAllIndexedSteps } from '../../core/references';
 import {
     summarizeSuiteMap,
     isSuiteMapHealthy,
     groupHolesByUri,
+    explainAmbiguousHole,
+    findHoleStep,
     type SuiteMapSummary,
     type SuiteMapStepHole,
     type SuiteMapOrphanHole,
@@ -19,6 +21,7 @@ import {
 } from '../../core/map/suiteMap';
 import { t } from '../../i18n';
 import { navigateToLocation } from '../navigation/navigator';
+import { showBindingQuickPick } from '../navigation/quickPick';
 import {
     resolveUnboundMapAuthorAction,
     type AuthorStepRef,
@@ -29,6 +32,7 @@ export const SUITE_MAP_FOCUS_COMMAND = 'bddGuardian.suiteMap.focus';
 const OPEN_LOCATION_COMMAND = 'bddGuardian.suiteMap.openLocation';
 const GENERATE_COMMAND = 'bddGuardian.suiteMap.generateBinding';
 const COPY_COMMAND = 'bddGuardian.suiteMap.copySnippet';
+const EXPLAIN_COMMAND = 'bddGuardian.suiteMap.explainAmbiguity';
 
 export function isSuiteMapEnabled(): boolean {
     return vscode.workspace.getConfiguration('bddGuardian.suiteMap').get<boolean>('enabled', true);
@@ -236,7 +240,7 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
                               ? 'suiteMap.unbound.copy'
                               : 'suiteMapHole.unbound';
                 } else {
-                    item.contextValue = 'suiteMapHole.ambiguous';
+                    item.contextValue = 'suiteMap.ambiguous.explain';
                 }
                 return item;
             }
@@ -462,6 +466,36 @@ export function registerSuiteMap(
                 return;
             }
             await vscode.commands.executeCommand('bddGuardian.author.copySnippet', toAuthorRef(node.hole));
+        }),
+        vscode.commands.registerCommand(EXPLAIN_COMMAND, async (node: SuiteMapNode) => {
+            if (node?.kind !== 'step' || node.status !== 'ambiguous') {
+                return;
+            }
+            const index = indexManager.getIndex();
+            const allBindings = index.getAllBindings();
+            const deps: ResolverDependencies = {
+                getAllBindings: () => allBindings,
+                getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
+            };
+            const resolve = createResolver(applyMatchingSettings(deps));
+            const steps = collectAllIndexedSteps(index);
+            const explanation = explainAmbiguousHole(node.hole, steps, resolve);
+            if (!explanation) {
+                vscode.window.showInformationMessage(t('suiteMapExplainStale'));
+                return;
+            }
+            const step = findHoleStep(node.hole, steps);
+            if (!step) {
+                vscode.window.showInformationMessage(t('suiteMapExplainStale'));
+                return;
+            }
+            const result = resolve(step);
+            if (result.status !== 'ambiguous') {
+                vscode.window.showInformationMessage(t('suiteMapExplainStale'));
+                return;
+            }
+            const why = ambiguityI18n(explanation);
+            await showBindingQuickPick(result, t(why.key, ...why.args));
         })
     );
 

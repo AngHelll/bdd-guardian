@@ -117,6 +117,7 @@ export const en: Record<string, string> = {
   suiteMapMore: '…and {0} more',
   suiteMapOrphansSkipped: 'Orphan scan skipped (too many bindings)',
   suiteMapOpen: 'Open',
+  suiteMapExplainStale: 'This step is no longer ambiguous',
 };
 
 export const es: Record<string, string> = {
@@ -233,4 +234,5 @@ export const es: Record<string, string> = {
   suiteMapMore: '…y {0} más',
   suiteMapOrphansSkipped: 'Escaneo de huérfanos omitido (demasiados bindings)',
   suiteMapOpen: 'Abrir',
+  suiteMapExplainStale: 'Este paso ya no es ambiguo',
 };

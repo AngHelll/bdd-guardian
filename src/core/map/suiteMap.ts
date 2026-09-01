@@ -5,6 +5,7 @@
 
 import { MAX_ORPHAN_BINDING_SCAN } from '../domain/constants';
 import type { Binding, FeatureStep } from '../domain/types';
+import { explainAmbiguity, type AmbiguityExplanation } from '../matching/ambiguityExplain';
 import { listOrphanBindings, type ResolveStep } from '../references/referenceFinder';
 
 export const SUITE_MAP_LIST_CAP = 500;
@@ -75,6 +76,35 @@ export function groupHolesByUri<T extends { readonly uri: { readonly fsPath: str
         groups[idx].holes.push(hole);
     }
     return groups;
+}
+
+export function findHoleStep(
+    hole: Pick<SuiteMapStepHole, 'uri' | 'lineNumber'>,
+    steps: readonly FeatureStep[]
+): FeatureStep | undefined {
+    return steps.find(
+        (s) => s.uri.fsPath === hole.uri.fsPath && s.lineNumber === hole.lineNumber
+    );
+}
+
+/**
+ * Why this map hole is still ambiguous (same `explainAmbiguity` as hover/Problems).
+ * `undefined` if the step is missing or no longer ambiguous.
+ */
+export function explainAmbiguousHole(
+    hole: Pick<SuiteMapStepHole, 'uri' | 'lineNumber'>,
+    steps: readonly FeatureStep[],
+    resolve: ResolveStep
+): AmbiguityExplanation | undefined {
+    const step = findHoleStep(hole, steps);
+    if (!step) {
+        return undefined;
+    }
+    const result = resolve(step);
+    if (result.status !== 'ambiguous') {
+        return undefined;
+    }
+    return explainAmbiguity(result.candidates);
 }
 
 function capList<T>(items: T[], max: number): { listed: T[]; truncated: number } {

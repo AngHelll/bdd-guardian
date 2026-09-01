@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-09-01
+
+**Highlights:** Suite map ola 3 — Explain on ambiguous rows (same why as hover + QuickPick of colliding bindings).
+
+### Added
+
+- Inline **Explain** on ambiguous BDD Map leaves; `bddGuardian.authorActions.enabled` does not hide it
+- Core helper `explainAmbiguousHole`
+
 ## [1.13.0] - 2026-08-21
 
 **Highlights:** Suite map ola 2 — holes grouped by file; Generate/Copy on unbound rows (same author commands as the lightbulb).
