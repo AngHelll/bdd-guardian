@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.14.0** (GitHub + Marketplace en curso 2026-09-01)
+> **Current release: v1.14.0** Marketplace 2026-09-01 · GitHub: [v1.14.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.14.0)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.14.0** |
+| ✅ Shipped | v0.1.0 → **v1.14.0** (Marketplace + GitHub) |
 | 🎯 Next | (dogfood mapa / next align) |
-| 📋 Gate | *publish* Marketplace |
+| 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -81,7 +81,7 @@
 | **1.14.0-A** `explainAmbiguousHole` puro + tests | ✅ |
 | **1.14.0-B** Acción inline Explain en ambiguous (QuickPick + why) | ✅ |
 | **1.14.0-C** i18n / docs / CHANGELOG | ✅ |
-| **1.14.0-4** VSIX + Marketplace | ☐ GitHub Stage 6; Marketplace con *publish* |
+| **1.14.0-4** VSIX + Marketplace | ✅ Marketplace + GitHub Release |
 
 Spec: `docs-internal/specs/suite-map-ola3-v1.14.0.md` (local).  
 **Anti-scope:** matching, Activity Bar, webview, listar bound, árbol por escenario, Coach, Pilot Run, generate en ambiguous, orphan actions, MCP/CLI schema, Index API v2, rename.
@@ -571,4 +571,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-01 — v1.14.0 Suite map ola 3 (GitHub + Marketplace en curso).*
+*Last updated: 2026-09-01 — v1.14.0 Suite map ola 3 shipped (Marketplace + GitHub).*
