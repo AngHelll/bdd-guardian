@@ -28,11 +28,15 @@
   "hoverShowAllMatches": "Show all matches",
   "hoverBindingsMatch": "{0} bindings match this step:",
   "hoverAmbiguityWhy": "Why ambiguous:",
+  "hoverUnboundWhy": "Why unbound:",
   "hoverAmbiguityPatterns": "Patterns",
   "ambiguitySamePattern": "Multiple bindings share pattern \"{0}\"",
   "ambiguityScoreTie": "Top matches have the same score ({0})",
   "ambiguityBroadVsSpecific": "Broad pattern \"{0}\" overlaps more specific \"{1}\"",
   "ambiguityGeneric": "{0} bindings match this step",
+  "unboundEmptyIndex": "No step bindings are indexed",
+  "unboundScopeExcluded": "Pattern matches {0} scoped binding(s); none apply to this step's tags (need {1})",
+  "unboundGeneric": "{0} bindings indexed; none match this step",
   "hoverBestMatch": "Best match:",
   "hoverBinding": "Binding",
   "hoverPattern": "Pattern",
@@ -85,5 +89,6 @@
   "suiteMapMore": "…and {0} more",
   "suiteMapOrphansSkipped": "Orphan scan skipped (too many bindings)",
   "suiteMapOpen": "Open",
-  "suiteMapExplainStale": "This step is no longer ambiguous"
+  "suiteMapExplainStale": "This step is no longer ambiguous",
+  "suiteMapExplainUnboundStale": "This step is no longer unbound"
 }

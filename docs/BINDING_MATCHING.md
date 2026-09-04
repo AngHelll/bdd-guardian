@@ -21,6 +21,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Fallback to literal** — Invalid regex pattern still produces a binding that matches the exact text.
 - **Ambiguity policy (v0.5.0+)** — Overlapping patterns (e.g. `\d+` vs `.*`) → **ambiguous**, not silent bound. Enable `bddGuardian.matching.preferSpecificBinding` for score-based winner.
 - **Ambiguity explained (v1.6.1+)** — Hover and Problems show a short *why* (duplicate pattern, score tie, or broad vs specific). Matching status and scores are unchanged.
+- **Unbound explained (v1.15.0+)** — Hover, Problems, BDD Map Explain, and CLI `resolve-step` `why` classify unbound as empty index, scope-excluded (`[Scope(Tag=…)]` matched the text but not the step tags), or generic (bindings indexed, none match). Uses the same compiled `binding.regex` and `isBindingInScope`; **does not** change status and **does not** add a second matcher.
 - **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
 - **Cucumber Expressions Wave A** — `{int}`, `{float|double}`, `{word}`, `{string}` compile to regex via `cucumberExpression.ts` when `ExpressionType.CucumberExpression` is set or the pattern looks like CE (`{name}` placeholders, not `\d{2}`).
 - **Cucumber Expressions Wave B (v1.10.0+)** —

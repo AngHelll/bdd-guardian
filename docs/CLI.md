@@ -29,7 +29,7 @@ JSON with `schemaVersion: 1`.
 
 - **discover** — features (path + stepCount), bindings (path + pattern + providerId), `providersDetected`
 - **analyze** — `counts` (features, steps, bindings, bound, unbound, ambiguous, orphanBindings) plus capped detail lists
-- **resolve-step** — `status` (`bound` / `unbound` / `ambiguous` / `no_step`), `matches[]`, English `why` when ambiguous
+- **resolve-step** — `status` (`bound` / `unbound` / `ambiguous` / `no_step`), `matches[]`, English `why` when unbound or ambiguous
 - **coach-analyze** — `counts.files` / `findings` / `byRuleId`, capped `findings[]` (no quick fixes)
 
 Matching uses the same resolver path as the extension (`preferSpecificBinding: false`).

@@ -3,6 +3,7 @@ export {
     isSuiteMapHealthy,
     groupHolesByUri,
     explainAmbiguousHole,
+    explainUnboundHole,
     findHoleStep,
     SUITE_MAP_LIST_CAP,
     type SuiteMapSummary,

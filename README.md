@@ -74,7 +74,7 @@ See binding status directly above each step:
 
 ### 🗺️ Suite map
 
-The **BDD Map** view in Explorer lists workspace **holes** in the step↔binding map (unbound steps, ambiguous steps, unused/orphan bindings) with the same resolution as CodeLens. Holes are grouped by `.feature` (orphans by binding file). Click a row to open the file. Unbound rows offer **Generate binding** (or **Copy snippet** if generate does not apply). Ambiguous rows offer **Explain** (same why as hover, then pick a colliding binding). Bound steps are counted in the summary, not listed (less noise).
+The **BDD Map** view in Explorer lists workspace **holes** in the step↔binding map (unbound steps, ambiguous steps, unused/orphan bindings) with the same resolution as CodeLens. Holes are grouped by `.feature` (orphans by binding file). Click a row to open the file. Unbound rows offer **Generate binding** (or **Copy snippet** if generate does not apply) and **Explain** (why the step is unbound; scoped-out bindings can be opened from a QuickPick). Ambiguous rows offer **Explain** (same why as hover, then pick a colliding binding). Bound steps are counted in the summary, not listed (less noise).
 
 Command: **BDD Guardian: Show suite map**. Disable with `bddGuardian.suiteMap.enabled: false`. Independent of `feedbackLevel`.
 
@@ -127,6 +127,7 @@ Hover over any step for detailed information:
 - Code preview (expandable)
 
 **For Unbound steps:**
+- Why unbound (empty index, scoped-out tags, or no pattern match)
 - Suggested binding pattern
 
 **For Ambiguous steps:**

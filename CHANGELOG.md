@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-09-04
+
+**Highlights:** Unbound explained — same *why* on hover, Problems, BDD Map, and CLI `resolve-step` (empty index / scope-excluded / generic). Matching unchanged.
+
+### Added
+
+- Core helper `explainUnbound` / `explainUnboundHole`
+- Inline **Explain** on unbound BDD Map leaves (Generate/Copy stay; `authorActions.enabled` does not hide Explain)
+- `resolve-step` fills `why` when status is `unbound`
+
+### Changed
+
+- Unbound hover and Problems include a short why line
+
 ## [1.14.0] - 2026-09-01
 
 **Highlights:** Suite map ola 3 — Explain on ambiguous rows (same why as hover + QuickPick of colliding bindings).

@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-    "version": "1.14.0",
+    "version": "1.15.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -143,6 +143,11 @@
         "command": "bddGuardian.suiteMap.explainAmbiguity",
         "title": "%command.suiteMap.explainAmbiguity%",
         "icon": "$(question)"
+      },
+      {
+        "command": "bddGuardian.suiteMap.explainUnbound",
+        "title": "%command.suiteMap.explainUnbound%",
+        "icon": "$(question)"
       }
     ],
     "menus": {
@@ -157,6 +162,10 @@
         },
         {
           "command": "bddGuardian.suiteMap.explainAmbiguity",
+          "when": "false"
+        },
+        {
+          "command": "bddGuardian.suiteMap.explainUnbound",
           "when": "false"
         }
       ],
@@ -174,6 +183,11 @@
         {
           "command": "bddGuardian.suiteMap.explainAmbiguity",
           "when": "view == bddGuardian.suiteMap && viewItem == suiteMap.ambiguous.explain",
+          "group": "inline"
+        },
+        {
+          "command": "bddGuardian.suiteMap.explainUnbound",
+          "when": "view == bddGuardian.suiteMap && (viewItem == suiteMap.unbound.generate || viewItem == suiteMap.unbound.copy || viewItem == suiteMapHole.unbound)",
           "group": "inline"
         }
       ]

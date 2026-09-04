@@ -6,6 +6,7 @@
 import { MAX_ORPHAN_BINDING_SCAN } from '../domain/constants';
 import type { Binding, FeatureStep } from '../domain/types';
 import { explainAmbiguity, type AmbiguityExplanation } from '../matching/ambiguityExplain';
+import { explainUnbound, type UnboundExplanation } from '../matching/unboundExplain';
 import { listOrphanBindings, type ResolveStep } from '../references/referenceFinder';
 
 export const SUITE_MAP_LIST_CAP = 500;
@@ -105,6 +106,27 @@ export function explainAmbiguousHole(
         return undefined;
     }
     return explainAmbiguity(result.candidates);
+}
+
+/**
+ * Why this map hole is still unbound (same `explainUnbound` as hover/Problems).
+ * `undefined` if the step is missing or no longer unbound.
+ */
+export function explainUnboundHole(
+    hole: Pick<SuiteMapStepHole, 'uri' | 'lineNumber'>,
+    steps: readonly FeatureStep[],
+    resolve: ResolveStep,
+    bindings: readonly Binding[]
+): UnboundExplanation | undefined {
+    const step = findHoleStep(hole, steps);
+    if (!step) {
+        return undefined;
+    }
+    const result = resolve(step);
+    if (result.status !== 'unbound') {
+        return undefined;
+    }
+    return explainUnbound(step, bindings);
 }
 
 function capList<T>(items: T[], max: number): { listed: T[]; truncated: number } {

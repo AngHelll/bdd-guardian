@@ -13,6 +13,7 @@ import {
     isSuiteMapHealthy,
     groupHolesByUri,
     explainAmbiguousHole,
+    explainUnboundHole,
     SUITE_MAP_LIST_CAP,
 } from '../core/map/suiteMap';
 import { Binding, FeatureStep, ResolvedKeyword } from '../core/domain/types';
@@ -25,7 +26,8 @@ function createBinding(
     pattern: string,
     methodName: string,
     lineNumber: number,
-    filePath = '/test/Steps.cs'
+    filePath = '/test/Steps.cs',
+    scopeTags: readonly string[] = []
 ): Binding {
     return {
         keyword,
@@ -37,7 +39,7 @@ function createBinding(
         range: new Range(lineNumber, 0, lineNumber, 80) as any,
         lineNumber,
         signature: `TestSteps.${methodName}`,
-        scopeTags: [],
+        scopeTags,
     };
 }
 
@@ -271,5 +273,57 @@ describe('explainAmbiguousHole', () => {
     it('returns undefined when the step is missing', () => {
         const hole = { uri: steps[0].uri, lineNumber: 99, rawText: 'ghost' };
         expect(explainAmbiguousHole(hole, steps, resolve)).toBeUndefined();
+    });
+});
+
+describe('explainUnboundHole', () => {
+    const used = createBinding('Given', 'user is logged in', 'UserIsLoggedIn', 10);
+    const scopedWeb = createBinding(
+        'Given',
+        'I log in with scoped credentials',
+        'LoginWeb',
+        20,
+        '/test/Steps.cs',
+        ['web']
+    );
+    const scopedApi = createBinding(
+        'Given',
+        'I log in with scoped credentials',
+        'LoginApi',
+        30,
+        '/test/Steps.cs',
+        ['api']
+    );
+    const broad = createBinding('Then', 'the result should be (.*)', 'ThenBroad', 40);
+    const specific = createBinding('Then', 'the result should be 15 on the screen', 'ThenSpecific', 50);
+    const bindings = [used, scopedWeb, scopedApi, broad, specific];
+    const steps = [
+        createStep('Given', 'user is logged in', 5),
+        createStep('Given', 'I log in with scoped credentials', 6),
+        createStep('Then', 'the result should be 15 on the screen', 7),
+    ];
+    const resolve = resolveFor(bindings);
+
+    it('returns an explanation when the hole is still unbound', () => {
+        const hole = { uri: steps[1].uri, lineNumber: 6, rawText: steps[1].rawText };
+        const explanation = explainUnboundHole(hole, steps, resolve, bindings);
+        expect(explanation).toBeDefined();
+        expect(explanation?.summaryKey).toBe('scopeExcluded');
+        expect(explanation?.outOfScopeMatches).toHaveLength(2);
+    });
+
+    it('returns undefined for an ambiguous hole', () => {
+        const hole = { uri: steps[2].uri, lineNumber: 7, rawText: steps[2].rawText };
+        expect(explainUnboundHole(hole, steps, resolve, bindings)).toBeUndefined();
+    });
+
+    it('returns undefined for a bound hole', () => {
+        const hole = { uri: steps[0].uri, lineNumber: 5, rawText: steps[0].rawText };
+        expect(explainUnboundHole(hole, steps, resolve, bindings)).toBeUndefined();
+    });
+
+    it('returns undefined when the step is missing', () => {
+        const hole = { uri: steps[0].uri, lineNumber: 99, rawText: 'ghost' };
+        expect(explainUnboundHole(hole, steps, resolve, bindings)).toBeUndefined();
     });
 });

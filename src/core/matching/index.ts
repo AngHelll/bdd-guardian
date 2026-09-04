@@ -15,6 +15,14 @@ export {
     type AmbiguityExplanation,
     type AmbiguityCandidateInput,
 } from './ambiguityExplain';
+export {
+    explainUnbound,
+    unboundI18n,
+    UNBOUND_OUT_OF_SCOPE_CAP,
+    type UnboundExplanation,
+    type UnboundOutOfScopeMatch,
+    type UnboundI18nKey,
+} from './unboundExplain';
 
 // Re-export matching types from domain for convenience
 export type { ResolveResult, MatchCandidate, MatchStatus } from '../domain/types';

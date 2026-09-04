@@ -9,5 +9,6 @@
   "command.suiteMap.generateBinding": "Generar binding",
   "command.suiteMap.copySnippet": "Copiar snippet",
   "command.suiteMap.explainAmbiguity": "Explicar",
+  "command.suiteMap.explainUnbound": "Explicar",
   "config.suiteMap.enabled": "Mostrar la vista Mapa BDD en Explorer (huecos unbound / ambiguous / orphan del workspace). Independiente de feedbackLevel."
 }

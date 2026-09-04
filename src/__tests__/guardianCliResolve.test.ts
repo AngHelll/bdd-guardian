@@ -21,6 +21,17 @@ describe('guardian-cli resolve-step', () => {
         expect(report.why).toBeNull();
     });
 
+    it('reports unbound why for the scoped-login step without web/api tags', () => {
+        const project = loadProject(BINDING_DEMO);
+        // 1-based line 118: Given I log in with scoped credentials (@v111, no @web/@api)
+        const report = buildResolveStepReport(project, FEATURE, 117);
+        expect(report.status).toBe('unbound');
+        expect(report.stepText).toMatch(/log in with scoped credentials/i);
+        expect(report.why).toBeTruthy();
+        expect(report.why).toMatch(/scoped/i);
+        expect(report.why).toMatch(/@web/i);
+    });
+
     it('reports no_step for a blank / non-step line', () => {
         const project = loadProject(BINDING_DEMO);
         const report = buildResolveStepReport(project, FEATURE, 0);

@@ -12,8 +12,8 @@
 
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n } from '../../core/matching';
-import { ResolvedKeyword, Binding, MatchCandidate } from '../../core/domain';
+import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n, explainUnbound, unboundI18n } from '../../core/matching';
+import { ResolvedKeyword, Binding, MatchCandidate, FeatureStep } from '../../core/domain';
 import { 
     StepStatus, 
     getUIConfig, 
@@ -106,7 +106,7 @@ export class HoverProvider implements vscode.HoverProvider {
         
         // Build content based on status
         if (status === StepStatus.Unbound) {
-            await this.buildUnboundContent(contents, step.rawText, step.keywordResolved);
+            await this.buildUnboundContent(contents, step, allBindings);
         } else if (status === StepStatus.Ambiguous) {
             await this.buildAmbiguousContent(contents, [...result.candidates], step.rawText);
         } else {
@@ -121,15 +121,17 @@ export class HoverProvider implements vscode.HoverProvider {
      */
     private async buildUnboundContent(
         contents: vscode.MarkdownString,
-        stepText: string,
-        keyword: ResolvedKeyword = 'When'
+        step: FeatureStep,
+        bindings: readonly Binding[]
     ): Promise<void> {
         contents.appendMarkdown(t('hoverNoBindingFound') + '\n\n');
+        const why = unboundI18n(explainUnbound(step, bindings));
+        contents.appendMarkdown(`**${t('hoverUnboundWhy')}** ${t(why.key, ...why.args)}\n\n`);
 
         const selection = getProviderManager().getCachedSelection();
         const framework = resolveHoverFrameworkContext({ selection });
-        const pattern = suggestBindingPattern(stepText);
-        const snippet = buildUnboundBindingSnippet(framework.snippetKind, keyword, pattern);
+        const pattern = suggestBindingPattern(step.rawText);
+        const snippet = buildUnboundBindingSnippet(framework.snippetKind, step.keywordResolved, pattern);
 
         contents.appendMarkdown(`**${t('hoverSuggestedBinding')}** ${t('hoverSuggestedForFramework', framework.displayName)}\n`);
         contents.appendMarkdown(`\`\`\`${snippet.fenceLanguage}\n`);
@@ -236,6 +238,7 @@ export class HoverProvider implements vscode.HoverProvider {
         contents.appendMarkdown(`#### ${t('hoverTitle')}\n\n`);
         contents.appendMarkdown(`**${t('hoverStatus')}:** ${getStatusEmoji(StepStatus.Unbound)} ${getStatusLabel(StepStatus.Unbound)}\n\n`);
         contents.appendMarkdown('---\n\n');
+        contents.appendMarkdown(`**${t('hoverUnboundWhy')}** ${t('unboundEmptyIndex')}\n\n`);
         contents.appendMarkdown(t('hoverNoBindingsIndexed') + '\n\n');
 
         const selection = getProviderManager().getCachedSelection();

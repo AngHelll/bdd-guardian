@@ -59,7 +59,7 @@ Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 
 Granular toggles (`gutterIcons.enabled`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
 
-**Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings).
+**Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings). **v1.15.0+:** unbound leaves also offer Explain (why + QuickPick of scoped-out bindings when that is the reason); Generate/Copy stay.
 
 ## Hover emojis
 

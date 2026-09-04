@@ -5,14 +5,15 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
-import { FILE_WATCHER_DEBOUNCE_MS, ResolvedKeyword } from '../../core/domain';
-import { createResolver, applyMatchingSettings, ResolverDependencies, ambiguityI18n } from '../../core/matching';
+import { FILE_WATCHER_DEBOUNCE_MS, ResolvedKeyword, MatchCandidate } from '../../core/domain';
+import { createResolver, applyMatchingSettings, ResolverDependencies, ambiguityI18n, unboundI18n } from '../../core/matching';
 import { collectAllIndexedSteps } from '../../core/references';
 import {
     summarizeSuiteMap,
     isSuiteMapHealthy,
     groupHolesByUri,
     explainAmbiguousHole,
+    explainUnboundHole,
     findHoleStep,
     type SuiteMapSummary,
     type SuiteMapStepHole,
@@ -33,6 +34,7 @@ const OPEN_LOCATION_COMMAND = 'bddGuardian.suiteMap.openLocation';
 const GENERATE_COMMAND = 'bddGuardian.suiteMap.generateBinding';
 const COPY_COMMAND = 'bddGuardian.suiteMap.copySnippet';
 const EXPLAIN_COMMAND = 'bddGuardian.suiteMap.explainAmbiguity';
+const EXPLAIN_UNBOUND_COMMAND = 'bddGuardian.suiteMap.explainUnbound';
 
 export function isSuiteMapEnabled(): boolean {
     return vscode.workspace.getConfiguration('bddGuardian.suiteMap').get<boolean>('enabled', true);
@@ -496,6 +498,45 @@ export function registerSuiteMap(
             }
             const why = ambiguityI18n(explanation);
             await showBindingQuickPick(result, t(why.key, ...why.args));
+        }),
+        vscode.commands.registerCommand(EXPLAIN_UNBOUND_COMMAND, async (node: SuiteMapNode) => {
+            if (node?.kind !== 'step' || node.status !== 'unbound') {
+                return;
+            }
+            const index = indexManager.getIndex();
+            const allBindings = index.getAllBindings();
+            const deps: ResolverDependencies = {
+                getAllBindings: () => allBindings,
+                getBindingsByKeyword: (kw: ResolvedKeyword) => index.getBindingsByKeyword(kw),
+            };
+            const resolve = createResolver(applyMatchingSettings(deps));
+            const steps = collectAllIndexedSteps(index);
+            const explanation = explainUnboundHole(node.hole, steps, resolve, allBindings);
+            if (!explanation) {
+                vscode.window.showInformationMessage(t('suiteMapExplainUnboundStale'));
+                return;
+            }
+            const step = findHoleStep(node.hole, steps);
+            if (!step) {
+                vscode.window.showInformationMessage(t('suiteMapExplainUnboundStale'));
+                return;
+            }
+            const why = unboundI18n(explanation);
+            const whyText = t(why.key, ...why.args);
+            if (explanation.summaryKey === 'scopeExcluded' && explanation.outOfScopeMatches.length > 0) {
+                const candidates: MatchCandidate[] = explanation.outOfScopeMatches.map((m) => ({
+                    binding: m.binding,
+                    score: 0,
+                    keywordMatched: false,
+                    matchedCandidate: step.rawText,
+                }));
+                await showBindingQuickPick(
+                    { step, status: 'unbound', candidates },
+                    whyText
+                );
+                return;
+            }
+            vscode.window.showInformationMessage(whyText);
         })
     );
 

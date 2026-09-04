@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.14.0** Marketplace 2026-09-01 · GitHub: [v1.14.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.14.0)
+> **Current release: v1.15.0** GitHub: [v1.15.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.15.0)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.14.0** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.15.0** (GitHub) |
 | 🎯 Next | (dogfood mapa / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -71,6 +71,23 @@
 | **1.12.0** | Suite map — Explorer view of unbound / ambiguous / orphan holes |
 | **1.13.0** | Suite map ola 2 — group holes by file + generate/copy from unbound |
 | **1.14.0** | Suite map ola 3 — Explain ambiguous holes from the map |
+| **1.15.0** | Unbound explained — hover / Problems / Map / CLI `why` |
+
+---
+
+## Plan v1.15.0 — verificado (2026-09-04)
+
+| # | Status |
+|---|--------|
+| **1.15.0-A** `explainUnbound` puro + tests | ✅ |
+| **1.15.0-B** Hover + Problems + Map Explain unbound + CLI `why` | ✅ |
+| **1.15.0-C** i18n / docs / CHANGELOG | ✅ |
+| **1.15.0-4** VSIX + Marketplace | ☐ Marketplace (*publish* en curso) |
+
+Spec: `docs-internal/specs/unbound-explained-v1.15.0.md` (local).  
+**Anti-scope:** matching, fallback literal, near-miss, generate, Coach, orphans, mapa estructural, Activity Bar/webview, Index API v2, schema CLI/MCP, Pilot.
+
+**Exit criteria:** `binding-demo` `@v111` untagged hover/Problems/Map why = scopeExcluded; Generate unbound intacto; `@web`/`@api` siguen bound; Capa B fijos OK.
 
 ---
 
@@ -571,4 +588,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-01 — v1.14.0 Suite map ola 3 shipped (Marketplace + GitHub).*
+*Last updated: 2026-09-04 — v1.15.0 Why unbound (GitHub; Marketplace pending publish).*

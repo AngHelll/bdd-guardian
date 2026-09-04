@@ -9,6 +9,11 @@ import {
     ambiguityI18n,
     type AmbiguityI18nKey,
 } from '../core/matching/ambiguityExplain';
+import {
+    explainUnbound,
+    unboundI18n,
+    type UnboundI18nKey,
+} from '../core/matching/unboundExplain';
 import type { Binding, ResolveResult } from '../core/domain/types';
 import type { LoadedProject } from './loadProject';
 import { toPosixRelative, pathsEqual } from './loadProject';
@@ -35,17 +40,34 @@ export interface ResolveStepReport {
 }
 
 /** English why strings (CLI has no VS Code locale). */
-const WHY_EN: Record<AmbiguityI18nKey, string> = {
+const AMBIGUITY_WHY_EN: Record<AmbiguityI18nKey, string> = {
     ambiguitySamePattern: 'Multiple bindings share pattern "{0}"',
     ambiguityScoreTie: 'Top matches have the same score ({0})',
     ambiguityBroadVsSpecific: 'Broad pattern "{0}" overlaps more specific "{1}"',
     ambiguityGeneric: '{0} bindings match this step',
 };
 
-function formatWhyEn(result: ResolveResult): string {
-    const explanation = explainAmbiguity(result.candidates);
-    const { key, args } = ambiguityI18n(explanation);
-    return WHY_EN[key].replace(/\{(\d+)\}/g, (_, i: string) => args[Number(i)] ?? '');
+const UNBOUND_WHY_EN: Record<UnboundI18nKey, string> = {
+    unboundEmptyIndex: 'No step bindings are indexed',
+    unboundScopeExcluded:
+        'Pattern matches {0} scoped binding(s); none apply to this step\'s tags (need {1})',
+    unboundGeneric: '{0} bindings indexed; none match this step',
+};
+
+function interpolateWhy(template: string, args: readonly string[]): string {
+    return template.replace(/\{(\d+)\}/g, (_, i: string) => args[Number(i)] ?? '');
+}
+
+function formatWhyEn(result: ResolveResult, bindings: readonly Binding[]): string | null {
+    if (result.status === 'ambiguous') {
+        const { key, args } = ambiguityI18n(explainAmbiguity(result.candidates));
+        return interpolateWhy(AMBIGUITY_WHY_EN[key], args);
+    }
+    if (result.status === 'unbound') {
+        const { key, args } = unboundI18n(explainUnbound(result.step, bindings));
+        return interpolateWhy(UNBOUND_WHY_EN[key], args);
+    }
+    return null;
 }
 
 function resolveFeatureAbs(projectDir: string, featurePath: string): string {
@@ -125,6 +147,6 @@ export function buildResolveStepReport(
         line,
         stepText: step.rawText,
         matches: mapMatches(project, result),
-        why: result.status === 'ambiguous' ? formatWhyEn(result) : null,
+        why: formatWhyEn(result, bindings),
     };
 }

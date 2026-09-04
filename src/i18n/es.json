@@ -28,11 +28,15 @@
   "hoverShowAllMatches": "Ver todos los coincidentes",
   "hoverBindingsMatch": "{0} bindings coinciden con este paso:",
   "hoverAmbiguityWhy": "Por qué es ambiguo:",
+  "hoverUnboundWhy": "Por qué no enlaza:",
   "hoverAmbiguityPatterns": "Patrones",
   "ambiguitySamePattern": "Varios bindings comparten el patrón \"{0}\"",
   "ambiguityScoreTie": "Los mejores matches tienen la misma puntuación ({0})",
   "ambiguityBroadVsSpecific": "El patrón amplio \"{0}\" se solapa con el más específico \"{1}\"",
   "ambiguityGeneric": "{0} bindings coinciden con este paso",
+  "unboundEmptyIndex": "No hay step bindings indexados",
+  "unboundScopeExcluded": "El patrón coincide con {0} binding(s) con Scope; ninguno aplica a los tags de este paso (hace falta {1})",
+  "unboundGeneric": "{0} bindings indexados; ninguno coincide con este paso",
   "hoverBestMatch": "Mejor coincidencia:",
   "hoverBinding": "Binding",
   "hoverPattern": "Patrón",
@@ -85,5 +89,6 @@
   "suiteMapMore": "…y {0} más",
   "suiteMapOrphansSkipped": "Escaneo de huérfanos omitido (demasiados bindings)",
   "suiteMapOpen": "Abrir",
-  "suiteMapExplainStale": "Este paso ya no es ambiguo"
+  "suiteMapExplainStale": "Este paso ya no es ambiguo",
+  "suiteMapExplainUnboundStale": "Este paso ya no está sin enlazar"
 }
