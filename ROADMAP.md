@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.15.0** GitHub: [v1.15.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.15.0)
+> **Current release: v1.15.0** Marketplace 2026-09-04 · GitHub: [v1.15.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.15.0)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.15.0** (GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.15.0** (Marketplace + GitHub) |
 | 🎯 Next | (dogfood mapa / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -82,7 +82,7 @@
 | **1.15.0-A** `explainUnbound` puro + tests | ✅ |
 | **1.15.0-B** Hover + Problems + Map Explain unbound + CLI `why` | ✅ |
 | **1.15.0-C** i18n / docs / CHANGELOG | ✅ |
-| **1.15.0-4** VSIX + Marketplace | ☐ Marketplace (*publish* en curso) |
+| **1.15.0-4** VSIX + Marketplace | ✅ Marketplace + GitHub Release |
 
 Spec: `docs-internal/specs/unbound-explained-v1.15.0.md` (local).  
 **Anti-scope:** matching, fallback literal, near-miss, generate, Coach, orphans, mapa estructural, Activity Bar/webview, Index API v2, schema CLI/MCP, Pilot.
@@ -588,4 +588,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-04 — v1.15.0 Why unbound (GitHub; Marketplace pending publish).*
+*Last updated: 2026-09-04 — v1.15.0 Why unbound shipped (Marketplace + GitHub).*
