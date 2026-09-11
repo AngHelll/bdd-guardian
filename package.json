@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-    "version": "1.15.0",
+    "version": "1.16.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -237,7 +237,12 @@
         "bddGuardian.gutterIcons.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Show gutter icons for step status (✓ bound, ✗ unbound, ! ambiguous)"
+          "description": "%config.gutterIcons.enabled%"
+        },
+        "bddGuardian.gutterIcons.showBound": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.gutterIcons.showBound%"
         },
         "bddGuardian.hoverDetails.enabled": {
           "type": "boolean",
@@ -256,7 +261,7 @@
             "standard",
             "minimal"
           ],
-          "default": "full",
+          "default": "standard",
           "description": "%config.feedbackLevel.description%",
           "enumDescriptions": [
             "%config.feedbackLevel.full%",

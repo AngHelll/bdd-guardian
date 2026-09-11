@@ -16,6 +16,7 @@ import { createResolver, applyMatchingSettings, ResolverDependencies } from '../
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword } from '../../core/domain';
 import { StepStatus, getUIConfig, getStatusEmoji, getStatusLabel, getAmbiguousStatusLabel } from '../../ui/stepStatus';
+import { shouldPaintBoundGutter } from '../../ui/feedbackLevel';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 
 // Debounce timer
@@ -80,8 +81,13 @@ const decorationTypes: {
 
 /**
  * Initialize or reinitialize decoration types based on config.
+ * Bound gutter icon is opt-in via showBound (problems-only default).
  */
-function initDecorationTypes(useGutterIcons: boolean, useBorder: boolean): void {
+function initDecorationTypes(
+    useGutterIcons: boolean,
+    useBorder: boolean,
+    showBoundGutter: boolean
+): void {
     // Dispose existing
     decorationTypes.bound?.dispose();
     decorationTypes.unbound?.dispose();
@@ -91,7 +97,7 @@ function initDecorationTypes(useGutterIcons: boolean, useBorder: boolean): void 
         'bound',
         'charts.green',
         'charts.green',
-        useGutterIcons,
+        shouldPaintBoundGutter(useGutterIcons, showBoundGutter),
         useBorder
     );
     decorationTypes.unbound = createDecorationType(
@@ -118,7 +124,7 @@ export interface DecorationStats {
 
 export class DecorationsManager {
     private disposables: vscode.Disposable[] = [];
-    private lastConfig: { gutterIcons: boolean; border: boolean } | null = null;
+    private lastConfig: { gutterIcons: boolean; border: boolean; showBound: boolean } | null = null;
     
     constructor(private indexManager: IndexManager) {
         // Listen for config changes
@@ -139,13 +145,15 @@ export class DecorationsManager {
         const next = {
             gutterIcons: uiConfig.gutterIconsEnabled,
             border: uiConfig.decorationsEnabled,
+            showBound: uiConfig.gutterIconsShowBound,
         };
         if (
             this.lastConfig?.gutterIcons !== next.gutterIcons ||
-            this.lastConfig?.border !== next.border
+            this.lastConfig?.border !== next.border ||
+            this.lastConfig?.showBound !== next.showBound
         ) {
             if (next.gutterIcons || next.border) {
-                initDecorationTypes(next.gutterIcons, next.border);
+                initDecorationTypes(next.gutterIcons, next.border, next.showBound);
             }
             this.lastConfig = next;
             
@@ -187,6 +195,7 @@ export class DecorationsManager {
 
         const showGutter = uiConfig.gutterIconsEnabled;
         const showBorder = uiConfig.decorationsEnabled;
+        const showBound = uiConfig.gutterIconsShowBound;
         
         if (!showGutter && !showBorder) {
             this.clearDecorations(editor);
@@ -197,10 +206,11 @@ export class DecorationsManager {
         if (
             !decorationTypes.bound ||
             this.lastConfig?.gutterIcons !== showGutter ||
-            this.lastConfig?.border !== showBorder
+            this.lastConfig?.border !== showBorder ||
+            this.lastConfig?.showBound !== showBound
         ) {
-            initDecorationTypes(showGutter, showBorder);
-            this.lastConfig = { gutterIcons: showGutter, border: showBorder };
+            initDecorationTypes(showGutter, showBorder, showBound);
+            this.lastConfig = { gutterIcons: showGutter, border: showBorder, showBound };
         }
         
         const index = this.indexManager.getIndex();
@@ -224,6 +234,8 @@ export class DecorationsManager {
         const boundRanges: vscode.DecorationOptions[] = [];
         const unboundRanges: vscode.DecorationOptions[] = [];
         const ambiguousRanges: vscode.DecorationOptions[] = [];
+        const paintBoundVisual =
+            showBorder || shouldPaintBoundGutter(showGutter, showBound);
         
         for (const step of steps) {
             if (config.tagFilter.length > 0 && !shouldShowStep(step.tagsEffective)) {
@@ -253,7 +265,7 @@ export class DecorationsManager {
                 unboundRanges.push(decorationOption);
             } else if (status === StepStatus.Ambiguous) {
                 ambiguousRanges.push(decorationOption);
-            } else {
+            } else if (paintBoundVisual) {
                 boundRanges.push(decorationOption);
             }
         }

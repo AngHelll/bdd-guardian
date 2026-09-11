@@ -25,6 +25,7 @@ import {
     getCodeLensIcon,
     getStatusLabel,
     stepStatusFromResolve,
+    withCodeLensIcon,
 } from '../ui/stepStatus';
 import { refreshLanguage } from '../i18n';
 
@@ -71,10 +72,17 @@ describe('formatBoundCodeLensTitle', () => {
 });
 
 describe('getCodeLensIcon', () => {
-    it('maps bound to check and ambiguous to warning', () => {
-        expect(getCodeLensIcon(StepStatus.Bound)).toBe('$(check)');
+    it('omits icon for bound; maps problems to warning/error', () => {
+        expect(getCodeLensIcon(StepStatus.Bound)).toBe('');
         expect(getCodeLensIcon(StepStatus.Unbound)).toBe('$(error)');
         expect(getCodeLensIcon(StepStatus.Ambiguous)).toBe('$(warning)');
+    });
+});
+
+describe('withCodeLensIcon', () => {
+    it('skips leading space when icon is empty', () => {
+        expect(withCodeLensIcon('', 'SampleSteps.GivenValidUser')).toBe('SampleSteps.GivenValidUser');
+        expect(withCodeLensIcon('$(error)', 'No binding')).toBe('$(error) No binding');
     });
 });
 

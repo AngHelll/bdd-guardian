@@ -223,10 +223,11 @@ Search for "BDD Guardian" in VS Code Extensions, or install from:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `bddGuardian.gutterIcons.enabled` | `true` | Show gutter icons for step status |
+| `bddGuardian.gutterIcons.enabled` | `true` | Gutter icons (unbound/ambiguous; bound optional) |
+| `bddGuardian.gutterIcons.showBound` | `false` | Show green check on bound steps |
 | `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
 | `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
-| `bddGuardian.ui.feedbackLevel` | `full` | Visual density ceiling: `full` / `standard` / `minimal` |
+| `bddGuardian.ui.feedbackLevel` | `standard` | Visual density ceiling: `full` / `standard` / `minimal` |
 | `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
 | `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS / Behave / Godog / Java) |
 | `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
@@ -270,10 +271,11 @@ Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibil
 | Setting | Namespace | Role |
 |---------|-----------|------|
 | `bddGuardian.displayLanguage` | branding | UI language (EN/ES) for status labels, toasts, hover |
-| `bddGuardian.gutterIcons.enabled` | branding | Gutter icons on steps |
+| `bddGuardian.gutterIcons.enabled` | branding | Gutter icons on steps (problems by default) |
+| `bddGuardian.gutterIcons.showBound` | branding | Opt-in bound green checks |
 | `bddGuardian.hoverDetails.enabled` | branding | Rich binding hover |
 | `bddGuardian.ui.showMatchScore` | branding | CodeLens debug score |
-| `bddGuardian.ui.feedbackLevel` | branding | Visual density: `full` / `standard` / `minimal` (ceiling; toggles can lower) |
+| `bddGuardian.ui.feedbackLevel` | branding | Visual density: `full` / `standard` (default) / `minimal` (ceiling; toggles can lower) |
 | `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
 | `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
 | `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |

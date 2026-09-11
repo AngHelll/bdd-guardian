@@ -10,8 +10,8 @@
 | Status | Item |
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.15.0** (Marketplace + GitHub) |
-| 🎯 Next | (dogfood mapa / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 🎯 Next | **v1.16.0** — Quiet bound signal (shipping) |
+| 📋 Gate | *publish* / post-ship pin |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -72,6 +72,23 @@
 | **1.13.0** | Suite map ola 2 — group holes by file + generate/copy from unbound |
 | **1.14.0** | Suite map ola 3 — Explain ambiguous holes from the map |
 | **1.15.0** | Unbound explained — hover / Problems / Map / CLI `why` |
+| **1.16.0** | Quiet bound signal — gutter problems-only; CodeLens = click primario |
+
+---
+
+## Plan v1.16.0 — verificado (2026-09-11)
+
+| # | Status |
+|---|--------|
+| **1.16.0-A** Gutter: unbound/ambiguous only; `gutterIcons.showBound` default off | ✅ |
+| **1.16.0-B** Default `feedbackLevel` → `standard`; CodeLens bound sin `$(check)` | ✅ |
+| **1.16.0-C** VISUAL_LANGUAGE / README / CHANGELOG | ✅ |
+| **1.16.0-4** VSIX + Marketplace | ⏳ shipping |
+
+Spec: `docs-internal/specs/quiet-bound-signal-v1.16.0.md` (local).  
+**Anti-scope:** matching, Pilot, Suite Map structure, Coach, Index API, CLI/MCP, Marketplace tile.
+
+**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario); matching unchanged.
 
 ---
 

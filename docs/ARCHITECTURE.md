@@ -285,7 +285,7 @@ interface ExtensionConfig {
     };
     
     // UI settings
-    gutterIcons: { enabled: boolean };
+    gutterIcons: { enabled: boolean; showBound: boolean };
     hoverDetails: { enabled: boolean };
     
     // Performance

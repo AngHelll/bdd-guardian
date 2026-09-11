@@ -10,7 +10,7 @@ import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getStepAtPosition, getStepAtPositionFromContent } from '../../core/references/stepContext';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
-import { getUIConfig, formatBoundCodeLensTitle, getCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
+import { getUIConfig, formatBoundCodeLensTitle, getCodeLensIcon, withCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
@@ -135,7 +135,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         
         if (result.candidates.length === 0) {
             codeLens.command = {
-                title: `${getCodeLensIcon(stepStatusFromResolve('unbound'))} ${t('codelensNoBindingFound')}`,
+                title: withCodeLensIcon(
+                    getCodeLensIcon(stepStatusFromResolve('unbound')),
+                    t('codelensNoBindingFound')
+                ),
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
@@ -150,14 +153,17 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 showScore
             );
             codeLens.command = {
-                title: `${icon} ${title}`,
+                title: withCodeLensIcon(icon, title),
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };
         } else {
             const best = result.candidates[0];
             codeLens.command = {
-                title: `${getCodeLensIcon(StepStatus.Ambiguous)} ${best.binding.methodName} ${t('codelensAmbiguousMore', String(result.candidates.length - 1))}`,
+                title: withCodeLensIcon(
+                    getCodeLensIcon(StepStatus.Ambiguous),
+                    `${best.binding.methodName} ${t('codelensAmbiguousMore', String(result.candidates.length - 1))}`
+                ),
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };

@@ -27,8 +27,8 @@ Single reference for how step binding status appears across the extension.
 
 | Surface | Bound | Unbound | Ambiguous | Orphan | Indexing |
 |---------|-------|---------|-----------|--------|----------|
-| **Gutter** (`resources/icons/*.svg`) | Green circle + check | Red circle + X | Orange circle + ! | — | (no gutter icon) |
-| **CodeLens** (feature) | `$(check)` + `Class.Method` | `$(error)` + message | `$(warning)` + candidates | — | `$(warning)` reindex CTA |
+| **Gutter** (`resources/icons/*.svg`) | *(none by default)*; green check if `showBound` | Red circle + X | Orange circle + ! | — | (no gutter icon) |
+| **CodeLens** (feature) | `Class.Method` (click) | `$(error)` + message | `$(warning)` + candidates | — | `$(warning)` reindex CTA |
 | **CodeLens** (binding file) | usage count | — | — | “No usages” (existing) | — |
 | **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + why + top matches | — | ⏳ emoji |
 | **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** + why hint (step) | Diagnostic **Information** (binding) | — |
@@ -41,23 +41,27 @@ Implementation: `src/ui/stepStatus.ts` (`getCodeLensIcon`, `getStatusColor`, `ge
 
 Custom SVGs under `resources/icons/` use **fixed colors** for legibility at 16px. Border and overview ruler use VS Code theme colors (`charts.green`, `charts.red`, `charts.yellow`).
 
-Toggle: `bddGuardian.gutterIcons.enabled`.
+**v1.16.0+:** gutter defaults to **problems-only** (unbound / ambiguous). Bound green checks are opt-in via `bddGuardian.gutterIcons.showBound`.
+
+Toggles: `bddGuardian.gutterIcons.enabled` · `bddGuardian.gutterIcons.showBound`.
 
 ## CodeLens icons
 
-CodeLens uses VS Code **codicons** aligned with gutter meaning (check / error / warning), not the SVG glyphs.
+CodeLens uses VS Code **codicons** for problems (error / warning). Bound CodeLens has **no** check icon — the clickable `Class.Method` text is the “recognized + navigate” signal (v1.16+).
 
 Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 
-**Feedback level (v1.9.0+):** `bddGuardian.ui.feedbackLevel` sets a **ceiling** for visual channels:
+**Feedback level (v1.9.0+ / defaults v1.16.0):** `bddGuardian.ui.feedbackLevel` sets a **ceiling** for visual channels:
 
 | Value | Gutter | Border / ruler | Problems (steps) | CodeLens |
 |-------|--------|----------------|------------------|----------|
-| `full` (default) | ✓ | ✓ | ✓ | ✓ |
-| `standard` | ✓ | — | ✓ | ✓ |
+| `full` | ✓ | ✓ | ✓ | ✓ |
+| `standard` (**default** v1.16+) | ✓ | — | ✓ | ✓ |
 | `minimal` | — | — | — | ✓ |
 
-Granular toggles (`gutterIcons.enabled`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
+Bound gutter icons still require `gutterIcons.showBound` under any preset that enables gutter.
+
+Granular toggles (`gutterIcons.enabled`, `gutterIcons.showBound`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
 
 **Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings). **v1.15.0+:** unbound leaves also offer Explain (why + QuickPick of scoped-out bindings when that is the reason); Generate/Copy stay.
 
@@ -75,7 +79,8 @@ Binding step diagnostics and orphan bindings: **`BDD Guardian`** (`bddGuardian/u
 
 | Setting | Effect |
 |---------|--------|
-| `bddGuardian.gutterIcons.enabled` | Gutter SVG icons |
+| `bddGuardian.gutterIcons.enabled` | Gutter SVG icons (problems; bound if `showBound`) |
+| `bddGuardian.gutterIcons.showBound` | Opt-in green check on bound steps |
 | `reqnrollNavigator.enableDecorations` | Left border + overview ruler |
 | `reqnrollNavigator.enableCodeLens` | CodeLens above steps |
 | `bddGuardian.hoverDetails.enabled` | Rich hover |

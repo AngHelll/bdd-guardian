@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-09-11
+
+**Highlights:** Quiet bound signal — gutter is problems-only by default; CodeLens `Class.Method` is the “recognized + click” affordance. Less visual noise on Mac/Windows gutters.
+
+### Added
+
+- Setting `bddGuardian.gutterIcons.showBound` (default `false`) to restore green check gutter icons on bound steps
+
+### Changed
+
+- Default `bddGuardian.ui.feedbackLevel` → `standard` (no border/overview by default)
+- Unknown `feedbackLevel` values normalize to `standard`
+- Bound CodeLens titles no longer prefix `$(check)` — destination text alone signals bound
+- Gutter icons paint unbound/ambiguous only unless `showBound` is on
+- Docs: `VISUAL_LANGUAGE.md`, README settings map
+
 ## [1.15.0] - 2026-09-04
 
 **Highlights:** Unbound explained — same *why* on hover, Problems, BDD Map, and CLI `resolve-step` (empty index / scope-excluded / generic). Matching unchanged.

@@ -23,7 +23,7 @@ export function getConfig(): ExtensionConfig {
     const config = vscode.workspace.getConfiguration('reqnrollNavigator');
     const guardianConfig = vscode.workspace.getConfiguration('bddGuardian');
 
-    const channels = resolveFeedbackChannels(guardianConfig.get('ui.feedbackLevel', 'full'), {
+    const channels = resolveFeedbackChannels(guardianConfig.get('ui.feedbackLevel', 'standard'), {
         gutter: guardianConfig.get('gutterIcons.enabled', true),
         border: config.get('enableDecorations', DEFAULT_CONFIG.enableDecorations),
         problems: config.get('enableDiagnostics', DEFAULT_CONFIG.enableDiagnostics),

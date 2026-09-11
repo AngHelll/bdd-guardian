@@ -29,7 +29,14 @@ export function normalizeFeedbackLevel(value: unknown): FeedbackLevel {
     if (value === 'standard' || value === 'minimal' || value === 'full') {
         return value;
     }
-    return 'full';
+    return 'standard';
+}
+
+/**
+ * Bound gutter icon is opt-in (v1.16+): problems-only by default.
+ */
+export function shouldPaintBoundGutter(gutterEnabled: boolean, showBound: boolean): boolean {
+    return gutterEnabled && showBound;
 }
 
 /**

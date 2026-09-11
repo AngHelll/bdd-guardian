@@ -37,6 +37,8 @@ export interface StepStatusInfo {
 export interface UIConfig {
     feedbackLevel: 'full' | 'standard' | 'minimal';
     gutterIconsEnabled: boolean;
+    /** When true with gutter on, paint green check on bound steps (default false = problems-only). */
+    gutterIconsShowBound: boolean;
     hoverDetailsEnabled: boolean;
     decorationsEnabled: boolean;
     codeLensEnabled: boolean;
@@ -51,7 +53,7 @@ export function getUIConfig(): UIConfig {
     const config = vscode.workspace.getConfiguration('bddGuardian');
     const legacyConfig = vscode.workspace.getConfiguration('reqnrollNavigator');
 
-    const level = normalizeFeedbackLevel(config.get<string>('ui.feedbackLevel', 'full'));
+    const level = normalizeFeedbackLevel(config.get<string>('ui.feedbackLevel', 'standard'));
     const channels = resolveFeedbackChannels(level, {
         gutter: config.get<boolean>('gutterIcons.enabled', true),
         border: legacyConfig.get<boolean>('enableDecorations', true),
@@ -62,6 +64,7 @@ export function getUIConfig(): UIConfig {
     return {
         feedbackLevel: level,
         gutterIconsEnabled: channels.gutter,
+        gutterIconsShowBound: config.get<boolean>('gutterIcons.showBound', false),
         hoverDetailsEnabled: config.get<boolean>('hoverDetails.enabled', true),
         decorationsEnabled: channels.border,
         codeLensEnabled: channels.codeLens,
@@ -145,11 +148,12 @@ export function formatBoundCodeLensTitle(
 
 /**
  * Codicon for CodeLens titles (aligned with gutter semantics — see docs/VISUAL_LANGUAGE.md).
+ * Bound has no icon: the clickable `Class.Method` text is the signal (v1.16+).
  */
 export function getCodeLensIcon(status: StepStatus): string {
     switch (status) {
         case StepStatus.Bound:
-            return '$(check)';
+            return '';
         case StepStatus.Ambiguous:
             return '$(warning)';
         case StepStatus.Unbound:
@@ -159,6 +163,11 @@ export function getCodeLensIcon(status: StepStatus): string {
         default:
             return '$(question)';
     }
+}
+
+/** Prefix CodeLens title with icon when present (bound has none). */
+export function withCodeLensIcon(icon: string, title: string): string {
+    return icon ? `${icon} ${title}` : title;
 }
 
 /**

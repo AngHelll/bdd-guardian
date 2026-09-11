@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     normalizeFeedbackLevel,
     resolveFeedbackChannels,
+    shouldPaintBoundGutter,
 } from '../ui/feedbackLevel';
 
 const ALL_ON = {
@@ -54,9 +55,18 @@ describe('resolveFeedbackChannels', () => {
         expect(resolveFeedbackChannels('minimal', ALL_ON).gutter).toBe(false);
     });
 
-    it('normalizeFeedbackLevel falls back to full', () => {
-        expect(normalizeFeedbackLevel('nope')).toBe('full');
-        expect(normalizeFeedbackLevel(undefined)).toBe('full');
+    it('normalizeFeedbackLevel falls back to standard', () => {
+        expect(normalizeFeedbackLevel('nope')).toBe('standard');
+        expect(normalizeFeedbackLevel(undefined)).toBe('standard');
+        expect(normalizeFeedbackLevel('full')).toBe('full');
         expect(normalizeFeedbackLevel('standard')).toBe('standard');
+    });
+});
+
+describe('shouldPaintBoundGutter', () => {
+    it('requires both gutter channel and showBound', () => {
+        expect(shouldPaintBoundGutter(true, false)).toBe(false);
+        expect(shouldPaintBoundGutter(false, true)).toBe(false);
+        expect(shouldPaintBoundGutter(true, true)).toBe(true);
     });
 });
