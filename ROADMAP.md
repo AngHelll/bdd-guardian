@@ -10,8 +10,8 @@
 | Status | Item |
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.16.0** (Marketplace + GitHub) |
-| 🎯 Next | (dogfood / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 🎯 Next | **v1.16.1** — Bound CodeLens go-to affordance (shipping) |
+| 📋 Gate | *publish* / post-ship pin |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -73,6 +73,22 @@
 | **1.14.0** | Suite map ola 3 — Explain ambiguous holes from the map |
 | **1.15.0** | Unbound explained — hover / Problems / Map / CLI `why` |
 | **1.16.0** | Quiet bound signal — gutter problems-only; CodeLens = click primario |
+| **1.16.1** | Bound CodeLens `$(go-to-file)` + open-binding tooltip |
+
+---
+
+## Plan v1.16.1 — verificado (2026-09-11)
+
+| # | Status |
+|---|--------|
+| **1.16.1-A** Bound CodeLens `$(go-to-file)` + tooltip i18n | ✅ |
+| **1.16.1-B** Docs / CHANGELOG / tests | ✅ |
+| **1.16.1-4** VSIX + Marketplace | ⏳ shipping |
+
+Spec: `docs-internal/specs/codelens-goto-affordance-v1.16.1.md` (local).  
+**Anti-scope:** “Go to” verb in title, file path in title, gutter, matching, new settings.
+
+**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario).
 
 ---
 

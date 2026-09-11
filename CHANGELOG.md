@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.16.1] - 2026-09-11
+
+**Highlights:** Bound CodeLens shows `$(go-to-file)` + destination and a tooltip (“Open binding in …”) so Mac/Windows users read it as navigate, not a status label.
+
+### Changed
+
+- Bound CodeLens icon: `$(go-to-file)` (replaces bare `Class.Method` from v1.16.0)
+- Bound CodeLens `command.tooltip` with relative binding path (EN/ES)
+
 ## [1.16.0] - 2026-09-11
 
 **Highlights:** Quiet bound signal — gutter is problems-only by default; CodeLens `Class.Method` is the “recognized + click” affordance. Less visual noise on Mac/Windows gutters.

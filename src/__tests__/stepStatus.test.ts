@@ -21,6 +21,7 @@ vi.mock('vscode', async () => {
 import {
     StepStatus,
     formatBoundCodeLensTitle,
+    formatBoundCodeLensTooltip,
     getAmbiguousStatusLabel,
     getCodeLensIcon,
     getStatusLabel,
@@ -72,8 +73,8 @@ describe('formatBoundCodeLensTitle', () => {
 });
 
 describe('getCodeLensIcon', () => {
-    it('omits icon for bound; maps problems to warning/error', () => {
-        expect(getCodeLensIcon(StepStatus.Bound)).toBe('');
+    it('maps bound to go-to-file; problems to warning/error', () => {
+        expect(getCodeLensIcon(StepStatus.Bound)).toBe('$(go-to-file)');
         expect(getCodeLensIcon(StepStatus.Unbound)).toBe('$(error)');
         expect(getCodeLensIcon(StepStatus.Ambiguous)).toBe('$(warning)');
     });
@@ -82,7 +83,31 @@ describe('getCodeLensIcon', () => {
 describe('withCodeLensIcon', () => {
     it('skips leading space when icon is empty', () => {
         expect(withCodeLensIcon('', 'SampleSteps.GivenValidUser')).toBe('SampleSteps.GivenValidUser');
+        expect(withCodeLensIcon('$(go-to-file)', 'SampleSteps.GivenValidUser')).toBe(
+            '$(go-to-file) SampleSteps.GivenValidUser'
+        );
         expect(withCodeLensIcon('$(error)', 'No binding')).toBe('$(error) No binding');
+    });
+});
+
+describe('formatBoundCodeLensTooltip', () => {
+    beforeEach(() => {
+        (globalThis as { __testLang?: string }).__testLang = 'en';
+        refreshLanguage();
+    });
+
+    it('includes file label in Open binding tooltip', () => {
+        expect(formatBoundCodeLensTooltip('Steps/SampleSteps.cs')).toBe(
+            'Open binding in Steps/SampleSteps.cs'
+        );
+    });
+
+    it('localizes tooltip when displayLanguage is es', () => {
+        (globalThis as { __testLang?: string }).__testLang = 'es';
+        refreshLanguage();
+        expect(formatBoundCodeLensTooltip('Steps/SampleSteps.cs')).toBe(
+            'Abrir binding en Steps/SampleSteps.cs'
+        );
     });
 });
 

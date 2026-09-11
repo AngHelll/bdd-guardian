@@ -28,7 +28,7 @@ Single reference for how step binding status appears across the extension.
 | Surface | Bound | Unbound | Ambiguous | Orphan | Indexing |
 |---------|-------|---------|-----------|--------|----------|
 | **Gutter** (`resources/icons/*.svg`) | *(none by default)*; green check if `showBound` | Red circle + X | Orange circle + ! | — | (no gutter icon) |
-| **CodeLens** (feature) | `Class.Method` (click) | `$(error)` + message | `$(warning)` + candidates | — | `$(warning)` reindex CTA |
+| **CodeLens** (feature) | `$(go-to-file)` + `Class.Method` (+ tooltip) | `$(error)` + message | `$(warning)` + candidates | — | `$(warning)` reindex CTA |
 | **CodeLens** (binding file) | usage count | — | — | “No usages” (existing) | — |
 | **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + why + top matches | — | ⏳ emoji |
 | **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** + why hint (step) | Diagnostic **Information** (binding) | — |
@@ -47,7 +47,7 @@ Toggles: `bddGuardian.gutterIcons.enabled` · `bddGuardian.gutterIcons.showBound
 
 ## CodeLens icons
 
-CodeLens uses VS Code **codicons** for problems (error / warning). Bound CodeLens has **no** check icon — the clickable `Class.Method` text is the “recognized + navigate” signal (v1.16+).
+CodeLens uses VS Code **codicons**: bound = **`$(go-to-file)`** (navigate, not “status OK”); problems = error / warning (v1.16.1). Bound CodeLens also sets a **tooltip** (`Open binding in {file}`).
 
 Optional debug score: `bddGuardian.ui.showMatchScore` (default `false`).
 

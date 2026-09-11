@@ -44,6 +44,7 @@
   "hoverCaptured": "Capturados",
   "hoverPreview": "Vista previa",
   "hoverClickFileLink": "Haz clic en el enlace del archivo de arriba para abrir el método completo.",
+  "codelensOpenBinding": "Abrir binding en {0}",
   "hoverIndexing": "Se están indexando los bindings...",
   "hoverNoBindingsIndexed": "No hay bindings de steps indexados en este workspace. Comprueba que existan archivos de step definitions y que coincidan con tu framework (p. ej. `@cucumber/cucumber` en package.json).",
   "hoverReindexNow": "Reindexar ahora",

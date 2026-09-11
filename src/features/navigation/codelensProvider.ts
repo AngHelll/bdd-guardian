@@ -10,7 +10,7 @@ import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getStepAtPosition, getStepAtPositionFromContent } from '../../core/references/stepContext';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, FeatureStep } from '../../core/domain';
-import { getUIConfig, formatBoundCodeLensTitle, getCodeLensIcon, withCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
+import { getUIConfig, formatBoundCodeLensTitle, formatBoundCodeLensTooltip, getCodeLensIcon, withCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
 
@@ -152,8 +152,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 candidate.score,
                 showScore
             );
+            const fileLabel = vscode.workspace.asRelativePath(candidate.binding.uri);
             codeLens.command = {
                 title: withCodeLensIcon(icon, title),
+                tooltip: formatBoundCodeLensTooltip(fileLabel),
                 command: 'reqnroll-navigator.goToStep',
                 arguments: [result],
             };

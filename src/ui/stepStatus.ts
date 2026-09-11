@@ -148,12 +148,12 @@ export function formatBoundCodeLensTitle(
 
 /**
  * Codicon for CodeLens titles (aligned with gutter semantics — see docs/VISUAL_LANGUAGE.md).
- * Bound has no icon: the clickable `Class.Method` text is the signal (v1.16+).
+ * Bound uses go-to-file (navigation affordance), not a status check (v1.16.1).
  */
 export function getCodeLensIcon(status: StepStatus): string {
     switch (status) {
         case StepStatus.Bound:
-            return '';
+            return '$(go-to-file)';
         case StepStatus.Ambiguous:
             return '$(warning)';
         case StepStatus.Unbound:
@@ -165,9 +165,14 @@ export function getCodeLensIcon(status: StepStatus): string {
     }
 }
 
-/** Prefix CodeLens title with icon when present (bound has none). */
+/** Prefix CodeLens title with icon when present. */
 export function withCodeLensIcon(icon: string, title: string): string {
     return icon ? `${icon} ${title}` : title;
+}
+
+/** Hover tooltip for bound CodeLens (file path / relative path). */
+export function formatBoundCodeLensTooltip(fileLabel: string): string {
+    return t('codelensOpenBinding', fileLabel);
 }
 
 /**
