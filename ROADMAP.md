@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.15.0** Marketplace 2026-09-04 · GitHub: [v1.15.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.15.0)
+> **Current release: v1.16.0** Marketplace 2026-09-11 · GitHub: [v1.16.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.16.0)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.15.0** (Marketplace + GitHub) |
-| 🎯 Next | **v1.16.0** — Quiet bound signal (shipping) |
-| 📋 Gate | *publish* / post-ship pin |
+| ✅ Shipped | v0.1.0 → **v1.16.0** (Marketplace + GitHub) |
+| 🎯 Next | (dogfood / next align) |
+| 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -83,12 +83,12 @@
 | **1.16.0-A** Gutter: unbound/ambiguous only; `gutterIcons.showBound` default off | ✅ |
 | **1.16.0-B** Default `feedbackLevel` → `standard`; CodeLens bound sin `$(check)` | ✅ |
 | **1.16.0-C** VISUAL_LANGUAGE / README / CHANGELOG | ✅ |
-| **1.16.0-4** VSIX + Marketplace | ⏳ shipping |
+| **1.16.0-4** VSIX + Marketplace | ✅ Marketplace + GitHub Release |
 
 Spec: `docs-internal/specs/quiet-bound-signal-v1.16.0.md` (local).  
 **Anti-scope:** matching, Pilot, Suite Map structure, Coach, Index API, CLI/MCP, Marketplace tile.
 
-**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario); matching unchanged.
+**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario); Marketplace + GitHub Release.
 
 ---
 
