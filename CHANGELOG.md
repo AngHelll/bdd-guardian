@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-09-28
+
+**Highlights:** Unbound steps can point at one existing binding to reuse, in hover, Problems, and `suggest-reuse` for agents. Matching status is unchanged.
+
+### Added
+
+- Reuse hint on unbound hover and Problems when a single indexed binding is a clear token overlap (`Similar step`)
+- CLI `suggest-reuse` and MCP `guardian_suggest_reuse` (same hint; `schemaVersion` stays 1)
+
 ## [1.16.1] - 2026-09-11
 
 **Highlights:** Bound CodeLens shows `$(go-to-file)` + destination and a tooltip (“Open binding in …”) so Mac/Windows users read it as navigate, not a status label.

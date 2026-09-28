@@ -13,6 +13,7 @@
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n, explainUnbound, unboundI18n } from '../../core/matching';
+import { suggestReuseForUnboundStep } from '../reuse/unboundReuseHint';
 import { ResolvedKeyword, Binding, MatchCandidate, FeatureStep } from '../../core/domain';
 import { 
     StepStatus, 
@@ -127,6 +128,12 @@ export class HoverProvider implements vscode.HoverProvider {
         contents.appendMarkdown(t('hoverNoBindingFound') + '\n\n');
         const why = unboundI18n(explainUnbound(step, bindings));
         contents.appendMarkdown(`**${t('hoverUnboundWhy')}** ${t(why.key, ...why.args)}\n\n`);
+        const reuse = suggestReuseForUnboundStep(step, bindings);
+        if (reuse.kind === 'reuse') {
+            contents.appendMarkdown(
+                `${t('hoverSimilarStep', reuse.humanized, reuse.methodName)}\n\n`
+            );
+        }
 
         const selection = getProviderManager().getCachedSelection();
         const framework = resolveHoverFrameworkContext({ selection });

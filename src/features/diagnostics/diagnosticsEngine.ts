@@ -5,6 +5,7 @@
 import * as vscode from 'vscode';
 import { IndexManager } from '../../core/index';
 import { createResolver, applyMatchingSettings, ResolverDependencies, explainAmbiguity, ambiguityI18n, truncateForDiagnostic, explainUnbound, unboundI18n } from '../../core/matching';
+import { suggestReuseForUnboundStep } from '../reuse/unboundReuseHint';
 import { parseFeatureDocument } from '../../core/parsing/gherkinParser';
 import { getConfig, shouldShowStep } from '../../config';
 import { ResolvedKeyword, BINDINGS_DIAGNOSTIC_SOURCE, UNBOUND_STEP_DIAGNOSTIC_CODE } from '../../core/domain';
@@ -86,7 +87,12 @@ export class DiagnosticsEngine {
                 const why = unboundI18n(explainUnbound(step, allBindings));
                 const whyArgs = why.args.map((a) => truncateForDiagnostic(a));
                 const whyHint = t(why.key, ...whyArgs);
-                const message = t('diagnosticUnboundStep', step.rawText) + ' — ' + whyHint;
+                const reuse = suggestReuseForUnboundStep(step, allBindings);
+                const similar =
+                    reuse.kind === 'reuse'
+                        ? ' — ' + t('diagnosticSimilarStep', truncateForDiagnostic(reuse.humanized))
+                        : '';
+                const message = t('diagnosticUnboundStep', step.rawText) + ' — ' + whyHint + similar;
                 const diagnostic = new vscode.Diagnostic(
                     step.range,
                     message.length > 280 ? message.slice(0, 279) + '…' : message,

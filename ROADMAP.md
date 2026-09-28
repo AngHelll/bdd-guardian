@@ -10,8 +10,8 @@
 | Status | Item |
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.16.1** (Marketplace + GitHub) |
-| 🎯 Next | (dogfood / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 🎯 Next | **v1.17.0** — Reuse hint (shipping) |
+| 📋 Gate | *publish* / post-ship pin |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -74,6 +74,23 @@
 | **1.15.0** | Unbound explained — hover / Problems / Map / CLI `why` |
 | **1.16.0** | Quiet bound signal — gutter problems-only; CodeLens = click primario |
 | **1.16.1** | Bound CodeLens `$(go-to-file)` + open-binding tooltip |
+| **1.17.0** | Reuse hint — one similar binding on unbound + CLI/MCP `suggest-reuse` |
+
+---
+
+## Plan v1.17.0 — verificado (2026-09-28)
+
+| # | Status |
+|---|--------|
+| **1.17.0-A** `suggestReuse` puro + tests (empate → silencio) | ✅ |
+| **1.17.0-B** Línea Similar en hover + Problems unbound | ✅ |
+| **1.17.0-C** CLI/MCP `suggest-reuse` + docs | ✅ |
+| **1.17.0-4** VSIX + Marketplace | ⏳ shipping |
+
+Spec: `docs-internal/specs/step-reuse-hint-v1.17.0.md` (local).  
+**Anti-scope:** matching, why unbound, Generate, CodeLens, BDD Map, corte 3 (paso cerrado), export catálogo, Coach, Index API v2, `schemaVersion` bump.
+
+**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario).
 
 ---
 
@@ -621,4 +638,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-04 — v1.15.0 Why unbound shipped (Marketplace + GitHub).*
+*Last updated: 2026-09-28 — v1.17.0 reuse hint verified (shipping).*

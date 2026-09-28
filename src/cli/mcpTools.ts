@@ -7,12 +7,14 @@ import { buildDiscoverReport } from './discover';
 import { buildAnalyzeReport, DEFAULT_MAX_ITEMS } from './analyze';
 import { buildResolveStepReport } from './resolveStep';
 import { buildCoachAnalyzeReport } from './coachAnalyze';
+import { buildSuggestReuseReport, parseReuseKeyword } from './suggestReuse';
 
 export const MCP_TOOL_NAMES = [
     'guardian_discover',
     'guardian_analyze',
     'guardian_resolve_step',
     'guardian_coach_analyze',
+    'guardian_suggest_reuse',
 ] as const;
 
 export type McpToolName = (typeof MCP_TOOL_NAMES)[number];
@@ -77,11 +79,37 @@ export const MCP_TOOL_DESCRIPTORS: McpToolDescriptor[] = [
             required: ['projectDir'],
         },
     },
+    {
+        name: 'guardian_suggest_reuse',
+        description:
+            'Suggest one existing binding to rewrite a proposed step toward (advisory; does not change bound/unbound).',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                projectDir: { type: 'string' },
+                stepText: { type: 'string', description: 'Proposed step text without the keyword' },
+                keyword: { type: 'string', description: 'Given, When, or Then' },
+                tags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Optional step tags; when set, out-of-scope bindings are ignored',
+                },
+            },
+            required: ['projectDir', 'stepText', 'keyword'],
+        },
+    },
 ];
 
 function asString(value: unknown, field: string): string {
     if (typeof value !== 'string' || !value.trim()) {
         throw new Error(`missing or invalid ${field}`);
+    }
+    return value;
+}
+
+function asStringArray(value: unknown): string[] {
+    if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
+        throw new Error('invalid tags');
     }
     return value;
 }
@@ -130,6 +158,15 @@ export function dispatchMcpTool(name: string, args: Record<string, unknown> = {}
                     ? undefined
                     : asString(args.featurePath, 'featurePath');
             return buildCoachAnalyzeReport(project, { maxItems, featurePath });
+        }
+        case 'guardian_suggest_reuse': {
+            const stepText = asString(args.stepText, 'stepText');
+            const keyword = parseReuseKeyword(asString(args.keyword, 'keyword'));
+            if (!keyword) {
+                throw new Error('keyword must be Given, When, or Then');
+            }
+            const tags = args.tags === undefined || args.tags === null ? undefined : asStringArray(args.tags);
+            return buildSuggestReuseReport(project, stepText, keyword, tags);
         }
         default:
             throw new Error(`unknown tool: ${name}`);

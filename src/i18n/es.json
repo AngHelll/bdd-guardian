@@ -29,6 +29,8 @@
   "hoverBindingsMatch": "{0} bindings coinciden con este paso:",
   "hoverAmbiguityWhy": "Por qué es ambiguo:",
   "hoverUnboundWhy": "Por qué no enlaza:",
+  "hoverSimilarStep": "Paso similar: {0} ({1})",
+  "diagnosticSimilarStep": "Similar: {0}",
   "hoverAmbiguityPatterns": "Patrones",
   "ambiguitySamePattern": "Varios bindings comparten el patrón \"{0}\"",
   "ambiguityScoreTie": "Los mejores matches tienen la misma puntuación ({0})",

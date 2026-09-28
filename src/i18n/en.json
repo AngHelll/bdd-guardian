@@ -29,6 +29,8 @@
   "hoverBindingsMatch": "{0} bindings match this step:",
   "hoverAmbiguityWhy": "Why ambiguous:",
   "hoverUnboundWhy": "Why unbound:",
+  "hoverSimilarStep": "Similar step: {0} ({1})",
+  "diagnosticSimilarStep": "Similar: {0}",
   "hoverAmbiguityPatterns": "Patterns",
   "ambiguitySamePattern": "Multiple bindings share pattern \"{0}\"",
   "ambiguityScoreTie": "Top matches have the same score ({0})",

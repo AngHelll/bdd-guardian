@@ -8,8 +8,9 @@ import { buildDiscoverReport } from './discover';
 import { buildAnalyzeReport, DEFAULT_MAX_ITEMS } from './analyze';
 import { buildResolveStepReport } from './resolveStep';
 import { buildCoachAnalyzeReport } from './coachAnalyze';
+import { buildSuggestReuseReport, parseReuseKeyword } from './suggestReuse';
 
-const COMMANDS = new Set(['discover', 'analyze', 'resolve-step', 'coach-analyze']);
+const COMMANDS = new Set(['discover', 'analyze', 'resolve-step', 'coach-analyze', 'suggest-reuse']);
 
 export const USAGE = [
     'Usage:',
@@ -17,6 +18,7 @@ export const USAGE = [
     '  npm run guardian -- analyze <project-dir> [--max-items <n>]',
     '  npm run guardian -- resolve-step <project-dir> <feature-path> <line>',
     '  npm run guardian -- coach-analyze <project-dir> [--feature <path>] [--max-items <n>]',
+    '  npm run guardian -- suggest-reuse <project-dir> --step <text> --keyword <Given|When|Then> [--tags tag1,tag2]',
     '',
     'Exit codes: 0 ok · 1 error · 2 usage',
     'MCP: npm run guardian:mcp  (stdio — see docs/CLI.md)',
@@ -43,6 +45,9 @@ export function runCli(argv: string[]): number {
     let projectDir: string | undefined;
     let featurePath: string | undefined;
     let lineRaw: string | undefined;
+    let stepText: string | undefined;
+    let keywordRaw: string | undefined;
+    let tagsRaw: string | undefined;
     let maxItems = DEFAULT_MAX_ITEMS;
     const positional: string[] = [];
 
@@ -63,6 +68,30 @@ export function runCli(argv: string[]): number {
                 return usageError('missing --feature value');
             }
             featurePath = raw;
+            continue;
+        }
+        if (arg === '--step') {
+            const raw = rest[++i];
+            if (!raw) {
+                return usageError('missing --step value');
+            }
+            stepText = raw;
+            continue;
+        }
+        if (arg === '--keyword') {
+            const raw = rest[++i];
+            if (!raw) {
+                return usageError('missing --keyword value');
+            }
+            keywordRaw = raw;
+            continue;
+        }
+        if (arg === '--tags') {
+            const raw = rest[++i];
+            if (!raw) {
+                return usageError('missing --tags value');
+            }
+            tagsRaw = raw;
             continue;
         }
         if (arg.startsWith('-')) {
@@ -107,6 +136,29 @@ export function runCli(argv: string[]): number {
             }
             console.log(
                 JSON.stringify(buildResolveStepReport(project, featurePath!, line), null, 2)
+            );
+            return 0;
+        }
+        if (command === 'suggest-reuse') {
+            if (!stepText) {
+                return usageError('suggest-reuse requires --step <text>');
+            }
+            if (!keywordRaw) {
+                return usageError('suggest-reuse requires --keyword <Given|When|Then>');
+            }
+            const keyword = parseReuseKeyword(keywordRaw);
+            if (!keyword) {
+                return usageError('keyword must be Given, When, or Then');
+            }
+            const tags =
+                tagsRaw === undefined
+                    ? undefined
+                    : tagsRaw
+                          .split(',')
+                          .map((tag) => tag.trim())
+                          .filter((tag) => tag.length > 0);
+            console.log(
+                JSON.stringify(buildSuggestReuseReport(project, stepText, keyword, tags), null, 2)
             );
             return 0;
         }
