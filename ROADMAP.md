@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.16.1** Marketplace 2026-09-11 · GitHub: [v1.16.1](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.16.1)
+> **Current release: v1.17.0** Marketplace 2026-09-28 · GitHub: [v1.17.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.17.0)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.16.1** (Marketplace + GitHub) |
-| 🎯 Next | **v1.17.0** — Reuse hint (shipping) |
-| 📋 Gate | *publish* / post-ship pin |
+| ✅ Shipped | v0.1.0 → **v1.17.0** (Marketplace + GitHub) |
+| 🎯 Next | (dogfood / next align) |
+| 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -85,12 +85,12 @@
 | **1.17.0-A** `suggestReuse` puro + tests (empate → silencio) | ✅ |
 | **1.17.0-B** Línea Similar en hover + Problems unbound | ✅ |
 | **1.17.0-C** CLI/MCP `suggest-reuse` + docs | ✅ |
-| **1.17.0-4** VSIX + Marketplace | ⏳ shipping |
+| **1.17.0-4** VSIX + Marketplace | ✅ Marketplace + GitHub Release |
 
 Spec: `docs-internal/specs/step-reuse-hint-v1.17.0.md` (local).  
 **Anti-scope:** matching, why unbound, Generate, CodeLens, BDD Map, corte 3 (paso cerrado), export catálogo, Coach, Index API v2, `schemaVersion` bump.
 
-**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario).
+**Exit criteria met:** Capa A verde; Capa B dogfood OK; Marketplace + GitHub Release.
 
 ---
 
@@ -638,4 +638,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-28 — v1.17.0 reuse hint verified (shipping).*
+*Last updated: 2026-09-28 — v1.17.0 reuse hint shipped (Marketplace + GitHub).*
