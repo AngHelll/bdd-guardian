@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-09-28
+
+**Highlights:** Browse the step vocabulary, and get a hint when a step is closed around one word. Match status is unchanged.
+
+### Added
+
+- Command **Step Vocabulary** lists humanized bindings (wording first, then method) and opens the definition
+- CLI `vocabulary` and MCP `guardian_vocabulary`
+- Unbound hover/Problems: parameterize the one word that blocks reuse, or point at the binding that already has that slot
+- Coach hint `coach/literal-cluster` when steps in a `.feature` differ by a single closed word
+
 ## [1.17.0] - 2026-09-28
 
 **Highlights:** Unbound steps can point at one existing binding to reuse, in hover, Problems, and `suggest-reuse` for agents. Matching status is unchanged.

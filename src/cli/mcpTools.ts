@@ -8,6 +8,7 @@ import { buildAnalyzeReport, DEFAULT_MAX_ITEMS } from './analyze';
 import { buildResolveStepReport } from './resolveStep';
 import { buildCoachAnalyzeReport } from './coachAnalyze';
 import { buildSuggestReuseReport, parseReuseKeyword } from './suggestReuse';
+import { buildVocabularyReport } from './vocabulary';
 
 export const MCP_TOOL_NAMES = [
     'guardian_discover',
@@ -15,6 +16,7 @@ export const MCP_TOOL_NAMES = [
     'guardian_resolve_step',
     'guardian_coach_analyze',
     'guardian_suggest_reuse',
+    'guardian_vocabulary',
 ] as const;
 
 export type McpToolName = (typeof MCP_TOOL_NAMES)[number];
@@ -98,6 +100,20 @@ export const MCP_TOOL_DESCRIPTORS: McpToolDescriptor[] = [
             required: ['projectDir', 'stepText', 'keyword'],
         },
     },
+    {
+        name: 'guardian_vocabulary',
+        description:
+            'List indexed step bindings as humanized vocabulary (wording, parameters, method). Does not resolve a step.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                projectDir: { type: 'string' },
+                keyword: { type: 'string', description: 'Optional Given, When, or Then filter' },
+                maxItems: { type: 'number', description: 'Cap the steps array (default 50). count stays complete.' },
+            },
+            required: ['projectDir'],
+        },
+    },
 ];
 
 function asString(value: unknown, field: string): string {
@@ -167,6 +183,15 @@ export function dispatchMcpTool(name: string, args: Record<string, unknown> = {}
             }
             const tags = args.tags === undefined || args.tags === null ? undefined : asStringArray(args.tags);
             return buildSuggestReuseReport(project, stepText, keyword, tags);
+        }
+        case 'guardian_vocabulary': {
+            const keywordRaw = args.keyword === undefined || args.keyword === null ? undefined : asString(args.keyword, 'keyword');
+            const keyword = keywordRaw === undefined ? undefined : parseReuseKeyword(keywordRaw);
+            if (keywordRaw !== undefined && !keyword) {
+                throw new Error('keyword must be Given, When, or Then');
+            }
+            const maxItems = asOptionalNumber(args.maxItems, 'maxItems') ?? DEFAULT_MAX_ITEMS;
+            return buildVocabularyReport(project, { maxItems, keyword });
         }
         default:
             throw new Error(`unknown tool: ${name}`);

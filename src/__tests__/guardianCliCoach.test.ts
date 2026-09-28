@@ -56,13 +56,14 @@ describe('guardian-cli coach-analyze', () => {
 });
 
 describe('guardian MCP tool dispatch', () => {
-    it('exposes discover, analyze, resolve, coach, and suggest-reuse', () => {
+    it('exposes discover, analyze, resolve, coach, suggest-reuse, and vocabulary', () => {
         expect(MCP_TOOL_DESCRIPTORS.map((t) => t.name)).toEqual([
             'guardian_discover',
             'guardian_analyze',
             'guardian_resolve_step',
             'guardian_coach_analyze',
             'guardian_suggest_reuse',
+            'guardian_vocabulary',
         ]);
     });
 

@@ -11,6 +11,7 @@ npm run guardian -- analyze <project-dir> [--max-items <n>]
 npm run guardian -- resolve-step <project-dir> <feature-path> <line>
 npm run guardian -- coach-analyze <project-dir> [--feature <path>] [--max-items <n>]
 npm run guardian -- suggest-reuse <project-dir> --step <text> --keyword <Given|When|Then> [--tags tag1,tag2]
+npm run guardian -- vocabulary <project-dir> [--keyword <Given|When|Then>] [--max-items <n>]
 npm run guardian:mcp   # MCP stdio server
 ```
 
@@ -33,6 +34,7 @@ JSON with `schemaVersion: 1`.
 - **resolve-step** — `status` (`bound` / `unbound` / `ambiguous` / `no_step`), `matches[]`, English `why` when unbound or ambiguous
 - **coach-analyze** — `counts.files` / `findings` / `byRuleId`, capped `findings[]` (no quick fixes)
 - **suggest-reuse** — `status` `reuse` or `none`, plus one `suggestion` (path, pattern, humanized text, score) or `null`. Advisory token overlap after the fact; it does not change bound/unbound/ambiguous. `--tags` limits candidates with the same scope filter as the editor.
+- **vocabulary** — `count` of indexed bindings (complete) and capped `steps[]` with humanized wording, `parameterized`, path, and line. Optional `--keyword`. Not a resolve.
 
 Matching uses the same resolver path as the extension (`preferSpecificBinding: false`).
 
@@ -52,6 +54,7 @@ npm run guardian:mcp
 | `guardian_resolve_step` | `projectDir`, `featurePath`, `line` (0-based) |
 | `guardian_coach_analyze` | `projectDir`, `featurePath?`, `maxItems?` |
 | `guardian_suggest_reuse` | `projectDir`, `stepText`, `keyword` (`Given` \| `When` \| `Then`), `tags?` |
+| `guardian_vocabulary` | `projectDir`, `keyword?`, `maxItems?` |
 
 **Cursor / MCP client example** (stdio):
 
@@ -69,7 +72,7 @@ npm run guardian:mcp
 
 Requires a prior `npm run compile` so `out/cli/mcpServer.js` exists. Local paths only; no network tools; does not run tests.
 
-**Smoke:** after compile, an MCP client `tools/list` should show the five tools; `guardian_discover` on `samples/binding-demo` returns JSON with bindings. `guardian_suggest_reuse` with a near-miss step returns `status: reuse` or `none` and does not alter resolve status.
+**Smoke:** after compile, an MCP client `tools/list` should show the six tools; `guardian_discover` on `samples/binding-demo` returns JSON with bindings. `guardian_suggest_reuse` returns `reuse` or `none`. `guardian_vocabulary` returns humanized steps. Neither changes resolve status.
 
 ## Notes
 

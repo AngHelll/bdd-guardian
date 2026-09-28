@@ -184,6 +184,8 @@ function getSuggestionForRule(ruleId: string, count: number): string {
             return `📊 ${count} Scenario Outlines lack examples. Add data-driven test cases.`;
         case 'coach/duplicate-steps':
             return `🔄 ${count} duplicate steps found. Consider using Background or parameterized steps.`;
+        case 'coach/literal-cluster':
+            return `♻️ ${count} closed step clusters. Parameterize the word that changes so the step can be reused.`;
         case 'coach/vague-then':
             return `❓ ${count} Then steps are vague. Assert specific, observable outcomes.`;
         case 'coach/too-many-steps':

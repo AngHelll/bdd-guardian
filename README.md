@@ -129,6 +129,7 @@ Hover over any step for detailed information:
 **For Unbound steps:**
 - Why unbound (empty index, scoped-out tags, or no pattern match)
 - Similar step, when one indexed binding is a clear rewrite target (does not change unbound)
+- Closed step, when one word blocks reuse (`parameterize "submit"`)
 - Suggested binding pattern
 
 **For Ambiguous steps:**

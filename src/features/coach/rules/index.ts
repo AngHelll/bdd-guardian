@@ -14,6 +14,7 @@ export { DuplicateStepsRule } from './duplicateStepsRule';
 export { VagueThenRule } from './vagueThenRule';
 export { TooManyStepsRule } from './tooManyStepsRule';
 export { DominantThenRule, createDominantThenRule, dominantThenRule } from './dominantThenRule';
+export { LiteralClusterRule } from './literalClusterRule';
 export {
     RedundantTagsRule,
     redundantTagsRule,
@@ -34,6 +35,7 @@ import { VagueThenRule } from './vagueThenRule';
 import { TooManyStepsRule } from './tooManyStepsRule';
 import { createDominantThenRule } from './dominantThenRule';
 import { redundantTagsRule } from './redundantTagsRule';
+import { LiteralClusterRule } from './literalClusterRule';
 
 /**
  * Get all default rules with the given configuration.
@@ -53,6 +55,7 @@ export function getDefaultRules(config?: CoachConfig): CoachRule[] {
         // v1.4.0
         createDominantThenRule(config),
         redundantTagsRule,
+        new LiteralClusterRule(),
     ];
 }
 
@@ -71,5 +74,6 @@ export function getAllRuleInfo(): { id: string; name: string; description: strin
         { id: 'coach/too-many-steps', name: 'Too Many Steps', description: 'Scenarios should be focused and have a reasonable number of steps.' },
         { id: 'coach/dominant-then', name: 'Dominant Then', description: 'Scenarios should have a clear Then outcome (at least one, capped by max).' },
         { id: 'coach/redundant-tags', name: 'Redundant Tags', description: 'Scenario tags that already appear on Feature are redundant.' },
+        { id: 'coach/literal-cluster', name: 'Closed Step Cluster', description: 'Steps that differ by a single closed word should use a parameter.' },
     ];
 }

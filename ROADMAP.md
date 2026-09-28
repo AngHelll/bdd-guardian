@@ -10,8 +10,8 @@
 | Status | Item |
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.17.0** (Marketplace + GitHub) |
-| 🎯 Next | (dogfood / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 🎯 Next | **v1.18.0** — Step vocabulary + closed step (shipping) |
+| 📋 Gate | *publish* / post-ship pin |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -75,6 +75,23 @@
 | **1.16.0** | Quiet bound signal — gutter problems-only; CodeLens = click primario |
 | **1.16.1** | Bound CodeLens `$(go-to-file)` + open-binding tooltip |
 | **1.17.0** | Reuse hint — one similar binding on unbound + CLI/MCP `suggest-reuse` |
+| **1.18.0** | Step vocabulary + closed-step hint + Coach literal cluster |
+
+---
+
+## Plan v1.18.0 — verificado (2026-09-28)
+
+| # | Status |
+|---|--------|
+| **1.18.0-A** Vocabulario humanizado (comando + CLI/MCP) | ✅ |
+| **1.18.0-B** Paso cerrado (hover/Problems) + Coach `literal-cluster` | ✅ |
+| **1.18.0-C** Docs / CHANGELOG | ✅ |
+| **1.18.0-4** VSIX + Marketplace | ⏳ shipping |
+
+Spec: `docs-internal/specs/vocabulary-closed-step-v1.18.0.md` (local).  
+**Anti-scope:** matching, compositor de escenarios, export Markdown, reescribir el `.feature`, bajar el umbral de v1.17 salvo el caso de una sola palabra.
+
+**Exit criteria met:** Capa A verde; Capa B dogfood OK (usuario).
 
 ---
 
@@ -638,4 +655,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-09-28 — v1.17.0 reuse hint shipped (Marketplace + GitHub).*
+*Last updated: 2026-09-28 — v1.18.0 vocabulary + closed step verified (shipping).*

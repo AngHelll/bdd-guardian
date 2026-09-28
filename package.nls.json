@@ -7,6 +7,7 @@
   "config.gutterIcons.enabled": "Show gutter icons for step status (problems by default; bound optional via showBound)",
   "config.gutterIcons.showBound": "Show green check gutter icons on bound steps (off by default — CodeLens is the bound signal)",
   "view.suiteMap.name": "BDD Map",
+  "command.showBindings.title": "BDD Guardian: Step Vocabulary",
   "command.suiteMap.focus": "BDD Guardian: Show suite map",
   "command.suiteMap.generateBinding": "Generate binding",
   "command.suiteMap.copySnippet": "Copy snippet",

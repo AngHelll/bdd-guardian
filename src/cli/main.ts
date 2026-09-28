@@ -9,8 +9,16 @@ import { buildAnalyzeReport, DEFAULT_MAX_ITEMS } from './analyze';
 import { buildResolveStepReport } from './resolveStep';
 import { buildCoachAnalyzeReport } from './coachAnalyze';
 import { buildSuggestReuseReport, parseReuseKeyword } from './suggestReuse';
+import { buildVocabularyReport } from './vocabulary';
 
-const COMMANDS = new Set(['discover', 'analyze', 'resolve-step', 'coach-analyze', 'suggest-reuse']);
+const COMMANDS = new Set([
+    'discover',
+    'analyze',
+    'resolve-step',
+    'coach-analyze',
+    'suggest-reuse',
+    'vocabulary',
+]);
 
 export const USAGE = [
     'Usage:',
@@ -19,6 +27,7 @@ export const USAGE = [
     '  npm run guardian -- resolve-step <project-dir> <feature-path> <line>',
     '  npm run guardian -- coach-analyze <project-dir> [--feature <path>] [--max-items <n>]',
     '  npm run guardian -- suggest-reuse <project-dir> --step <text> --keyword <Given|When|Then> [--tags tag1,tag2]',
+    '  npm run guardian -- vocabulary <project-dir> [--keyword <Given|When|Then>] [--max-items <n>]',
     '',
     'Exit codes: 0 ok · 1 error · 2 usage',
     'MCP: npm run guardian:mcp  (stdio — see docs/CLI.md)',
@@ -159,6 +168,16 @@ export function runCli(argv: string[]): number {
                           .filter((tag) => tag.length > 0);
             console.log(
                 JSON.stringify(buildSuggestReuseReport(project, stepText, keyword, tags), null, 2)
+            );
+            return 0;
+        }
+        if (command === 'vocabulary') {
+            const keyword = keywordRaw === undefined ? undefined : parseReuseKeyword(keywordRaw);
+            if (keywordRaw !== undefined && !keyword) {
+                return usageError('keyword must be Given, When, or Then');
+            }
+            console.log(
+                JSON.stringify(buildVocabularyReport(project, { maxItems, keyword }), null, 2)
             );
             return 0;
         }

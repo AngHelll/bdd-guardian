@@ -9,6 +9,7 @@ import { stepLengthRule, createStepLengthRule } from '../features/coach/rules/st
 import { uiLeakageRule, createUiLeakageRule } from '../features/coach/rules/uiLeakageRule';
 import { outlineExamplesRule } from '../features/coach/rules/outlineExamplesRule';
 import { DuplicateStepsRule } from '../features/coach/rules/duplicateStepsRule';
+import { LiteralClusterRule } from '../features/coach/rules/literalClusterRule';
 import { VagueThenRule } from '../features/coach/rules/vagueThenRule';
 import { TooManyStepsRule } from '../features/coach/rules/tooManyStepsRule';
 import { createDominantThenRule } from '../features/coach/rules/dominantThenRule';
@@ -576,5 +577,36 @@ describe('removeTagFromLine / findTagLineAbove', () => {
         expect(
             parseRedundantTagFromMessage('Redundant tag "@smoke": already declared on Feature.')
         ).toBe('@smoke');
+    });
+});
+
+describe('LiteralClusterRule', () => {
+    const rule = new LiteralClusterRule();
+
+    it('flags steps that differ by one closed word', () => {
+        const model: GherkinModel = {
+            scenarios: [
+                createScenario('Press submit', [createStep('When', 'I press Submit', 'When', 4)]),
+                createScenario('Press cancel', [createStep('When', 'I press Cancel', 'When', 8)]),
+            ],
+            featureTags: [],
+        };
+        const findings = rule.run(model);
+        expect(findings).toHaveLength(1);
+        expect(findings[0].ruleId).toBe('coach/literal-cluster');
+        expect(findings[0].message).toContain('cancel');
+        expect(findings[0].message).toContain('submit');
+        expect(findings[0].line).toBe(4);
+    });
+
+    it('ignores steps that already quote the varying value', () => {
+        const model: GherkinModel = {
+            scenarios: [
+                createScenario('A', [createStep('When', 'I press "Submit"', 'When', 4)]),
+                createScenario('B', [createStep('When', 'I press "Cancel"', 'When', 8)]),
+            ],
+            featureTags: [],
+        };
+        expect(rule.run(model)).toHaveLength(0);
     });
 });

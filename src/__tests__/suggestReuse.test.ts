@@ -10,7 +10,7 @@ import {
     suggestReuse,
     type ReuseBindingSource,
 } from '../core/reuse/suggestReuse';
-import { suggestReuseForUnboundStep } from '../features/reuse/unboundReuseHint';
+import { unboundAdvice } from '../features/reuse/unboundReuseHint';
 import { Range, Uri } from './mocks/vscode';
 
 const BINDING_DEMO = join(__dirname, '../../samples/binding-demo');
@@ -102,11 +102,11 @@ describe('suggestReuse', () => {
     it('drops a scoped binding when the step has no matching tags', () => {
         const step = featureStep('Given', 'I log in with scoped credentials');
         const scoped = binding('Given', 'I log in with scoped credentials', 'LoginWeb', ['web']);
-        expect(suggestReuseForUnboundStep(step, [scoped])).toEqual({ kind: 'none' });
+        expect(unboundAdvice(step, [scoped])).toEqual({ kind: 'none' });
         const tagged = featureStep('Given', 'I log in with scoped credentials', ['web']);
-        const hinted = suggestReuseForUnboundStep(tagged, [scoped]);
-        expect(hinted.kind).toBe('reuse');
-        if (hinted.kind === 'reuse') {
+        const hinted = unboundAdvice(tagged, [scoped]);
+        expect(hinted.kind).toBe('similar');
+        if (hinted.kind === 'similar') {
             expect(hinted.methodName).toBe('LoginWeb');
         }
     });

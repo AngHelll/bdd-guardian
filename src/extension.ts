@@ -26,6 +26,7 @@ import {
 import { getProviderManager } from './providers/bindings';
 import { BindingCodeLensProvider } from './providers/bindingCodeLensProvider';
 import { ResolveResult, ResolvedKeyword } from './core/domain';
+import { humanizePatternForCompletion } from './core/autocomplete/stepCompletion';
 import { createResolver, applyMatchingSettings, ResolverDependencies } from './core/matching';
 import { getStepAtPosition } from './core/references/stepContext';
 // Coach Mode
@@ -195,12 +196,16 @@ function registerCommands(context: vscode.ExtensionContext): void {
                 return;
             }
             const items = bindings.map(b => ({
-                label: '[' + b.keyword + '] ' + b.methodName,
-                description: b.patternRaw,
-                detail: b.className + ' - ' + vscode.workspace.asRelativePath(b.uri),
+                label: '[' + b.keyword + '] ' + humanizePatternForCompletion(b.patternRaw, b.methodName),
+                description: b.methodName,
+                detail: vscode.workspace.asRelativePath(b.uri),
                 binding: b,
             }));
-            const selected = await vscode.window.showQuickPick(items, { placeHolder: 'Select binding' });
+            const selected = await vscode.window.showQuickPick(items, {
+                placeHolder: t('stepVocabularyPlaceholder'),
+                matchOnDescription: true,
+                matchOnDetail: true,
+            });
             if (selected) {
                 await vscode.commands.executeCommand('vscode.open', selected.binding.uri, {
                     selection: new vscode.Range(selected.binding.lineNumber, 0, selected.binding.lineNumber, 0),

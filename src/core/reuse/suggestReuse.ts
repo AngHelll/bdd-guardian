@@ -36,6 +36,16 @@ export type ReuseSuggestion =
           readonly score: number;
       };
 
+/** Ordered significant tokens. Quoted text and numbers become the slot token `param`. */
+export function reuseTokenSequence(text: string): readonly string[] {
+    return tokenize(text);
+}
+
+/** Ordered tokens of a binding pattern, with captures and `{type}` as `param`. */
+export function patternTokenSequence(patternRaw: string): readonly string[] {
+    return tokenize(patternProse(patternRaw));
+}
+
 function tokenize(text: string): string[] {
     const slotted = text
         .toLowerCase()
