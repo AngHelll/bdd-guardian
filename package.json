@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Guard and navigate BDD steps (Reqnroll, SpecFlow, Cucumber, Godog, Behave, Java) with CodeLens and diagnostics — works with BDD Pilot for test execution",
-    "version": "1.18.0",
+  "version": "1.19.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -124,6 +124,10 @@
       {
         "command": "bddGuardian.pilot.install",
         "title": "BDD Guardian: Install BDD Pilot"
+      },
+      {
+        "command": "bddGuardian.format.install",
+        "title": "BDD Guardian: Install BDD Gherkin Format"
       },
       {
         "command": "bddGuardian.suiteMap.focus",
@@ -298,6 +302,11 @@
           "type": "boolean",
           "default": true,
           "description": "Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding"
+        },
+        "bddGuardian.formatHint.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Suggest BDD Gherkin Format once, on the first .feature file, when no Gherkin formatter is installed"
         },
         "bddGuardian.matching.preferSpecificBinding": {
           "type": "boolean",

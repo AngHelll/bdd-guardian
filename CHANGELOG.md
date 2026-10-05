@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-10-05
+
+**Highlights:** Guardian suggests BDD Gherkin Format once, so `.feature` files get Format Document and syntax colors without a second step indexer. Matching is unchanged.
+
+### Added
+
+- One-time hint on the first `.feature` file when no Gherkin formatter is installed (skipped next to Cucumber Official or Cucumber Full Support). Setting `bddGuardian.formatHint.enabled`
+- Command **Install BDD Gherkin Format**
+
 ## [1.18.0] - 2026-09-28
 
 **Highlights:** Browse the step vocabulary, and get a hint when a step is closed around one word. Match status is unchanged.

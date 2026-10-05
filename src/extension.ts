@@ -40,6 +40,7 @@ import { createGuardianIndexApi, type GuardianIndexApiV1 } from './api';
 import { showZeroBindingsHintIfNeeded } from './features/onboarding';
 import { BindingCodeActionsProvider, registerAuthorCommands, StepCompletionProvider } from './features/author';
 import { registerSuiteMap } from './features/suiteMap';
+import { registerFormatHint } from './features/ecosystem';
 
 let indexManager: IndexManager;
 let workspaceIndex: WorkspaceIndex;
@@ -131,6 +132,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Guardi
     registerCoachCommands(context);
 
     registerAuthorCommands(context, indexManager);
+    registerFormatHint(context);
     refreshSuiteMap = registerSuiteMap(context, indexManager).refresh;
     const stepCompletionProvider = new StepCompletionProvider(indexManager);
     context.subscriptions.push(

@@ -83,6 +83,8 @@
   "codeActionOpenPilot": "BDD Guardian: Open BDD Pilot",
   "codeActionInstallPilot": "BDD Guardian: Install BDD Pilot",
   "pilotHandoffFailed": "Could not open BDD Pilot — is it installed and enabled?",
+  "formatHintMessage": "Format Document and syntax colors for .feature files: BDD Gherkin Format is the presentation companion to Guardian — no second step indexer.",
+  "formatHintInstall": "Install BDD Gherkin Format",
   "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\"",
   "suiteMapSummary": "{0} bound · {1} unbound · {2} ambiguous · {3} orphan",
   "suiteMapUnbound": "Unbound ({0})",

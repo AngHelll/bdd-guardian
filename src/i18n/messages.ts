@@ -116,6 +116,9 @@ export const en: Record<string, string> = {
   codeActionOpenPilot: 'BDD Guardian: Open BDD Pilot',
   codeActionInstallPilot: 'BDD Guardian: Install BDD Pilot',
   pilotHandoffFailed: 'Could not open BDD Pilot — is it installed and enabled?',
+  formatHintMessage:
+    'Format Document and syntax colors for .feature files: BDD Gherkin Format is the presentation companion to Guardian — no second step indexer.',
+  formatHintInstall: 'Install BDD Gherkin Format',
   suiteMapSummary: '{0} bound · {1} unbound · {2} ambiguous · {3} orphan',
   suiteMapUnbound: 'Unbound ({0})',
   suiteMapAmbiguous: 'Ambiguous ({0})',
@@ -244,6 +247,9 @@ export const es: Record<string, string> = {
   codeActionOpenPilot: 'BDD Guardian: Abrir BDD Pilot',
   codeActionInstallPilot: 'BDD Guardian: Instalar BDD Pilot',
   pilotHandoffFailed: 'No se pudo abrir BDD Pilot — ¿está instalado y activado?',
+  formatHintMessage:
+    'Format Document y colores de sintaxis para .feature: BDD Gherkin Format es el companion de presentación de Guardian — sin un segundo indexador de pasos.',
+  formatHintInstall: 'Instalar BDD Gherkin Format',
   suiteMapSummary: '{0} enlazados · {1} sin enlazar · {2} ambiguos · {3} huérfanos',
   suiteMapUnbound: 'Sin enlazar ({0})',
   suiteMapAmbiguous: 'Ambiguos ({0})',
