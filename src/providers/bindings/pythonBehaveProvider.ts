@@ -17,6 +17,23 @@ import { parsePythonBehaveBindingsFromText } from '../../core/parsing/pythonBeha
 
 const DEP_FILE_EXCLUDE = '{**/.venv/**,**/venv/**,**/node_modules/**,**/__pycache__/**}';
 
+/** True when a dependency file names the `behave` package (not `pytest-bdd`). */
+export function declaresBehaveDependency(content: string, pattern: string): boolean {
+    if (!/\bbehave\b/.test(content)) {
+        return false;
+    }
+    if (pattern.endsWith('requirements.txt') || pattern.includes('requirements/')) {
+        return /^\s*behave(?:[=<>!~\s]|$)/m.test(content);
+    }
+    if (pattern.endsWith('pyproject.toml')) {
+        return /behave\s*[=<>!~]|["[]behave["\]]/.test(content);
+    }
+    if (pattern.endsWith('setup.py')) {
+        return /['"]behave['"]/.test(content) || /install_requires[\s\S]*behave/.test(content);
+    }
+    return false;
+}
+
 export class PythonBehaveProvider implements IBindingProvider {
     public readonly id: BindingProviderId = 'python-behave';
     public readonly displayName = 'Python Behave';
@@ -62,7 +79,7 @@ export class PythonBehaveProvider implements IBindingProvider {
                 for (const fileUri of files) {
                     try {
                         const content = await this.readFileContent(fileUri);
-                        if (this.declaresBehaveDependency(content, pattern)) {
+                        if (declaresBehaveDependency(content, pattern)) {
                             signals.push(
                                 `Found behave in ${vscode.workspace.asRelativePath(fileUri)}`
                             );
@@ -104,22 +121,6 @@ export class PythonBehaveProvider implements IBindingProvider {
         return parsePythonBehaveBindingsFromText(document.getText(), document.uri, {
             caseInsensitive: options?.caseInsensitive,
         });
-    }
-
-    private declaresBehaveDependency(content: string, pattern: string): boolean {
-        if (!/\bbehave\b/.test(content)) {
-            return false;
-        }
-        if (pattern.endsWith('requirements.txt') || pattern.includes('requirements/')) {
-            return /^\s*behave(?:[=<>!~\s]|$)/m.test(content);
-        }
-        if (pattern.endsWith('pyproject.toml')) {
-            return /behave\s*[=<>!~]|["[]behave["\]]/.test(content);
-        }
-        if (pattern.endsWith('setup.py')) {
-            return /['"]behave['"]/.test(content) || /install_requires[\s\S]*behave/.test(content);
-        }
-        return false;
     }
 
     private async readFileContent(uri: vscode.Uri): Promise<string> {

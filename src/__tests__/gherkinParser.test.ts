@@ -118,6 +118,7 @@ describe('gherkinParser sample regression', () => {
         'cucumber-demo/features/search.feature': 3,
         'godog-demo/features/godogs.feature': 3,
         'java-cucumber-demo/src/test/resources/features/search.feature': 3,
+        'pytest-bdd-demo/features/search.feature': 2,
     };
 
     it('keeps the same step count on every sample feature', () => {

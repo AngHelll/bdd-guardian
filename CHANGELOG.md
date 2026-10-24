@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-10-23
+
+**Highlights:** pytest-bdd steps get CodeLens and Go to Definition. `{name}` and `{name:converter}` match one token. Matching is unchanged.
+
+### Added
+
+- **pytest-bdd** provider: detects `pytest-bdd` and indexes `@given` / `@when` / `@then` string steps. `{name}` and `{name:converter}` (for example `{count:d}`) match one token. Matching is unchanged.
+
 ## [1.19.2] - 2026-10-23
 
 **Highlights:** Descriptions and docstrings are no longer treated as steps. `*` and the English headers `Example:`, `Scenario Template:`, `Scenarios:`, and `Rule:` are recognized. Matching is unchanged.

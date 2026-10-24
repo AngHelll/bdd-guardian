@@ -41,6 +41,7 @@ No project yet? Open [`samples/binding-demo/`](./samples/binding-demo/) from thi
 | Java — **Cucumber-JVM** | `@Given("...")` |
 | Go — **Godog** | `ctx.Step(...)` |
 | Python — **Behave** | `@given('...')` |
+| Python — **pytest-bdd** | `@given('...')` from `pytest_bdd`, including `{count:d}` |
 
 Frameworks are detected automatically. **Show Provider Detection Report** explains what was found.
 
