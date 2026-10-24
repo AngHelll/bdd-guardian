@@ -21,12 +21,14 @@ import {
     type SuiteMapFileGroup,
 } from '../../core/map/suiteMap';
 import { t } from '../../i18n';
+import { getStatusIcon, StepStatus } from '../../ui/stepStatus';
 import { navigateToLocation } from '../navigation/navigator';
 import { showBindingQuickPick } from '../navigation/quickPick';
 import {
     resolveUnboundMapAuthorAction,
     type AuthorStepRef,
 } from '../author/bindingCodeActionsProvider';
+import { formatSuiteMapHoleDescription, formatSuiteMapHoleLabel } from './suiteMapLabels';
 
 export const SUITE_MAP_VIEW_ID = 'bddGuardian.suiteMap';
 export const SUITE_MAP_FOCUS_COMMAND = 'bddGuardian.suiteMap.focus';
@@ -80,14 +82,6 @@ type SuiteMapNode =
 
 function isIndexReady(index: ReturnType<IndexManager['getIndex']>): boolean {
     return index.getData().lastIndexed.getTime() > 0;
-}
-
-function displayLine(lineNumber: number): number {
-    return lineNumber + 1;
-}
-
-function holeLineLabel(lineNumber: number, text: string): string {
-    return `${displayLine(lineNumber)} — ${text}`;
 }
 
 function fileLabel(filePath: string, holeCount: number): string {
@@ -180,13 +174,12 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
                             : t('suiteMapOrphans', String(element.summary.counts.orphanBindings));
                 const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Expanded);
                 item.id = `suiteMap.group.${element.group}`;
-                item.iconPath = new vscode.ThemeIcon(
-                    element.group === 'unbound'
-                        ? 'error'
-                        : element.group === 'ambiguous'
-                          ? 'warning'
-                          : 'info'
-                );
+                item.iconPath =
+                    element.group === 'orphans'
+                        ? new vscode.ThemeIcon('info')
+                        : getStatusIcon(
+                              element.group === 'unbound' ? StepStatus.Unbound : StepStatus.Ambiguous
+                          );
                 item.contextValue = `suiteMapGroup.${element.group}`;
                 return item;
             }
@@ -213,15 +206,16 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
             }
             case 'step': {
                 const item = new vscode.TreeItem(
-                    holeLineLabel(element.hole.lineNumber, element.hole.rawText),
+                    formatSuiteMapHoleLabel(element.hole.rawText),
                     vscode.TreeItemCollapsibleState.None
                 );
-                item.iconPath = new vscode.ThemeIcon(
-                    element.status === 'unbound' ? 'error' : 'warning'
+                item.iconPath = getStatusIcon(
+                    element.status === 'unbound' ? StepStatus.Unbound : StepStatus.Ambiguous
                 );
-                if (element.hole.matchCount !== undefined) {
-                    item.description = String(element.hole.matchCount);
-                }
+                item.description = formatSuiteMapHoleDescription(
+                    element.hole.lineNumber,
+                    element.hole.matchCount
+                );
                 item.tooltip = element.hole.rawText;
                 item.command = {
                     command: OPEN_LOCATION_COMMAND,
@@ -248,10 +242,11 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
             }
             case 'orphan': {
                 const item = new vscode.TreeItem(
-                    holeLineLabel(element.hole.lineNumber, element.hole.patternRaw),
+                    formatSuiteMapHoleLabel(element.hole.patternRaw),
                     vscode.TreeItemCollapsibleState.None
                 );
                 item.iconPath = new vscode.ThemeIcon('info');
+                item.description = formatSuiteMapHoleDescription(element.hole.lineNumber);
                 item.tooltip = element.hole.methodName;
                 item.command = {
                     command: OPEN_LOCATION_COMMAND,

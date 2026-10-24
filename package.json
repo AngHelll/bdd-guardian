@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Go to Definition, CodeLens and live diagnostics for Gherkin steps. Find unbound and ambiguous steps in Reqnroll, SpecFlow, Cucumber, Godog and Behave before you run tests.",
-  "version": "1.21.0",
+  "version": "1.21.1",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {

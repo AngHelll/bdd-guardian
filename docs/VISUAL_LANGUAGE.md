@@ -33,7 +33,7 @@ Single reference for how step binding status appears across the extension.
 | **CodeLens** (binding file) | usage count | — | — | “No usages” (existing) | — |
 | **Hover** | ✅ emoji + details | ❌ emoji + suggestion | ⚠️ emoji + why + top matches | — | ⏳ emoji |
 | **Problems** | — | Diagnostic **Warning** (step) | Diagnostic **Information** + why hint (step) | Diagnostic **Information** (binding) | — |
-| **Suite map (Explorer)** | count in summary only | Group + jump + Generate/Copy | Group + jump + Explain | Group + jump to binding | “Indexing…” |
+| **Suite map (Explorer)** | count in summary only | Group + leaf: `error` + `charts.red`; label = step text, description = `L{n}` | Group + leaf: `warning` + `charts.yellow`; description = `L{n} · {count}` | Group + leaf: `info` (no chart color); label = pattern, description = `L{n}` | “Indexing…” |
 | **Border / ruler** | `charts.green` | `charts.red` | `charts.yellow` | — | — |
 
 Implementation: `src/ui/stepStatus.ts` (`getCodeLensIcon`, `getStatusColor`, `getStatusLabel`, `getStatusEmoji`).
@@ -64,7 +64,7 @@ Bound gutter icons still require `gutterIcons.showBound` under any preset that e
 
 Granular toggles (`gutterIcons.enabled`, `gutterIcons.showBound`, `reqnrollNavigator.enableDecorations` / `enableDiagnostics` / `enableCodeLens`) can still turn a channel **off** under that ceiling.
 
-**Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings). **v1.15.0+:** unbound leaves also offer Explain (why + QuickPick of scoped-out bindings when that is the reason); Generate/Copy stay.
+**Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings). **v1.15.0+:** unbound leaves also offer Explain (why + QuickPick of scoped-out bindings when that is the reason); Generate/Copy stay. **v1.21.1:** unbound and ambiguous icons use `charts.red` / `charts.yellow` via `getStatusIcon`. A hole’s label is the step or pattern text; the line number is the dimmed description (`L{n}`, ambiguous also ` · {count}`). Orphan stays `info` without a chart color.
 
 ## Hover emojis
 

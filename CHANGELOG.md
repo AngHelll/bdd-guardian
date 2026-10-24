@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.21.1] - 2026-10-23
+
+**Highlights:** BDD Map hole rows separate the step text from the line number. Unbound and ambiguous icons use the same status colors as the gutter. Matching is unchanged.
+
+### Changed
+
+- BDD Map: unbound and ambiguous icons use `charts.red` and `charts.yellow`. A hole’s label is the step text (or the binding pattern, for orphans) and the dimmed description is `L{n}` (ambiguous: `L{n} · {count}`). Orphan icons stay uncolored. Matching is unchanged.
+
 ## [1.21.0] - 2026-10-23
 
 **Highlights:** A `# language:` header selects the official Gherkin dialect. Spanish `Dado` / `Cuando` / `Entonces` are steps. Matching is unchanged.
