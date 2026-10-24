@@ -140,4 +140,23 @@ describe('binding-demo sample', () => {
         expect(resolve(apiStep!).best?.binding.methodName).toBe('LoginApi');
         expect(resolve(bareStep!).status).toBe('unbound');
     });
+
+    it('resolves a Reqnroll {my_version} transformation', () => {
+        const featureText = readFileSync(join(ROOT, 'Features/sample.feature'), 'utf-8');
+        const stepsText = readFileSync(join(ROOT, 'StepDefinitions/SampleSteps.cs'), 'utf-8');
+        const doc = createMockDocument(featureText, join(ROOT, 'Features/sample.feature'));
+        const parsed = parseFeatureDocument(doc as any)!;
+        const bindings = parseCSharpBindingsFromText(
+            stepsText,
+            Uri.file(join(ROOT, 'StepDefinitions/SampleSteps.cs')) as any
+        );
+        const resolve = createResolver({
+            getAllBindings: () => bindings,
+            getBindingsByKeyword: (kw) => bindings.filter((b) => b.keyword === kw),
+            preferSpecificBinding: false,
+        });
+        const step = parsed.allSteps.find((s) => s.rawText === 'I download the release v1.2.3 of the application');
+        expect(resolve(step!).status).toBe('bound');
+        expect(resolve(step!).best?.binding.methodName).toBe('WhenIDownload');
+    });
 });

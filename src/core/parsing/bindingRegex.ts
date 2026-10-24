@@ -67,6 +67,11 @@ export type BindingExpressionType = 'auto' | 'regex' | 'cucumber';
 export interface CompileBindingRegexOptions {
     caseInsensitive?: boolean;
     expressionType?: BindingExpressionType;
+    /**
+     * Case-sensitive Cucumber Expression parameter types (name → regex source).
+     * Used only on the cucumber path. Built-ins are not overridden.
+     */
+    parameterTypes?: Readonly<Record<string, string>>;
 }
 
 export function compileBindingRegex(
@@ -83,7 +88,11 @@ export function compileBindingRegex(
 
     if (expressionType === 'cucumber' || (expressionType === 'auto' && looksLikeCucumberExpression(patternRaw))) {
         try {
-            const re = compileCucumberExpressionToRegex(normalizePatternWhitespace(patternRaw), caseInsensitive);
+            const re = compileCucumberExpressionToRegex(
+                normalizePatternWhitespace(patternRaw),
+                caseInsensitive,
+                options.parameterTypes
+            );
             if (re) {
                 return re;
             }

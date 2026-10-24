@@ -300,24 +300,31 @@ export class IndexManager {
 
             this.outputChannel.appendLine(`[IndexManager] Found ${files.length} files for ${provider.displayName}`);
 
-            // Process in batches for large file sets
             let allBindings: Awaited<ReturnType<typeof provider.indexBindings>> = [];
-            
-            for (let i = 0; i < files.length; i += BATCH_SIZE) {
+            const indexOptions = {
+                caseInsensitive: config.caseInsensitive,
+                debug: config.debug,
+            };
+
+            // C# parameter types are a workspace map, so one pass sees every indexed file.
+            if (provider.id === 'csharp-reqnroll' || provider.id === 'csharp-specflow') {
                 if (token?.isCancellationRequested) {
                     return;
                 }
+                allBindings = await provider.indexBindings(files, indexOptions);
+            } else {
+                for (let i = 0; i < files.length; i += BATCH_SIZE) {
+                    if (token?.isCancellationRequested) {
+                        return;
+                    }
 
-                const batch = files.slice(i, i + BATCH_SIZE);
-                const bindings = await provider.indexBindings(batch, {
-                    caseInsensitive: config.caseInsensitive,
-                    debug: config.debug,
-                });
-                allBindings = allBindings.concat(bindings);
+                    const batch = files.slice(i, i + BATCH_SIZE);
+                    const bindings = await provider.indexBindings(batch, indexOptions);
+                    allBindings = allBindings.concat(bindings);
 
-                // Yield to UI after each batch
-                if (i + BATCH_SIZE < files.length) {
-                    await yieldToUI();
+                    if (i + BATCH_SIZE < files.length) {
+                        await yieldToUI();
+                    }
                 }
             }
 

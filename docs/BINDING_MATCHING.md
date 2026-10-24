@@ -30,7 +30,8 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Cucumber Expressions Wave B (v1.10.0+)** —
   - **Optional text** — `(…)` segments are optional (`cucumber(s)` matches `cucumber` and `cucumbers`).
   - **Alternation** — `a/b` outside placeholders compiles to `(?:a|b)` (`a/an {word}` matches both forms).
-  - **Built-in type extras** — `long`, `short`, `byte`, `biginteger` (int-like) and `bigdecimal` (decimal-like), case-insensitive.
+  - **Built-in type extras** — `long`, `short`, `byte`, `biginteger` (int-like) and `bigdecimal` (decimal-like), case-insensitive. `{decimal}` also allows a comma fraction. `{Guid}` is the hyphenated form. `{}` is `(.*)`.
+  - **Reqnroll / SpecFlow transformations** — `[StepArgumentTransformation(@"regex")]` (with `Name` or a simple return type) supplies the capture for that placeholder. The regex is not executed. A name defined twice is ignored.
   - **Unknown `{CustomType}`** — CE compile fails closed (no silent `.*`); existing regex/literal path may apply, but never a CE wildcard.
 - **Scope-aware matching (v1.11.0+)** — After regex match, bindings with `[Scope(Tag=…)]` (method and/or class, OR) are kept only if `step.tagsEffective` contains a matching tag (case-insensitive; `@` optional). Bindings with empty `scopeTags` stay global. Steps with no tags exclude all Tag-scoped bindings. UI `tagFilter` is unchanged (display only).
 
@@ -42,7 +43,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 ## Documented limitations
 
 - Lookaheads and complex nested regex groups may differ from the test runner; regex alternation `(a|b)` is covered by the precision corpus.
-- Custom Cucumber parameter types (user-defined `{MyType}`) are not discovered from C#; they stay unbound as CE until configured elsewhere (out of scope).
+- Custom Cucumber parameter types are read from C# `[StepArgumentTransformation(@"regex")]` (`Name`, or a simple return type). `{decimal}`, `{Guid}`, and `{}` are built in. Unknown `{MyType}` stays fail-closed (no `.*`). `{DateTime}`, enums, Cucumber.js `defineParameterType`, and Java `@ParameterType` are not discovered.
 - `Scope(Feature=…)` / `Scope(Scenario=…)` / file-path scopes are not applied (Tag-only MVP).
 
 ## Where the code lives

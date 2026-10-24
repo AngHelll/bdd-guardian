@@ -14,7 +14,33 @@ import { compileBindingRegex, type BindingExpressionType } from './bindingRegex'
 
 export interface CSharpBindingParseOptions {
     caseInsensitive?: boolean;
+    /** Workspace map. When omitted, types are collected from this file only. */
+    parameterTypes?: Readonly<Record<string, string>>;
 }
+
+/** One file's `[StepArgumentTransformation]` scan. Duplicates are not usable names. */
+export interface CSharpParameterTypeScan {
+    readonly types: ReadonlyMap<string, string>;
+    readonly duplicates: ReadonlySet<string>;
+}
+
+const BUILT_IN_PARAMETER_TYPES = new Set([
+    'int',
+    'long',
+    'short',
+    'byte',
+    'biginteger',
+    'float',
+    'double',
+    'bigdecimal',
+    'decimal',
+    'guid',
+    'word',
+    'string',
+]);
+
+const PLACEHOLDER_NAME = /^[A-Za-z][\w-]*$/;
+const SIMPLE_RETURN_TYPE = /^[A-Za-z_][\w]*$/;
 
 /** Matches Scope(Tag = "…") / Scope(Tag = @"…") inside or as attributes. */
 const SCOPE_TAG_IN_ATTR_REGEX = /Scope\s*\(\s*Tag\s*=\s*@?"([^"]*)"\s*\)/gi;
@@ -31,6 +57,9 @@ export function parseCSharpBindingsFromText(
     const lines = text.split('\n');
     const classNames = findClassNames(text);
     const classScopeTags = buildClassScopeTagMap(text, classNames);
+    const parameterTypes = options.parameterTypes ?? mergeCSharpParameterTypes([
+        collectCSharpParameterTypes(text),
+    ]);
 
     let match: RegExpExecArray | null;
     const attributeRegex = new RegExp(BINDING_ATTRIBUTE_REGEX.source, 'g');
@@ -66,6 +95,7 @@ export function parseCSharpBindingsFromText(
             const compiledRegex = compileBindingRegex(patternRaw, {
                 caseInsensitive: options.caseInsensitive ?? false,
                 expressionType,
+                parameterTypes,
             });
             if (!compiledRegex) {
                 continue;
@@ -225,4 +255,119 @@ function inferExpressionTypeOverride(attributeText: string): BindingExpressionTy
         return 'regex';
     }
     return 'auto';
+}
+
+/**
+ * `[StepArgumentTransformation(@"regex")]` / `Name = "…"` on a single line.
+ * Without Name, the name is a simple return type on the following method.
+ * A name seen twice in this file is listed in `duplicates` and omitted from `types`.
+ */
+export function collectCSharpParameterTypes(text: string): CSharpParameterTypeScan {
+    const counts = new Map<string, { regex: string; count: number }>();
+    const start = /\[StepArgumentTransformation\b/g;
+    let match: RegExpExecArray | null;
+    while ((match = start.exec(text)) !== null) {
+        const lineEnd = text.indexOf('\n', match.index);
+        const line = text.slice(match.index, lineEnd === -1 ? text.length : lineEnd);
+        if (!line.includes(']')) {
+            continue;
+        }
+        const parsed = parseTransformationAttribute(line);
+        if (!parsed) {
+            continue;
+        }
+        const name = parsed.name !== undefined
+            ? parsed.name
+            : findFollowingReturnType(text.slice(lineEnd === -1 ? text.length : lineEnd));
+        if (!name || !PLACEHOLDER_NAME.test(name) || BUILT_IN_PARAMETER_TYPES.has(name.toLowerCase())) {
+            continue;
+        }
+        if (!isCompilableRegex(parsed.regex)) {
+            continue;
+        }
+        const previous = counts.get(name);
+        if (!previous) {
+            counts.set(name, { regex: parsed.regex, count: 1 });
+        } else {
+            previous.count += 1;
+        }
+    }
+
+    const types = new Map<string, string>();
+    const duplicates = new Set<string>();
+    for (const [name, info] of counts) {
+        if (info.count === 1) {
+            types.set(name, info.regex);
+        } else {
+            duplicates.add(name);
+        }
+    }
+    return { types, duplicates };
+}
+
+/** Drop a name that appears more than once in one file or across files. */
+export function mergeCSharpParameterTypes(
+    scans: readonly CSharpParameterTypeScan[]
+): Record<string, string> {
+    const counts = new Map<string, { regex: string; count: number }>();
+    const banned = new Set<string>();
+    for (const scan of scans) {
+        for (const name of scan.duplicates) {
+            banned.add(name);
+        }
+        for (const [name, regex] of scan.types) {
+            const previous = counts.get(name);
+            if (!previous) {
+                counts.set(name, { regex, count: 1 });
+            } else {
+                previous.count += 1;
+            }
+        }
+    }
+    const merged: Record<string, string> = {};
+    for (const [name, info] of counts) {
+        if (info.count === 1 && !banned.has(name)) {
+            merged[name] = info.regex;
+        }
+    }
+    return merged;
+}
+
+function parseTransformationAttribute(line: string): { regex: string; name?: string } | null {
+    const open = line.indexOf('(');
+    if (open < 0) {
+        return null;
+    }
+    const stringMatch = line.slice(open + 1).match(/^\s*(@?"(?:[^"\\]|\\.|"")*")/);
+    if (!stringMatch) {
+        return null;
+    }
+    const nameMatch = line.match(/\bName\s*=\s*"([^"]*)"/);
+    return {
+        regex: extractCSharpPatternString(stringMatch[1]),
+        name: nameMatch ? nameMatch[1] : undefined,
+    };
+}
+
+function findFollowingReturnType(afterAttribute: string): string | undefined {
+    const match = afterAttribute.match(
+        /(?:public|private|protected|internal)?\s*(?:static\s+)?(?:async\s+)?([^\s(]+)\s+[A-Za-z_][\w]*\s*\(/
+    );
+    if (!match) {
+        return undefined;
+    }
+    const returnType = match[1];
+    if (returnType === 'void' || returnType === 'Task' || !SIMPLE_RETURN_TYPE.test(returnType)) {
+        return undefined;
+    }
+    return returnType;
+}
+
+function isCompilableRegex(source: string): boolean {
+    try {
+        new RegExp(source);
+        return true;
+    } catch {
+        return false;
+    }
 }

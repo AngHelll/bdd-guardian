@@ -14,7 +14,7 @@ import {
     createDetectionResult,
 } from './types';
 import { Binding } from '../../core/domain';
-import { parseCSharpBindingsFromText } from '../../core/parsing/csharpBindingParser';
+import { parseCSharpBindingsFromText, collectCSharpParameterTypes, mergeCSharpParameterTypes } from '../../core/parsing/csharpBindingParser';
 
 const PATTERNS = {
     CSPROJ_SPECFLOW: /PackageReference\s+Include\s*=\s*["']SpecFlow/i,
@@ -146,16 +146,26 @@ export class CSharpSpecflowProvider implements IBindingProvider {
         files: readonly vscode.Uri[],
         options: BindingIndexOptions = {}
     ): Promise<Binding[]> {
-        const bindings: Binding[] = [];
+        const loaded: Array<{ uri: vscode.Uri; text: string }> = [];
         for (const uri of files) {
             try {
                 const document = await vscode.workspace.openTextDocument(uri);
-                bindings.push(...this.parseFile(document, options));
+                loaded.push({ uri: document.uri, text: document.getText() });
             } catch (error) {
                 if (options.debug) {
                     console.warn(`[CSharpSpecflowProvider] Error indexing ${uri.fsPath}: ${error}`);
                 }
             }
+        }
+        const parameterTypes = mergeCSharpParameterTypes(
+            loaded.map((file) => collectCSharpParameterTypes(file.text))
+        );
+        const bindings: Binding[] = [];
+        for (const file of loaded) {
+            bindings.push(...parseCSharpBindingsFromText(file.text, file.uri, {
+                caseInsensitive: options.caseInsensitive,
+                parameterTypes,
+            }));
         }
         return bindings;
     }

@@ -5,7 +5,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseFeatureDocument } from '../core/parsing/gherkinParser';
-import { parseCSharpBindingsFromText } from '../core/parsing/csharpBindingParser';
+import { parseCSharpBindingsFromText, collectCSharpParameterTypes, mergeCSharpParameterTypes } from '../core/parsing/csharpBindingParser';
 import { parseJsCucumberBindingsFromText } from '../core/parsing/jsCucumberBindingParser';
 import { parsePythonBehaveBindingsFromText } from '../core/parsing/pythonBehaveBindingParser';
 import { parseGoGodogBindingsFromText } from '../core/parsing/goGodogBindingParser';
@@ -128,7 +128,8 @@ function detectCsharpProvider(text: string): BindingProviderId {
 
 function parseBindingsForFile(
     absPath: string,
-    text: string
+    text: string,
+    parameterTypes?: Readonly<Record<string, string>>
 ): { providerId: BindingProviderId; bindings: Binding[] } | null {
     const lower = absPath.toLowerCase();
     const uri = fileUri(absPath) as never;
@@ -136,7 +137,7 @@ function parseBindingsForFile(
     try {
         if (lower.endsWith('.cs')) {
             const providerId = detectCsharpProvider(text);
-            return { providerId, bindings: parseCSharpBindingsFromText(text, uri) };
+            return { providerId, bindings: parseCSharpBindingsFromText(text, uri, { parameterTypes }) };
         }
         if (lower.endsWith('.ts') || lower.endsWith('.js') || lower.endsWith('.mjs') || lower.endsWith('.cjs')) {
             const bindings = parseJsCucumberBindingsFromText(text, uri);
@@ -190,6 +191,13 @@ export function loadProject(projectDir: string): LoadedProject {
     }
 
     const files = walkProjectFiles(root);
+    const csharpParameterTypes = mergeCSharpParameterTypes(
+        files
+            .filter((abs) => abs.toLowerCase().endsWith('.cs') && isLikelyBindingPath(abs))
+            .map((abs) => readText(abs))
+            .filter((text): text is string => text !== null)
+            .map((text) => collectCSharpParameterTypes(text))
+    );
     const features: FeatureDocument[] = [];
     const featurePaths: string[] = [];
     const loaded: LoadedBinding[] = [];
@@ -222,7 +230,7 @@ export function loadProject(projectDir: string): LoadedProject {
         if (text === null) {
             continue;
         }
-        const parsed = parseBindingsForFile(abs, text);
+        const parsed = parseBindingsForFile(abs, text, csharpParameterTypes);
         if (!parsed || parsed.bindings.length === 0) {
             continue;
         }

@@ -4,8 +4,9 @@
  * Wave A: {int}, {float|double}, {word}, {string} → regex; other text escaped as literals.
  * Wave B: optional text `(…)`, alternation `a/b`, built-in numeric types extras.
  *
- * Out of scope (Wave C+): custom parameter types, pluralization engine, embedding
- * `@cucumber/cucumber-expressions`.
+ * Reqnroll extras: `{decimal}`, `{Guid}`, anonymous `{}`, and caller-supplied
+ * parameter types (C# `[StepArgumentTransformation]`). Unknown names still fail closed.
+ * Out of scope: pluralization engine, embedding `@cucumber/cucumber-expressions`.
  */
 
 export type CucumberExpressionParameterType =
@@ -20,7 +21,13 @@ export type CucumberExpressionParameterType =
     | 'biginteger'
     | 'bigdecimal';
 
-const PLACEHOLDER_PATTERN = /\{([a-zA-Z][\w-]*)\}/;
+/** `{name}` or anonymous `{}`. Does not match regex quantifiers like `{2}`. */
+const PLACEHOLDER_PATTERN = /\{(?:[a-zA-Z][\w-]*)?\}/;
+
+/** Decimal with an optional fraction using `.` or `,`. */
+const DECIMAL_COMMA = '(-?\\d+(?:[.,]\\d+)?)';
+/** GUID `8-4-4-4-12`. The no-hyphen form is not accepted. */
+const GUID_LIKE = '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
 
 type Token =
     | { kind: 'text'; text: string }
@@ -38,9 +45,15 @@ const INT_LIKE = '(-?\\d+)';
 /** Decimal-like capture (int or decimal, optional leading minus). */
 const DECIMAL_LIKE = '(-?\\d+(?:\\.\\d+)?)';
 
-function parameterTypeToRegex(name: string): string | null {
+function parameterTypeToRegex(
+    name: string,
+    parameterTypes?: Readonly<Record<string, string>>
+): string | null {
+    if (name === '') {
+        return '(.*)';
+    }
     const lower = name.toLowerCase();
-    switch (lower as CucumberExpressionParameterType) {
+    switch (lower as CucumberExpressionParameterType | 'decimal' | 'guid') {
         case 'int':
         case 'long':
         case 'short':
@@ -51,13 +64,28 @@ function parameterTypeToRegex(name: string): string | null {
         case 'double':
         case 'bigdecimal':
             return DECIMAL_LIKE;
+        case 'decimal':
+            return DECIMAL_COMMA;
+        case 'guid':
+            return GUID_LIKE;
         case 'word':
             return '(\\S+)';
         case 'string':
             // Captures the inner string; two capture groups are acceptable for matching purposes.
             return '(?:"([^"]*)"|\'([^\']*)\')';
-        default:
-            return null;
+        default: {
+            const source = parameterTypes?.[name];
+            if (source === undefined) {
+                return null;
+            }
+            try {
+                // Validate before splicing. An invalid source fails the whole expression.
+                new RegExp(source);
+            } catch {
+                return null;
+            }
+            return `(?:${source})`;
+        }
     }
 }
 
@@ -108,7 +136,7 @@ function tokenize(expression: string): Token[] | null {
                 return null;
             }
             const name = expression.slice(i + 1, close);
-            if (!/^[a-zA-Z][\w-]*$/.test(name)) {
+            if (name !== '' && !/^[a-zA-Z][\w-]*$/.test(name)) {
                 return null;
             }
             tokens.push({ kind: 'param', name });
@@ -172,7 +200,7 @@ function compileOptionalInner(inner: string): string | null {
     return compileTokenSequence(tokens);
 }
 
-function compileAtom(token: Token): string | null {
+function compileAtom(token: Token, parameterTypes?: Readonly<Record<string, string>>): string | null {
     switch (token.kind) {
         case 'text':
             return escapeRegexLiteral(token.text);
@@ -186,7 +214,7 @@ function compileAtom(token: Token): string | null {
             return `(?:${inner})?`;
         }
         case 'param': {
-            const paramRegex = parameterTypeToRegex(token.name);
+            const paramRegex = parameterTypeToRegex(token.name, parameterTypes);
             if (!paramRegex) {
                 return null;
             }
@@ -200,7 +228,10 @@ function compileAtom(token: Token): string | null {
 /**
  * Compile a run of non-space tokens, honoring `/` alternation between alternatives.
  */
-function compileWordGroup(group: Token[]): string | null {
+function compileWordGroup(
+    group: Token[],
+    parameterTypes?: Readonly<Record<string, string>>
+): string | null {
     if (group.length === 0) {
         return '';
     }
@@ -223,7 +254,7 @@ function compileWordGroup(group: Token[]): string | null {
     for (const alt of alternatives) {
         let part = '';
         for (const token of alt) {
-            const atom = compileAtom(token);
+            const atom = compileAtom(token, parameterTypes);
             if (atom === null) {
                 return null;
             }
@@ -238,7 +269,10 @@ function compileWordGroup(group: Token[]): string | null {
     return `(?:${compiledAlts.join('|')})`;
 }
 
-function compileTokenSequence(tokens: Token[]): string | null {
+function compileTokenSequence(
+    tokens: Token[],
+    parameterTypes?: Readonly<Record<string, string>>
+): string | null {
     let result = '';
     let i = 0;
 
@@ -256,7 +290,7 @@ function compileTokenSequence(tokens: Token[]): string | null {
             i++;
         }
 
-        const compiled = compileWordGroup(group);
+        const compiled = compileWordGroup(group, parameterTypes);
         if (compiled === null) {
             return null;
         }
@@ -272,14 +306,15 @@ function compileTokenSequence(tokens: Token[]): string | null {
  */
 export function compileCucumberExpressionToRegex(
     expressionRaw: string,
-    caseInsensitive: boolean = false
+    caseInsensitive: boolean = false,
+    parameterTypes?: Readonly<Record<string, string>>
 ): RegExp | null {
     const tokens = tokenize(expressionRaw);
     if (!tokens) {
         return null;
     }
 
-    const body = compileTokenSequence(tokens);
+    const body = compileTokenSequence(tokens, parameterTypes);
     if (body === null) {
         return null;
     }

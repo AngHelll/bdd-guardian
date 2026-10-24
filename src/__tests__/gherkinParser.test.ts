@@ -210,7 +210,7 @@ Fonctionnalité: Recherche
 describe('gherkinParser sample regression', () => {
     const expectedSteps: Record<string, number> = {
         'behave-demo/features/search.feature': 3,
-        'binding-demo/Features/sample.feature': 37,
+        'binding-demo/Features/sample.feature': 38,
         'cucumber-demo/features/home.feature': 3,
         'cucumber-demo/features/search.feature': 3,
         'godog-demo/features/godogs.feature': 3,

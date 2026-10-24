@@ -163,6 +163,18 @@ namespace Calculator.Steps
     }
 
     [Binding]
+    public class ParameterTypeSteps
+    {
+        [StepArgumentTransformation(@"v(.*)", Name = "my_version")]
+        public string VersionTransform(string version) => version;
+
+        [When("I download the release {my_version} of the application", ExpressionType = ExpressionType.CucumberExpression)]
+        public void WhenIDownload(string version)
+        {
+        }
+    }
+
+    [Binding]
     public class ScopeAwareSteps
     {
         // Wave B/v1.11: same pattern, different Scope(Tag) — runtime picks by scenario tags.

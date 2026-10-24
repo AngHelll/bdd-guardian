@@ -250,6 +250,33 @@ describe('compileBindingRegex', () => {
       expect(forced!.test('I have foo items')).toBe(false);
       expect(forced!.test('I have {MyType} items')).toBe(true);
     });
+
+    it('compiles {decimal}, {Guid}, and anonymous {}', () => {
+      const decimalRe = compileBindingRegex('price is {decimal}', { expressionType: 'cucumber' });
+      expect(decimalRe!.test('price is 3.5')).toBe(true);
+      expect(decimalRe!.test('price is 3,5')).toBe(true);
+      expect(decimalRe!.test('price is -2')).toBe(true);
+      expect(decimalRe!.test('price is xyz')).toBe(false);
+
+      const guidRe = compileBindingRegex('id is {Guid}', { expressionType: 'cucumber' });
+      expect(guidRe!.test('id is 00112233-4455-6677-8899-aabbccddeeff')).toBe(true);
+      expect(guidRe!.test('id is 00112233445566778899aabbccddeeff')).toBe(false);
+
+      const anyRe = compileBindingRegex('before {} after', { expressionType: 'cucumber' });
+      expect(anyRe!.test('before hello after')).toBe(true);
+      expect(anyRe!.test('before hello')).toBe(false);
+    });
+
+    it('uses a supplied parameter type only on the cucumber path', () => {
+      const pattern = 'I download the release {my_version} of the application';
+      const types = { my_version: 'v(.*)' };
+      const ce = compileBindingRegex(pattern, { expressionType: 'cucumber', parameterTypes: types });
+      expect(ce!.test('I download the release v1.2.3 of the application')).toBe(true);
+      expect(ce!.test('I download the release 1.2.3 of the application')).toBe(false);
+
+      const asRegex = compileBindingRegex(pattern, { expressionType: 'regex', parameterTypes: types });
+      expect(asRegex!.test('I download the release v1.2.3 of the application')).toBe(false);
+    });
   });
 });
 

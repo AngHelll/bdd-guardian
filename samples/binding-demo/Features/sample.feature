@@ -116,3 +116,8 @@ Feature: Calculator Operations
   Scenario: Scoped login without web/api tag is unbound
     # Expect: CodeLens unbound (scoped-only bindings excluded)
     Given I log in with scoped credentials
+
+  @v122 @cucumber-expressions
+  Scenario: Custom parameter type {my_version} binds
+    # Expect: CodeLens ✅ bound to WhenIDownload
+    When I download the release v1.2.3 of the application

@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-10-24
+
+**Highlights:** Reqnroll `{name}` from a step argument transformation links. `{decimal}`, `{Guid}`, and `{}` compile. An unknown name still does not become `.*`.
+
+### Added
+
+- Reqnroll/SpecFlow `[StepArgumentTransformation(@"regex")]` supplies `{name}` (from `Name` or a simple return type). `{decimal}`, `{Guid}`, and `{}` compile. An unknown name still does not become `.*`.
+
 ## [1.21.1] - 2026-10-23
 
 **Highlights:** BDD Map hole rows separate the step text from the line number. Unbound and ambiguous icons use the same status colors as the gutter. Matching is unchanged.
