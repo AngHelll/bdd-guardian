@@ -2,6 +2,8 @@
 
 Headless inventory, map analysis, step resolve, and Coach findings for agents and CI — **no VS Code Extension Host**.
 
+Requires **Node.js 22** or newer (same floor as `engines.node`). The extension itself still runs inside VS Code.
+
 ## Commands
 
 ```bash

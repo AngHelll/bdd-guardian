@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.19.1] - 2026-10-23
+
+**Highlights:** CI and contributor tooling move to Node.js 22. The Marketplace listing is refreshed. Matching is unchanged.
+
+### Changed
+
+- CI tests Node.js 22 and 24. `actions/checkout` v5, `actions/setup-node` v5, and `actions/upload-artifact` v7 run on the Node 24 action runtime (v4 was still Node 20, which GitHub runners now force forward and warn on).
+- Development, CLI, and MCP require Node.js 22 or newer. Packaging uses `@vscode/vsce` 4. `engines.vscode` stays ^1.85.0.
+- Marketplace description, keywords, and README.
+
 ## [1.19.0] - 2026-10-05
 
 **Highlights:** Guardian suggests BDD Gherkin Format once, so `.feature` files get Format Document and syntax colors without a second step indexer. Matching is unchanged.

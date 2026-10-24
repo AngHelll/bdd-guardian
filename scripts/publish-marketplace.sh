@@ -28,7 +28,16 @@ echo "-- vsce publish --"
 npx @vscode/vsce publish --no-dependencies
 
 echo ""
+echo "-- ovsx publish (same VSIX) --"
+if [[ ! -f bdd-guardian.vsix ]]; then
+  echo "error: bdd-guardian.vsix not found after package" >&2
+  exit 1
+fi
+npx ovsx publish bdd-guardian.vsix
+
+echo ""
 echo "Published. Verify:"
 echo "  https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian"
+echo "  https://open-vsx.org/extension/anghelll/bdd-guardian"
 echo ""
 echo "Post-publish: pin ROADMAP checklist · watch 1–2 weeks."

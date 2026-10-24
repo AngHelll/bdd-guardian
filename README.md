@@ -1,393 +1,206 @@
-# BDD Guardian 🛡️
+# BDD Guardian
 
-> Guard and navigate your BDD steps across Reqnroll, SpecFlow, Cucumber, Godog, Behave, and Java!
+**Know where every Gherkin step is implemented — and which ones aren't.**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-[![Tests](https://img.shields.io/badge/tests-229%20passing-brightgreen.svg)](https://github.com/AngHelll/bdd-guardian)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+Go to Definition, CodeLens, and live diagnostics for `.feature` files in VS Code. Works with Reqnroll, SpecFlow, Cucumber.js, Cucumber-JVM, Godog, and Behave.
+
+[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/anghelll.bdd-guardian?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/anghelll.bdd-guardian)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/anghelll.bdd-guardian)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian&ssr=false#review-details)
 [![CI](https://github.com/AngHelll/bdd-guardian/actions/workflows/ci.yml/badge.svg)](https://github.com/AngHelll/bdd-guardian/actions)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## 🖥️ Compatibility
+In a growing BDD suite, steps drift away from their bindings: a typo leaves a step unbound, two regexes start matching the same line, old bindings stop being used. You usually find out when the test run fails. Guardian shows it while you type.
 
-| Requirement | Supported |
-|-------------|-----------|
-| **VS Code** | >= 1.85.0 |
-| **Windows** | ✅ |
-| **macOS** | ✅ |
-| **Linux** | ✅ |
-| **Remote - SSH** | ✅ |
-| **Dev Containers** | ✅ |
-| **Codespaces** | ✅ |
+![CodeLens on a scoped step: SignInSteps.OnWeb under @web, SignInSteps.OnApi under @api](./media/gallery/01-codelens-scope.png)
 
-A VS Code extension that provides intelligent navigation, visual feedback, and diagnostics for BDD projects across five binding stacks.
+## Why Guardian
 
-## BDD extension family
+- **Jump from step to code and back.** `F12` on a step opens its binding; CodeLens on a binding lists every step that uses it.
+- **Catch unbound and ambiguous steps before running anything.** Problems panel, gutter, and CodeLens use the same resolver, aligned with how Reqnroll reports ambiguity.
+- **See the holes in the whole suite.** The **BDD Map** view lists unbound steps, ambiguous steps, and unused bindings across the workspace.
+- **Fix in place.** Copy a binding snippet or generate the scaffold in your step-definition file, for six frameworks.
+- **One index, many stacks.** C#, JavaScript/TypeScript, Java, Go, and Python bindings in the same workspace.
+- **No glue configuration.** No step globs or paths to set up; Guardian finds the bindings on its own.
 
-| Extension | Role |
-|-----------|------|
-| **BDD Guardian** (this extension) | Go to Definition, CodeLens, binding diagnostics, Coach, Index API |
-| [**BDD Pilot**](https://github.com/AngHelll/bdd-pilot) | Run tests, dashboard, TRX / failure context |
+## Quick start
 
-Guardian answers *“where is this step implemented?”* — Pilot answers *“run this and what failed?”*
+1. Install **BDD Guardian** from the Extensions view, or run `ext install anghelll.bdd-guardian`.
+2. Open a folder that has `.feature` files and step definitions.
+3. Wait for **Ready** in the status bar. CodeLens appears above each step: bound, unbound, or ambiguous.
+4. Press `F12` on a step to open its binding, or `Shift+F12` on a binding to find its usages.
 
-**ForgeOne:** navigation & map (Guardian) → execution (Pilot).
+No project yet? Open [`samples/binding-demo/`](./samples/binding-demo/) from this repo.
 
-### ✨ What's new (1.0.0)
+## Supported frameworks
 
-- **Stable multi-framework release** — C# (Reqnroll/SpecFlow), JavaScript Cucumber.js, Go Godog, Python Behave, Java Cucumber-JVM.
-- **Communication polish** — Unified Spanish status labels (*Enlazado* / *Sin enlazar*); i18n for navigation and Coach UI.
-- **Visual language** — CodeLens icons aligned with gutter semantics; see [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md).
-- **First-run hint** — One-time toast when `.feature` files exist but no bindings are indexed (`bddGuardian.onboarding.enabled`).
-- **Guardian ↔ Pilot** — Navigate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot).
+| Stack | Bindings |
+|-------|----------|
+| C# — **Reqnroll** and **SpecFlow** | `[Binding]`, `[Given(@"...")]`, verbatim patterns with quotes |
+| JavaScript / TypeScript — **Cucumber.js** | `Given('...')`, Cucumber Expressions |
+| Java — **Cucumber-JVM** | `@Given("...")` |
+| Go — **Godog** | `ctx.Step(...)` |
+| Python — **Behave** | `@given('...')` |
 
-### 🎬 Quick demo
+Frameworks are detected automatically. **Show Provider Detection Report** explains what was found.
 
-Open [`samples/binding-demo/`](./samples/binding-demo/) after installing the VSIX: wait for **Ready** in the status bar → CodeLens above a step → **Go to Definition** to the binding.
+Samples for each stack live in [`samples/`](./samples/).
 
-![Quick demo — binding-demo: CodeLens and Go to Definition](docs/assets/guardian-onboarding.gif)
+## Features
 
-> Maintainer: if the GIF is missing locally, record per [docs/assets/README.md](docs/assets/README.md) before Marketplace publish.
+### CodeLens on steps and bindings
 
-### ✨ Highlights (0.5.x–0.9.x)
+- Above each step: **✓ `Class.Method`** (click to open), **✗ unbound**, or **⚠ ambiguous** (click to pick).
+- Above each binding: **→ N usages (M scenarios)**, or **No usages** when nothing resolves to it.
 
-- **Reqnroll & SpecFlow — same binding engine** — Shared C# parser; SpecFlow-only projects index and navigate like Reqnroll. Reqnroll is the current open-source line; SpecFlow projects keep the same UX.
-- **Ambiguity aligned with runtime** — When multiple bindings match, Guardian shows ⚠️ ambiguous (Reqnroll-like), not a silent “best score” bound. Optional `bddGuardian.matching.preferSpecificBinding` restores legacy behavior.
-- **Scenario Outline precision** — Examples on plain `Scenario`; expanded candidates from table rows; matching-corpus regression suite.
-- **Guardian ↔ Pilot workflow** — Navigate and validate bindings here; run tests with [BDD Pilot](https://github.com/AngHelll/bdd-pilot). If Pilot reports `PENDING_STEPS` or `AMBIGUOUS_STEPS`, refine bindings and re-check in Guardian.
-- **164 tests** — Includes precision corpus and SpecFlow provider coverage.
+### Go to Definition and Find All References
 
-### ✨ What's improved (0.4.x)
+| From | `F12` / `Shift+F12` shows |
+|------|---------------------------|
+| A step in a `.feature` | Its binding, and other steps that resolve to the same binding |
+| A binding in `.cs`, `.ts`, `.py`, `.go`, `.java` | The binding and every step that uses it |
 
-- **C# verbatim patterns with quotes** — Bindings like `[When(@"they click on ""(.*)"" in the menu")]` now correctly match steps such as `When they click on "Projects" in the menu`.
-- **Pattern whitespace** — Binding patterns are normalized like step text (fewer false “unbound”). See [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
-- **Index while you edit** — Open `.feature` files reindex from the editor buffer (debounced); binding files replace per-file entries on save (no duplicate index entries).
-- **Single architecture** — One indexing and resolution path (IndexManager + binding providers + core resolver); one regex compiler in core.
-- **Unified Gherkin parsing** — Coach and navigation/diagnostics share the same core parser for `.feature` files.
-- **UI language** — Optional English/Spanish via `bddGuardian.displayLanguage`.
-- **197 tests** — Matching, parsing, index, references, Coach, and multi-provider coverage.
+`Alt+←` / `Alt+→` move back and forward between steps and bindings; `Alt+H` opens the history.
 
-### 📊 CodeLens
-See binding status directly above each step:
-- ✅ **Bound**: Shows `ClassName.MethodName` — click to navigate
-- ❌ **Unbound**: No binding found
-- ⚠️ **Ambiguous**: Multiple bindings match — click to select
+### Diagnostics while you type
 
-### 🗺️ Suite map
+The Problems panel flags **unbound** and **ambiguous** steps as you edit, plus **unused bindings** as Information. Scenario Outlines are expanded with their Examples values, so parameterized steps resolve correctly.
 
-The **BDD Map** view in Explorer lists workspace **holes** in the step↔binding map (unbound steps, ambiguous steps, unused/orphan bindings) with the same resolution as CodeLens. Holes are grouped by `.feature` (orphans by binding file). Click a row to open the file. Unbound rows offer **Generate binding** (or **Copy snippet** if generate does not apply) and **Explain** (why the step is unbound; scoped-out bindings can be opened from a QuickPick). Ambiguous rows offer **Explain** (same why as hover, then pick a colliding binding). Bound steps are counted in the summary, not listed (less noise).
+![An unbound step flagged in the gutter and in CodeLens](./media/gallery/02-unbound-step.png)
 
-Command: **BDD Guardian: Show suite map**. Disable with `bddGuardian.suiteMap.enabled: false`. Independent of `feedbackLevel`.
+### BDD Map
 
-### 🎯 Visual Feedback
+An Explorer view with every hole in the step ↔ binding map, grouped by `.feature`. Each row offers **Explain** (why it's unbound or which bindings collide) and **Generate binding**. Run **BDD Guardian: Show suite map**.
 
-BDD Guardian provides subtle, non-intrusive visual feedback:
+### Hover with context
 
-#### Gutter Icons
-Small icons in the editor gutter show step status at a glance:
-- ✓ Green checkmark — bound step
-- ✗ Red X — unbound step
-- ! Orange warning — ambiguous step
-
-#### Left Border
-A subtle colored border on step lines reinforces status.
-
-#### Overview Ruler
-Status markers appear in the minimap/overview ruler for quick file scanning.
-
-> 💡 **Tip**: All visual feedback can be disabled via settings. Full matrix: [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md).
-
-### Iconography
-
-BDD Guardian uses **VS Code codicons** for CodeLens and chrome, plus two **brand assets** that share the **same silhouette** (shield + linked nodes + map pin — Opción B, ForgeOne navy tile):
-
-| Asset | Role |
-|-------|------|
-| **`icon.png`** | Marketplace / Extensions discovery — color tile from `media/guardian.svg` (`media/icon-marketplace.svg` source) |
-| **`media/guardian.svg`** | Brand mono silhouette (`currentColor`) — theme-aware if used in chrome |
-| **`resources/icons/*.svg`** | Editor gutter — bound / unbound / ambiguous (status colors, not brand) |
-
-| Area | Icons | Meaning |
-|------|-------|---------|
-| CodeLens (feature) | `$(check)` / `$(error)` / `$(warning)` | Bound · unbound · ambiguous |
-| CodeLens (binding) | usage count / “No usages” | References / orphan signal |
-| Hover | ✅ ❌ ⚠️ ⏳ | Dense detail (same semantics) |
-| Border / overview ruler | `charts.green` / `charts.red` / `charts.yellow` | Theme-aware status chrome |
-
-**ForgeOne family:** Guardian = navigation & step bindings · [BDD Pilot](https://github.com/AngHelll/bdd-pilot) = execution — same navy Opción B shelf; Guardian glyph = map/link/shield (not Pilot radar).
-
-### 💬 Enriched Hover
-
-Hover over any step for detailed information:
-
-**For Bound steps:**
-- Binding class and method
-- Regex pattern
-- File location (clickable)
-- Captured parameters
-- Code preview (expandable)
-
-**For Unbound steps:**
-- Why unbound (empty index, scoped-out tags, or no pattern match)
-- Similar step, when one indexed binding is a clear rewrite target (does not change unbound)
-- Closed step, when one word blocks reuse (`parameterize "submit"`)
-- Suggested binding pattern
-
-**For Ambiguous steps:**
-- Top 3 matching bindings
-- Best match highlighted
-- Link to show all matches
-
-### 🔎 Find All References (Shift+F12)
-
-| From | Shows |
-|------|--------|
-| **Step** in a `.feature` | Other steps with the same text or the same binding match (all indexed features) |
-| **Binding** in `.cs` (etc.) | The binding line + every `.feature` step that resolves to it |
-
-Same resolver and index as CodeLens and Go to Definition — not generated Reqnroll code under `obj/`.
-
-### 🧭 Navigation History
-Navigate back and forward between steps and bindings:
-
-| Shortcut | Command | Description |
-|----------|---------|-------------|
-| `Alt+←` | Go Back | Return to previous location |
-| `Alt+→` | Go Forward | Go to next location |
-| `Alt+H` | Show History | Pick from navigation history |
-
-### 📍 From bindings to steps (usages)
-In step definition files (.cs, .ts, .py, etc.), CodeLens above each binding shows how many steps use it:
-- **→ 1 usage (Scenario name)** — click to open the step in the feature file
-- **→ N usages (M scenarios)** — click to pick a usage from a list and jump to it  
-Works with any indexed framework (Reqnroll, SpecFlow, and future Cucumber.js, Behave, etc.).
-
-### 🏥 BDD Coach (optional)
-
-Best-practice hints for `.feature` files (duplicate steps, GWT structure, vague Then, dominant Then, redundant Feature→Scenario tags, step length, UI leakage, etc.).
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `bddGuardian.coach.enabled` | `false` | Enable Coach diagnostics in the Problems panel |
-| `bddGuardian.coach.statusBar.enabled` | `true` | Health score in the status bar when Coach is on |
-| `bddGuardian.coach.dominantThen.max` | `1` | Max Then steps per scenario before `coach/dominant-then` warns |
-
-Quick Fix: remove redundant scenario tags that already exist on Feature.
-
-Commands: **BDD Guardian: Toggle Coach Mode**, **Show Coach Rules**, **Show Health Score**.
-
-### 🔍 Diagnostics
-Warnings in the Problems panel for:
-- Unbound steps (no matching binding)
-- Ambiguous steps (multiple bindings match)
-
-Updates while typing in `.feature` files (debounced), aligned with the workspace index.
-
-### 📋 Scenario Outline Support
-Full support for Scenario Outlines with Examples tables:
-- Automatically expands `<placeholders>` with Example values
-- Accurate binding resolution for parameterized steps
-
-### 🔌 Multi-Framework Support
-Automatic detection of BDD frameworks:
-- ✅ **C# Reqnroll** — Full navigation (current open-source stack)
-- ✅ **C# SpecFlow** — Same attribute-based bindings as Reqnroll; shared parser, separate NuGet detection
-- ✅ JavaScript Cucumber.js (v0.6.1+)
-- ✅ Go Godog (v0.7.0+)
-- ✅ Python Behave (v0.7.1+)
-- ✅ Java Cucumber-JVM (v0.9.0+)
-
-#### C# step bindings (Reqnroll & SpecFlow)
-
-Reqnroll and SpecFlow share the same binding model (`[Binding]`, `[Given(@"...")]`, etc.). BDD Guardian indexes both with one C# parser — Reqnroll is the active open-source line; legacy SpecFlow projects get the same CodeLens, Go to Definition, and diagnostics.
-
-**Recommended flow:** Guardian (navigate & validate) → [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (run `dotnet test`) → if `PENDING_STEPS` or `AMBIGUOUS_STEPS`, fix bindings and re-open in Guardian. Sample pair: [`samples/binding-demo/`](./samples/binding-demo/) + Pilot [`samples/minimal-bdd`](https://github.com/AngHelll/bdd-pilot/tree/main/samples/minimal-bdd).
-
-## 📦 Installation
-
-### From VSIX (Current)
-1. Download the `.vsix` file
-2. In VS Code: `Cmd+Shift+P` → "Install from VSIX"
-3. Select the downloaded file
-
-### From Marketplace
-Search for "BDD Guardian" in VS Code Extensions, or install from:  
-[Marketplace](https://marketplace.visualstudio.com/items?itemName=anghelll-bdd-guardian.bdd-guardian)
-
-## ⚙️ Configuration
-
-### Language
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `bddGuardian.displayLanguage` | `en` | UI language for messages (toasts, status bar, hover). `en` = English, `es` = Spanish. If unset, follows VS Code display language. |
-
-### Visual Feedback
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `bddGuardian.gutterIcons.enabled` | `true` | Gutter icons (unbound/ambiguous; bound optional) |
-| `bddGuardian.gutterIcons.showBound` | `false` | Show green check on bound steps |
-| `bddGuardian.hoverDetails.enabled` | `true` | Show enriched hover with code preview |
-| `bddGuardian.ui.showMatchScore` | `false` | Show numeric match score in bound step CodeLens (debug) |
-| `bddGuardian.ui.feedbackLevel` | `standard` | Visual density ceiling: `full` / `standard` / `minimal` |
-| `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
-| `bddGuardian.authorActions.enabled` | `true` | Quick fixes on unbound steps: copy snippet/pattern; generate scaffold (C# / JS/TS / Behave / Godog / Java) |
-| `bddGuardian.autocomplete.enabled` | `true` | Suggest step text from indexed bindings while typing in `.feature` files |
-| `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on step bindings that no feature step resolves to |
-| `bddGuardian.suiteMap.enabled` | `true` | Show the BDD Map Explorer view (workspace unbound / ambiguous / orphan holes) |
-| `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open/Install BDD Pilot on unbound steps and Run with Pilot after generate binding |
-
-### Autocomplete
-
-While typing a Gherkin step (`Given` / `When` / `Then` / `And` / `But`), IntelliSense suggests steps from the **same index** used by CodeLens and diagnostics (keyword + prefix filter; patterns are humanized for insert). Autocomplete does not invent steps and does not run tests — use [BDD Pilot](https://github.com/AngHelll/bdd-pilot) to execute.
-
-Disable with `bddGuardian.autocomplete.enabled: false`.
-
-### Orphan bindings
-
-Bindings that no indexed feature step resolves to appear in the Problems panel as **Information** diagnostics on the binding file (dual of unbound steps). CodeLens “No usages” on step definitions remains unchanged.
-
-Disable with `bddGuardian.orphanBindings.enabled: false`. Workspaces with more than 2000 indexed bindings skip the orphan scan (see Output channel).
+- **Bound:** binding class and method, pattern, captured parameters, code preview.
+- **Unbound:** why (empty index, scoped-out tag, or no match), a similar existing step when there's a clear candidate, and a suggested pattern.
+- **Ambiguous:** the top matches, with the best one highlighted.
 
 ### Author actions
 
-On **unbound** steps (Problems panel or lightbulb), BDD Guardian offers:
+On an unbound step, the lightbulb offers **Copy binding snippet**, **Copy suggested pattern**, or **Generate binding**. Generate inserts into an existing step-definition file or creates a conventional one (`StepDefinitions/GuardianGeneratedSteps.cs`, `features/step_definitions/guardian-generated.steps.ts`, `features/steps/guardian_generated_steps.py`, and so on).
 
-- **Copy binding snippet** — framework-aware step definition text (same as hover v1.0.1)
-- **Copy suggested pattern** — regex/Cucumber pattern only
-- **Generate binding (insert)** — inserts scaffold into an indexed step-definition file, or creates a conventional new file:
-  - C#: `StepDefinitions/GuardianGeneratedSteps.cs`
-  - JS/TS: `features/step_definitions/guardian-generated.steps.ts`
-  - Behave: `features/steps/guardian_generated_steps.py`
-  - Godog: `features/guardian_generated_steps_test.go` (or insert into existing `InitializeScenario`)
-  - Java: `src/test/java/generated/GuardianGeneratedSteps.java`
+### Step autocomplete
 
-After generate, **reindex** the workspace to verify the step is bound. When **BDD Pilot** is installed, the toast also offers **Run with BDD Pilot** (opens Pilot’s dashboard — Pilot runs tests; Guardian does not). On unbound steps, the lightbulb includes **Open BDD Pilot** or **Install BDD Pilot** if Pilot is missing.
+While typing `Given` / `When` / `Then`, IntelliSense suggests steps that already have a binding. It never invents steps.
 
-Disable author actions with `bddGuardian.authorActions.enabled: false`. Disable Pilot CTAs with `bddGuardian.pilotHandoff.enabled: false`.
+### BDD Coach (opt-in)
 
-### Settings reference
+Writing-quality hints for `.feature` files: duplicate steps, Given/When/Then order, vague or too many `Then`s, redundant tags, long steps, UI details leaking into scenarios. Includes a health score in the status bar. Turn it on with `bddGuardian.coach.enabled`.
 
-Keys under `reqnrollNavigator.*` are **legacy IDs** kept for backward compatibility — do not rename in settings JSON. New UX settings use `bddGuardian.*`.
+## Works well with
 
-| Setting | Namespace | Role |
-|---------|-----------|------|
-| `bddGuardian.displayLanguage` | branding | UI language (EN/ES) for status labels, toasts, hover |
-| `bddGuardian.gutterIcons.enabled` | branding | Gutter icons on steps (problems by default) |
-| `bddGuardian.gutterIcons.showBound` | branding | Opt-in bound green checks |
-| `bddGuardian.hoverDetails.enabled` | branding | Rich binding hover |
-| `bddGuardian.ui.showMatchScore` | branding | CodeLens debug score |
-| `bddGuardian.ui.feedbackLevel` | branding | Visual density: `full` / `standard` (default) / `minimal` (ceiling; toggles can lower) |
-| `bddGuardian.matching.preferSpecificBinding` | branding | Ambiguity policy |
-| `bddGuardian.providers.indexMode` | branding | `all` vs `primary` provider indexing |
-| `bddGuardian.onboarding.enabled` | branding | First-run zero-bindings hint |
-| `bddGuardian.authorActions.enabled` | branding | Unbound step copy/generate quick fixes |
-| `bddGuardian.autocomplete.enabled` | branding | Step IntelliSense from indexed bindings |
-| `bddGuardian.orphanBindings.enabled` | branding | Unused binding Problems (Information) |
-| `bddGuardian.suiteMap.enabled` | branding | Explorer BDD Map (workspace holes) |
-| `bddGuardian.pilotHandoff.enabled` | branding | Open/Install Pilot CTAs + post-generate Run with Pilot |
-| `bddGuardian.coach.*` | branding | Coach rules and UI |
-| `reqnrollNavigator.enableCodeLens` | legacy | CodeLens on/off |
-| `reqnrollNavigator.enableDiagnostics` | legacy | Problems panel unbound/ambiguous |
-| `reqnrollNavigator.enableDecorations` | legacy | Gutter border / overview ruler |
-| `reqnrollNavigator.caseInsensitive` | legacy | Case-insensitive matching |
-| `reqnrollNavigator.tagFilter` / `tagFilterMode` | legacy | Filter steps in CodeLens/diagnostics |
-| `reqnrollNavigator.featureGlob` / `bindingsGlob` | legacy | Index globs |
-| `reqnrollNavigator.excludePatterns` | legacy | Index exclusions |
-| `reqnrollNavigator.navigationHistorySize` | legacy | Back/forward history size |
-| `reqnrollNavigator.debug` | legacy | Verbose output |
+Guardian is one piece of the **ForgeOne** BDD family. Each extension does one job, so they don't fight over your `.feature` files.
 
-### Matching
+| Extension | Job |
+|-----------|-----|
+| **BDD Guardian** (this one) | What a step **means**: bindings, navigation, diagnostics |
+| [BDD Gherkin Format](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-gherkin-format) | How a `.feature` **looks**: Format Document, table alignment, syntax colors |
+| [BDD Pilot](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-pilot) | **Runs** Reqnroll / SpecFlow scenarios with `dotnet test` and maps the results |
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `bddGuardian.matching.preferSpecificBinding` | `false` | When multiple bindings match, pick highest score (`true`, legacy). Default `false`: show ambiguous (Reqnroll-like). |
+Want Format and Guardian in one install? Get the [**BDD ForgeOne**](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-forgeone) extension pack.
 
-### Core Features
+Guardian doesn't run tests. For Reqnroll / SpecFlow, [BDD Pilot](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-pilot) does.
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `reqnrollNavigator.enableCodeLens` | `true` | Show CodeLens above steps |
-| `reqnrollNavigator.enableDiagnostics` | `true` | Show problems for unbound steps |
-| `reqnrollNavigator.enableDecorations` | `true` | Show border and overview ruler |
-| `reqnrollNavigator.navigationHistorySize` | `50` | Max items in navigation history |
+## Coming from Cucumber or Cucumber Full Support
 
-### Indexing
+| If you're used to… | With Guardian |
+|--------------------|---------------|
+| Setting `cucumber.glue` or step globs per project | Nothing to set. Frameworks are detected, and every folder of a multi-root workspace is searched |
+| Go to Definition landing on the wrong step when two patterns overlap | Both matches are reported as **ambiguous**, with an **Explain** that names the colliding bindings |
+| Not knowing where a step definition is used | CodeLens **N usages** on every binding, `Shift+F12`, and **unused bindings** in Problems and the BDD Map |
+| An undefined-step warning you can't turn off | `reqnrollNavigator.enableDiagnostics`, `bddGuardian.ui.feedbackLevel`, and `reqnrollNavigator.tagFilter` |
+| Writing the step definition by hand | **Generate binding** for all six frameworks |
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `bddGuardian.providers.indexMode` | `all` | `all` = index every detected provider; `primary` = only the highest-confidence provider |
-| `reqnrollNavigator.bindingsGlob` | `**/*.cs` | Paths to search for bindings |
-| `reqnrollNavigator.excludePatterns` | `[**/bin/**, **/obj/**]` | Paths to exclude |
+Uninstall the other extension rather than running both: each bundles its own step resolver, and two resolvers can disagree. Use Gherkin Format for layout and colors instead:
 
-## 🐛 Known Issues
+```json
+"[gherkin]": {
+  "editor.defaultFormatter": "anghelll.bdd-gherkin-format",
+  "editor.formatOnSave": true
+}
+```
 
-- Large projects may experience initial indexing delay (status bar shows “Indexing…” while running)
-- Advanced regex in bindings (lookaheads, complex nested groups) may not match as in the test runner; standard alternation `(a|b)` is covered by tests ([details](docs/BINDING_MATCHING.md))
+## Configuration
 
-## Sample workspace
+Most teams need no configuration. Settings you're most likely to touch:
 
-[`samples/binding-demo/`](./samples/binding-demo/) is a minimal Reqnroll workspace for manual verification: install VSIX → open that folder → CodeLens + Go to Definition on `Features/sample.feature`. For test **execution**, use [BDD Pilot](https://github.com/AngHelll/bdd-pilot) `samples/minimal-bdd`.
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `bddGuardian.displayLanguage` | `en` | UI language: `en` or `es` |
+| `bddGuardian.ui.feedbackLevel` | `standard` | Visual density: `full`, `standard`, or `minimal` |
+| `bddGuardian.gutterIcons.showBound` | `false` | Also show a green check on bound steps |
+| `bddGuardian.coach.enabled` | `false` | Turn on BDD Coach |
+| `bddGuardian.matching.preferSpecificBinding` | `false` | On multiple matches, pick the highest score instead of reporting ambiguous |
+| `bddGuardian.providers.indexMode` | `all` | `all` indexes every detected framework; `primary` only the most confident one |
+| `reqnrollNavigator.bindingsGlob` | `**/*.cs` | Where to look for bindings |
+| `reqnrollNavigator.excludePatterns` | `bin`, `obj`, `node_modules` | Paths to skip |
 
-Maintainers: `npm run verify:local` runs lint, tests, and packages `bdd-guardian.vsix` (Capa A); see [CONTRIBUTING.md](CONTRIBUTING.md).
+<details>
+<summary>All settings</summary>
 
-## Roadmap
+Keys under `reqnrollNavigator.*` are legacy IDs kept for backward compatibility.
 
-See [ROADMAP.md](./ROADMAP.md). Current release is **v1.9.0**. Works alongside [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (test execution).
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `bddGuardian.gutterIcons.enabled` | `true` | Gutter icons on unbound / ambiguous steps |
+| `bddGuardian.hoverDetails.enabled` | `true` | Rich hover with code preview |
+| `bddGuardian.ui.showMatchScore` | `false` | Show the match score in CodeLens (debug) |
+| `bddGuardian.onboarding.enabled` | `true` | One-time hint when features exist but no bindings are indexed |
+| `bddGuardian.authorActions.enabled` | `true` | Copy / generate quick fixes on unbound steps |
+| `bddGuardian.autocomplete.enabled` | `true` | Step suggestions from indexed bindings |
+| `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on unused bindings (skipped above 2,000 bindings) |
+| `bddGuardian.suiteMap.enabled` | `true` | Show the BDD Map view |
+| `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open / Install BDD Pilot and Run with Pilot |
+| `bddGuardian.formatHint.enabled` | `true` | Suggest BDD Gherkin Format for `.feature` layout |
+| `bddGuardian.coach.statusBar.enabled` | `true` | Health score in the status bar when Coach is on |
+| `bddGuardian.coach.stepLength.max` | `120` | Max step length before Coach warns |
+| `bddGuardian.coach.dominantThen.max` | `1` | Max `Then` steps per scenario before Coach warns |
+| `bddGuardian.coach.disabled` | `[]` | Coach rules to turn off |
+| `bddGuardian.coach.severityOverrides` | `{}` | Per-rule severity |
+| `reqnrollNavigator.enableCodeLens` | `true` | CodeLens above steps |
+| `reqnrollNavigator.enableDiagnostics` | `true` | Problems for unbound / ambiguous steps |
+| `reqnrollNavigator.enableDecorations` | `true` | Status border and overview ruler marks |
+| `reqnrollNavigator.caseInsensitive` | `false` | Case-insensitive matching |
+| `reqnrollNavigator.tagFilter` | `[]` | Only check steps with (or without) these tags |
+| `reqnrollNavigator.tagFilterMode` | `include` | `include` or `exclude` for `tagFilter` |
+| `reqnrollNavigator.featureGlob` | `**/*.feature` | Where to look for features |
+| `reqnrollNavigator.maxFilesIndexed` | `5000` | Upper bound on indexed files |
+| `reqnrollNavigator.navigationHistorySize` | `50` | Back / forward history size |
+| `reqnrollNavigator.debug` | `false` | Verbose output |
 
-## 📚 Documentation
+</details>
 
-| Doc | Description |
-|-----|-------------|
-| [docs/README.md](docs/README.md) | Doc index and product direction |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Extension architecture |
-| [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md) | Icons, colors, and status semantics |
-| [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md) | Step-to-binding matching |
-| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Adding a framework provider |
-| [ROADMAP.md](./ROADMAP.md) | Done vs planned features |
+### Large repositories
 
-## 📝 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for version history.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue first to discuss proposed changes.
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgments
-
-- Inspired by the Reqnroll, SpecFlow, and Cucumber communities
-- Built with ❤️ for BDD practitioners
-
-## 🏢 Enterprise Features
-
-BDD Guardian is designed for enterprise-scale projects:
-
-### Performance Guardrails
-- **Max Files Limit**: Configurable limit (default: 5,000) prevents memory issues in large monorepos
-- **Batch Processing**: Files are indexed in batches to keep VS Code responsive
-- **Async Operations**: All indexing is non-blocking
-
-### Resilience
-- **Safe Fallbacks**: Extension never crashes - all operations are wrapped in try/catch
-- **Graceful Degradation**: If provider detection fails, falls back to manual configuration
-- **Detailed Logging**: Output channel shows all operations for troubleshooting
-
-### Configuration for Large Projects
+Indexing runs in batches and never blocks the editor; the status bar shows **Indexing…** meanwhile. For monorepos, raise the file limit and exclude build output:
 
 ```json
 {
   "reqnrollNavigator.maxFilesIndexed": 10000,
-  "reqnrollNavigator.excludePatterns": [
-    "**/bin/**",
-    "**/obj/**",
-    "**/node_modules/**",
-    "**/TestResults/**"
-  ]
+  "reqnrollNavigator.excludePatterns": ["**/bin/**", "**/obj/**", "**/node_modules/**", "**/TestResults/**"]
 }
 ```
 
+## Requirements
+
+VS Code 1.85 or later, on Windows, macOS, or Linux. Works over Remote SSH, Dev Containers, and Codespaces.
+
+## Known issues
+
+- Very large projects take a moment to index the first time.
+- Advanced regex in bindings (lookaheads, complex nested groups) may resolve differently than the test runner. Plain alternation `(a|b)` is covered. See [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
+
+## Learn more
+
+- [What's new](CHANGELOG.md)
+- [Visual language: icons and colors](docs/VISUAL_LANGUAGE.md)
+- [How step matching works](docs/BINDING_MATCHING.md)
+- [Adding a framework provider](docs/PROVIDERS.md)
+- [Roadmap](ROADMAP.md)
+
+Found a bug or want a framework supported? [Open an issue](https://github.com/AngHelll/bdd-guardian/issues). Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+MIT License. Built for the Reqnroll, SpecFlow, and Cucumber communities.

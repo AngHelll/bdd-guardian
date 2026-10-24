@@ -9,6 +9,7 @@ Single reference for how step binding status appears across the extension.
 | Extension | Role |
 |-----------|------|
 | **BDD Guardian** | Navigation & binding map (this extension) |
+| [**BDD Gherkin Format**](https://github.com/AngHelll/bdd-gherkin-format) | `.feature` presentation (layout + lexical syntax colors) — not bound/unbound |
 | **BDD Pilot** | Test execution |
 
 **Marketplace tile (v1.7.0+):** ForgeOne Opción B — navy gradient (`#1a2332` → `#0d1219`), cool light glyph (`#e8eef6`), silhouette in `media/guardian.svg` / `media/icon-marketplace.svg`. `galleryBanner.color` = `#1a2332`. Gutter / `charts.*` status colors stay as below (unchanged).
