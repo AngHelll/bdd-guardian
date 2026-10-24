@@ -13,25 +13,21 @@ import {
     ResolvedKeyword,
 } from '../domain/types';
 import {
-    STEP_KEYWORD_REGEX,
     TAG_LINE_REGEX,
-    FEATURE_REGEX,
-    RULE_REGEX,
-    BACKGROUND_REGEX,
-    SCENARIO_REGEX,
-    SCENARIO_OUTLINE_REGEX,
-    EXAMPLES_REGEX,
     TABLE_ROW_REGEX,
     MAX_EXAMPLE_ROWS,
     PLACEHOLDER_REGEX,
 } from '../domain/constants';
+import { gherkinPatternsForText } from './gherkinDialect';
 import { normalizeWhitespace, generateCandidateTexts } from '../matching/normalization';
 
 /**
  * Parse a feature document into a structured FeatureDocument
  */
 export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocument | undefined {
-    const lines = document.getText().split('\n');
+    const text = document.getText();
+    const lines = text.split('\n');
+    const patterns = gherkinPatternsForText(text);
     
     let featureName = '';
     let featureTags: string[] = [];
@@ -69,7 +65,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const featureMatch = trimmedLine.match(FEATURE_REGEX);
+        const featureMatch = trimmedLine.match(patterns.feature);
         if (featureMatch) {
             featureName = featureMatch[1].trim();
             featureTags = [...pendingTags];
@@ -78,7 +74,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        if (RULE_REGEX.test(trimmedLine)) {
+        if (patterns.rule.test(trimmedLine)) {
             if (currentScenario) {
                 finalizeScenario(currentScenario, scenarios);
             }
@@ -91,7 +87,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const backgroundMatch = trimmedLine.match(BACKGROUND_REGEX);
+        const backgroundMatch = trimmedLine.match(patterns.background);
         if (backgroundMatch) {
             inBackground = true;
             currentScenario = null;
@@ -102,7 +98,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const outlineMatch = trimmedLine.match(SCENARIO_OUTLINE_REGEX);
+        const outlineMatch = trimmedLine.match(patterns.scenarioOutline);
         if (outlineMatch) {
             if (currentScenario) {
                 finalizeScenario(currentScenario, scenarios);
@@ -123,7 +119,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const scenarioMatch = trimmedLine.match(SCENARIO_REGEX);
+        const scenarioMatch = trimmedLine.match(patterns.scenario);
         if (scenarioMatch) {
             if (currentScenario) {
                 finalizeScenario(currentScenario, scenarios);
@@ -144,7 +140,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const examplesMatch = trimmedLine.match(EXAMPLES_REGEX);
+        const examplesMatch = trimmedLine.match(patterns.examples);
         if (examplesMatch && currentScenario) {
             currentExamples = {
                 headers: [],
@@ -183,14 +179,14 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             continue;
         }
 
-        const stepMatch = trimmedLine.match(STEP_KEYWORD_REGEX);
+        const stepMatch = trimmedLine.match(patterns.step);
         if (stepMatch) {
             if (description === 'swallow') {
                 continue;
             }
             description = null;
 
-            const keywordOriginal = normalizeKeyword(stepMatch[1]);
+            const keywordOriginal = patterns.roleOf(stepMatch[1]);
             const rawText = stepMatch[2].trim();
 
             let keywordResolved: ResolvedKeyword;
@@ -291,21 +287,6 @@ function docstringDelimiter(trimmed: string): DocstringDelim | null {
 
 function isConjunction(keyword: StepKeyword): boolean {
     return keyword === 'And' || keyword === 'But' || keyword === '*';
-}
-
-function normalizeKeyword(keyword: string): StepKeyword {
-    if (keyword === '*') {
-        return '*';
-    }
-    const lower = keyword.toLowerCase();
-    switch (lower) {
-        case 'given': return 'Given';
-        case 'when': return 'When';
-        case 'then': return 'Then';
-        case 'and': return 'And';
-        case 'but': return 'But';
-        default: return 'Given';
-    }
 }
 
 /**

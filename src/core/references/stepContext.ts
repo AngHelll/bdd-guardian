@@ -7,7 +7,7 @@ import { parseFeatureDocument } from '../parsing/gherkinParser';
 import type { FeatureStep, ResolvedKeyword, StepKeyword, ResolveResult } from '../domain/types';
 import { normalizeWhitespace } from '../matching/normalization';
 import type { createResolver } from '../matching/resolver';
-import { STEP_KEYWORD_REGEX } from '../domain/constants';
+import { gherkinPatternsForText } from '../parsing/gherkinDialect';
 
 /** Build a minimal TextDocument for headless / disk-read feature parsing. */
 export function featureTextDocument(uri: vscode.Uri, text: string): vscode.TextDocument {
@@ -41,32 +41,8 @@ export function getStepAtPositionFromContent(
     );
 }
 
-function resolveKeyword(keyword: string, previous: ResolvedKeyword): ResolvedKeyword {
-    const lower = keyword.toLowerCase();
-    if (lower === 'given') return 'Given';
-    if (lower === 'when') return 'When';
-    if (lower === 'then') return 'Then';
-    return previous;
-}
-
-function isConjunctionKeyword(keyword: string): boolean {
-    const lower = keyword.toLowerCase();
-    return lower === 'and' || lower === 'but' || keyword === '*';
-}
-
-function normalizeStepKeyword(keyword: string): StepKeyword {
-    if (keyword === '*') {
-        return '*';
-    }
-    const lower = keyword.toLowerCase();
-    switch (lower) {
-        case 'given': return 'Given';
-        case 'when': return 'When';
-        case 'then': return 'Then';
-        case 'and': return 'And';
-        case 'but': return 'But';
-        default: return 'Given';
-    }
+function isConjunctionKeyword(keyword: StepKeyword): boolean {
+    return keyword === 'And' || keyword === 'But' || keyword === '*';
 }
 
 /**
@@ -81,13 +57,14 @@ export function getStepAtPosition(
         return feature.allSteps.find(s => s.lineNumber === position.line);
     }
 
+    const patterns = gherkinPatternsForText(document.getText());
     const line = document.lineAt(position.line).text;
-    const stepMatch = line.match(STEP_KEYWORD_REGEX);
+    const stepMatch = line.match(patterns.step);
     if (!stepMatch) {
         return undefined;
     }
 
-    const keywordOriginal = normalizeStepKeyword(stepMatch[1]);
+    const keywordOriginal = patterns.roleOf(stepMatch[1]);
     const rawText = stepMatch[2].trim();
 
     let keywordResolved: ResolvedKeyword = 'Given';
@@ -95,9 +72,9 @@ export function getStepAtPosition(
         keywordResolved = keywordOriginal as ResolvedKeyword;
     } else {
         for (let i = position.line - 1; i >= 0; i--) {
-            const prev = document.lineAt(i).text.match(STEP_KEYWORD_REGEX);
-            if (prev && !isConjunctionKeyword(prev[1])) {
-                keywordResolved = resolveKeyword(prev[1], 'Given');
+            const prev = document.lineAt(i).text.match(patterns.step);
+            if (prev && !isConjunctionKeyword(patterns.roleOf(prev[1]))) {
+                keywordResolved = patterns.roleOf(prev[1]) as ResolvedKeyword;
                 break;
             }
         }

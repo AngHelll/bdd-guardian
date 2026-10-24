@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-23
+
+**Highlights:** A `# language:` header selects the official Gherkin dialect. Spanish `Dado` / `Cuando` / `Entonces` are steps. Matching is unchanged.
+
+### Added
+
+- Gherkin `# language:` selects the official dialect keyword table (for example Spanish `Dado` / `Cuando` / `Entonces`). Matching is unchanged.
+
 ## [1.20.0] - 2026-10-23
 
 **Highlights:** pytest-bdd steps get CodeLens and Go to Definition. `{name}` and `{name:converter}` match one token. Matching is unchanged.

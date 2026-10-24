@@ -3,6 +3,8 @@
  * Central place for all magic numbers, limits, and regex patterns
  */
 
+import { englishGherkinKeywords, englishGherkinPatterns } from '../parsing/gherkinDialect';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // LIMITS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -55,55 +57,41 @@ export const PENALTY_KEYWORD_FALLBACK = 40;
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * English Gherkin keywords. Another language is a data change here, not a new parser.
+ * English Gherkin keywords from the official `en` dialect.
+ * Another language is selected per file (`# language:`), not by editing this list.
  * `*` is a step keyword and resolves like And/But.
  */
-export const GHERKIN_STEP_KEYWORDS = ['Given', 'When', 'Then', 'And', 'But', '*'] as const;
-export const GHERKIN_FEATURE_KEYWORDS = ['Feature'] as const;
-export const GHERKIN_RULE_KEYWORDS = ['Rule'] as const;
-export const GHERKIN_BACKGROUND_KEYWORDS = ['Background'] as const;
-export const GHERKIN_SCENARIO_KEYWORDS = ['Scenario', 'Example'] as const;
-export const GHERKIN_SCENARIO_OUTLINE_KEYWORDS = ['Scenario Outline', 'Scenario Template'] as const;
-export const GHERKIN_EXAMPLES_KEYWORDS = ['Examples', 'Scenarios'] as const;
+export const GHERKIN_STEP_KEYWORDS = englishGherkinKeywords.step;
+export const GHERKIN_FEATURE_KEYWORDS = englishGherkinKeywords.feature;
+export const GHERKIN_RULE_KEYWORDS = englishGherkinKeywords.rule;
+export const GHERKIN_BACKGROUND_KEYWORDS = englishGherkinKeywords.background;
+export const GHERKIN_SCENARIO_KEYWORDS = englishGherkinKeywords.scenario;
+export const GHERKIN_SCENARIO_OUTLINE_KEYWORDS = englishGherkinKeywords.scenarioOutline;
+export const GHERKIN_EXAMPLES_KEYWORDS = englishGherkinKeywords.examples;
 
-function keywordAlternation(keywords: readonly string[]): string {
-    return [...keywords]
-        .sort((a, b) => b.length - a.length)
-        .map((keyword) => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-        .join('|');
-}
-
-function headerPattern(keywords: readonly string[], name: 'required' | 'optional'): RegExp {
-    const nameGroup = name === 'required' ? '(.+)' : '(.*)';
-    return new RegExp(`^\\s*(?:${keywordAlternation(keywords)}):\\s*${nameGroup}$`, 'i');
-}
-
-/** Matches step keywords, including `*`. */
-export const STEP_KEYWORD_REGEX = new RegExp(
-    `^\\s*(${keywordAlternation(GHERKIN_STEP_KEYWORDS)})\\s+(.+)$`,
-    'i'
-);
+/** Matches English step keywords, including `*`. */
+export const STEP_KEYWORD_REGEX = englishGherkinPatterns.step;
 
 /** Matches tag lines: @tag1 @tag2 */
 export const TAG_LINE_REGEX = /^\s*(@[\w-]+(?:\s+@[\w-]+)*)\s*$/;
 
-/** Matches Feature: line */
-export const FEATURE_REGEX = headerPattern(GHERKIN_FEATURE_KEYWORDS, 'required');
+/** Matches Feature: line (English dialect). */
+export const FEATURE_REGEX = englishGherkinPatterns.feature;
 
-/** Matches Rule: line */
-export const RULE_REGEX = headerPattern(GHERKIN_RULE_KEYWORDS, 'optional');
+/** Matches Rule: line (English dialect). */
+export const RULE_REGEX = englishGherkinPatterns.rule;
 
-/** Matches Background: line */
-export const BACKGROUND_REGEX = headerPattern(GHERKIN_BACKGROUND_KEYWORDS, 'optional');
+/** Matches Background: line (English dialect). */
+export const BACKGROUND_REGEX = englishGherkinPatterns.background;
 
-/** Matches Scenario: and Example: */
-export const SCENARIO_REGEX = headerPattern(GHERKIN_SCENARIO_KEYWORDS, 'required');
+/** Matches Scenario: and Example: (English dialect). */
+export const SCENARIO_REGEX = englishGherkinPatterns.scenario;
 
-/** Matches Scenario Outline: and Scenario Template: */
-export const SCENARIO_OUTLINE_REGEX = headerPattern(GHERKIN_SCENARIO_OUTLINE_KEYWORDS, 'required');
+/** Matches Scenario Outline: and Scenario Template: (English dialect). */
+export const SCENARIO_OUTLINE_REGEX = englishGherkinPatterns.scenarioOutline;
 
-/** Matches Examples: and Scenarios: */
-export const EXAMPLES_REGEX = headerPattern(GHERKIN_EXAMPLES_KEYWORDS, 'optional');
+/** Matches Examples: and Scenarios: (English dialect). */
+export const EXAMPLES_REGEX = englishGherkinPatterns.examples;
 
 /** Matches table row: | cell1 | cell2 | */
 export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;

@@ -2,7 +2,7 @@
 
 **Know where every Gherkin step is implemented — and which ones aren't.**
 
-Go to Definition, CodeLens, and live diagnostics for `.feature` files in VS Code. Works with Reqnroll, SpecFlow, Cucumber.js, Cucumber-JVM, Godog, and Behave.
+Go to Definition, CodeLens, and live diagnostics for `.feature` files in VS Code. Works with Reqnroll, SpecFlow, Cucumber.js, Cucumber-JVM, Godog, and Behave. A `.feature` file accepts a `# language:` header.
 
 [![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/anghelll.bdd-guardian?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/anghelll.bdd-guardian)](https://marketplace.visualstudio.com/items?itemName=anghelll.bdd-guardian)

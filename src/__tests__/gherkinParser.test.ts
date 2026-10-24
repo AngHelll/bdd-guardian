@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { parseFeatureDocument } from '../core/parsing/gherkinParser';
+import { getStepAtPosition } from '../core/references/stepContext';
 import { createMockDocument } from './mocks/vscode';
+import { Position } from 'vscode';
 
 function parse(content: string) {
     const doc = createMockDocument(content, 'fixture.feature');
@@ -110,6 +112,101 @@ describe('gherkinParser fidelity', () => {
     });
 });
 
+describe('gherkinParser languages', () => {
+    it('indexes Spanish steps and swallows the feature description', () => {
+        const doc = parse(`# language: ES
+Característica: Búsqueda
+
+  Esta línea no es un step
+  Dado en la descripción
+
+  Escenario: uno
+    Dado a user exists
+    Cuando the user searches
+    Entonces the user sees results
+`);
+        expect(doc!.featureName).toBe('Búsqueda');
+        expect(doc!.allSteps.map((s) => `${s.keywordOriginal}:${s.keywordResolved}:${s.rawText}`)).toEqual([
+            'Given:Given:a user exists',
+            'When:When:the user searches',
+            'Then:Then:the user sees results',
+        ]);
+    });
+
+    it('treats Y, E, Pero and * as conjunctions', () => {
+        const doc = parse(`# language: es
+Característica: F
+  Escenario: s
+    Dado a user
+    Y sigue
+    E sigue también
+    Pero no
+    * y esto
+`);
+        expect(doc!.allSteps.map((s) => `${s.keywordOriginal}:${s.keywordResolved}:${s.rawText}`)).toEqual([
+            'Given:Given:a user',
+            'And:Given:sigue',
+            'And:Given:sigue también',
+            'But:Given:no',
+            '*:Given:y esto',
+        ]);
+    });
+
+    it('treats Ejemplos as an examples table', () => {
+        const doc = parse(`# language: es
+Característica: F
+  Esquema del escenario: saludar
+    Cuando saludo a <nombre>
+  Ejemplos:
+    | nombre |
+    | Ada |
+`);
+        expect(doc!.scenarios).toHaveLength(1);
+        expect(doc!.scenarios[0].type).toBe('Scenario Outline');
+        expect(doc!.allSteps[0].candidateTexts).toContain('saludo a Ada');
+    });
+
+    it('keeps English when the code is unknown or the header is not the first line', () => {
+        const unknown = parse(`# language: zz
+Feature: F
+  Scenario: s
+    Given real
+    Dado hola
+`);
+        expect(unknown!.allSteps.map((s) => s.rawText)).toEqual(['real']);
+
+        const later = parse(`
+# language: es
+Feature: F
+  Scenario: s
+    Given real
+    Dado hola
+`);
+        expect(later!.allSteps.map((s) => s.rawText)).toEqual(['real']);
+    });
+
+    it('reads a French given keyword and a BOM before the header', () => {
+        const doc = parse(`\uFEFF# language: fr
+Fonctionnalité: Recherche
+  Scénario: un
+    Étant donné un utilisateur
+`);
+        expect(doc!.featureName).toBe('Recherche');
+        expect(doc!.allSteps.map((s) => `${s.keywordOriginal}:${s.rawText}`)).toEqual([
+            'Given:un utilisateur',
+        ]);
+    });
+
+    it('uses the language header in the single-line fallback', () => {
+        const content = '# language: es\nDado hola\n';
+        const doc = createMockDocument(content, 'fallback.feature');
+        const step = getStepAtPosition(doc as never, new Position(1, 0));
+        expect(step?.keywordOriginal).toBe('Given');
+        expect(step?.keywordResolved).toBe('Given');
+        expect(step?.rawText).toBe('hola');
+    });
+});
+
 describe('gherkinParser sample regression', () => {
     const expectedSteps: Record<string, number> = {
         'behave-demo/features/search.feature': 3,
@@ -119,6 +216,7 @@ describe('gherkinParser sample regression', () => {
         'godog-demo/features/godogs.feature': 3,
         'java-cucumber-demo/src/test/resources/features/search.feature': 3,
         'pytest-bdd-demo/features/search.feature': 2,
+        'gherkin-languages/busqueda.feature': 3,
     };
 
     it('keeps the same step count on every sample feature', () => {
