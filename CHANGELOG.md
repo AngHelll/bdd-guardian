@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.19.2] - 2026-10-23
+
+**Highlights:** Descriptions and docstrings are no longer treated as steps. `*` and the English headers `Example:`, `Scenario Template:`, `Scenarios:`, and `Rule:` are recognized. Matching is unchanged.
+
+### Fixed
+
+- Gherkin descriptions and docstrings are no longer indexed as steps. `*` is a step keyword (same resolution as And/But). English headers `Example:`, `Scenario Template:`, `Scenarios:`, and `Rule:` are recognized. Matching is unchanged.
+
 ## [1.19.1] - 2026-10-23
 
 **Highlights:** CI and contributor tooling move to Node.js 22. The Marketplace listing is refreshed. Matching is unchanged.

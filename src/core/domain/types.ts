@@ -13,8 +13,8 @@ import * as vscode from 'vscode';
 // ENUMS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** Step keywords as written in feature files */
-export type StepKeyword = 'Given' | 'When' | 'Then' | 'And' | 'But';
+/** Step keywords as written in feature files. `*` resolves like And/But. */
+export type StepKeyword = 'Given' | 'When' | 'Then' | 'And' | 'But' | '*';
 
 /** Resolved step keywords (And/But resolved to actual keyword) */
 export type ResolvedKeyword = 'Given' | 'When' | 'Then';
@@ -81,7 +81,7 @@ export interface ExampleTable {
  * Represents a single step in a feature file
  */
 export interface FeatureStep {
-    /** Original keyword (Given/When/Then/And/But) */
+    /** Original keyword (Given/When/Then/And/But/`*`) */
     readonly keywordOriginal: StepKeyword;
     /** Resolved keyword (And/But -> previous keyword) */
     readonly keywordResolved: ResolvedKeyword;

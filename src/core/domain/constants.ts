@@ -54,26 +54,56 @@ export const PENALTY_KEYWORD_FALLBACK = 40;
 // REGEX PATTERNS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** Matches step keywords: Given, When, Then, And, But */
-export const STEP_KEYWORD_REGEX = /^\s*(Given|When|Then|And|But)\s+(.+)$/i;
+/**
+ * English Gherkin keywords. Another language is a data change here, not a new parser.
+ * `*` is a step keyword and resolves like And/But.
+ */
+export const GHERKIN_STEP_KEYWORDS = ['Given', 'When', 'Then', 'And', 'But', '*'] as const;
+export const GHERKIN_FEATURE_KEYWORDS = ['Feature'] as const;
+export const GHERKIN_RULE_KEYWORDS = ['Rule'] as const;
+export const GHERKIN_BACKGROUND_KEYWORDS = ['Background'] as const;
+export const GHERKIN_SCENARIO_KEYWORDS = ['Scenario', 'Example'] as const;
+export const GHERKIN_SCENARIO_OUTLINE_KEYWORDS = ['Scenario Outline', 'Scenario Template'] as const;
+export const GHERKIN_EXAMPLES_KEYWORDS = ['Examples', 'Scenarios'] as const;
+
+function keywordAlternation(keywords: readonly string[]): string {
+    return [...keywords]
+        .sort((a, b) => b.length - a.length)
+        .map((keyword) => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|');
+}
+
+function headerPattern(keywords: readonly string[], name: 'required' | 'optional'): RegExp {
+    const nameGroup = name === 'required' ? '(.+)' : '(.*)';
+    return new RegExp(`^\\s*(?:${keywordAlternation(keywords)}):\\s*${nameGroup}$`, 'i');
+}
+
+/** Matches step keywords, including `*`. */
+export const STEP_KEYWORD_REGEX = new RegExp(
+    `^\\s*(${keywordAlternation(GHERKIN_STEP_KEYWORDS)})\\s+(.+)$`,
+    'i'
+);
 
 /** Matches tag lines: @tag1 @tag2 */
 export const TAG_LINE_REGEX = /^\s*(@[\w-]+(?:\s+@[\w-]+)*)\s*$/;
 
 /** Matches Feature: line */
-export const FEATURE_REGEX = /^\s*Feature:\s*(.+)$/i;
+export const FEATURE_REGEX = headerPattern(GHERKIN_FEATURE_KEYWORDS, 'required');
+
+/** Matches Rule: line */
+export const RULE_REGEX = headerPattern(GHERKIN_RULE_KEYWORDS, 'optional');
 
 /** Matches Background: line */
-export const BACKGROUND_REGEX = /^\s*Background:\s*(.*)$/i;
+export const BACKGROUND_REGEX = headerPattern(GHERKIN_BACKGROUND_KEYWORDS, 'optional');
 
-/** Matches Scenario: line */
-export const SCENARIO_REGEX = /^\s*Scenario:\s*(.+)$/i;
+/** Matches Scenario: and Example: */
+export const SCENARIO_REGEX = headerPattern(GHERKIN_SCENARIO_KEYWORDS, 'required');
 
-/** Matches Scenario Outline: line */
-export const SCENARIO_OUTLINE_REGEX = /^\s*Scenario Outline:\s*(.+)$/i;
+/** Matches Scenario Outline: and Scenario Template: */
+export const SCENARIO_OUTLINE_REGEX = headerPattern(GHERKIN_SCENARIO_OUTLINE_KEYWORDS, 'required');
 
-/** Matches Examples: line */
-export const EXAMPLES_REGEX = /^\s*Examples:\s*(.*)$/i;
+/** Matches Examples: and Scenarios: */
+export const EXAMPLES_REGEX = headerPattern(GHERKIN_EXAMPLES_KEYWORDS, 'optional');
 
 /** Matches table row: | cell1 | cell2 | */
 export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;

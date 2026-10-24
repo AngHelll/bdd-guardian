@@ -25,6 +25,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Reuse hint (v1.17.0+)** — After a step is already unbound, hover, Problems, and CLI/MCP `suggest-reuse` may name **one** existing binding the text resembles (token overlap). Advisory only: it does not change bound/unbound/ambiguous and it is not a second matcher or a literal fallback. Silence when nothing clears the threshold or the top score ties. Out-of-scope bindings are not suggested.
 - **Closed step (v1.18.0+)** — If reuse stays silent and the unbound text differs from one binding by a single word, hover and Problems say to parameterize that word (or to reuse the binding when that position is already a parameter). Coach `coach/literal-cluster` flags the same pattern among steps in one `.feature`. `vocabulary` lists the humanized catalog. None of this changes match status.
 - **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
+- **Star steps** — `*` is a step keyword and resolves like `And` / `But` (the previous strong keyword, or `Given` when it is first in the block).
 - **Cucumber Expressions Wave A** — `{int}`, `{float|double}`, `{word}`, `{string}` compile to regex via `cucumberExpression.ts` when `ExpressionType.CucumberExpression` is set or the pattern looks like CE (`{name}` placeholders, not `\d{2}`).
 - **Cucumber Expressions Wave B (v1.10.0+)** —
   - **Optional text** — `(…)` segments are optional (`cucumber(s)` matches `cucumber` and `cucumbers`).

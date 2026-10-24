@@ -16,6 +16,7 @@ import {
     STEP_KEYWORD_REGEX,
     TAG_LINE_REGEX,
     FEATURE_REGEX,
+    RULE_REGEX,
     BACKGROUND_REGEX,
     SCENARIO_REGEX,
     SCENARIO_OUTLINE_REGEX,
@@ -43,34 +44,53 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
     let currentExamples: MutableExampleTable | null = null;
     let inBackground = false;
     let lastResolvedKeyword: ResolvedKeyword = 'Given';
+    /** Feature/Rule prose swallows step-like lines. Other blocks end at the first step. */
+    let description: 'swallow' | 'until-step' | null = null;
+    let docstringDelim: DocstringDelim | null = null;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmedLine = line.trim();
 
-        // Skip empty lines and comments
+        if (docstringDelim) {
+            if (trimmedLine === docstringDelim) {
+                docstringDelim = null;
+            }
+            continue;
+        }
+
         if (!trimmedLine || trimmedLine.startsWith('#')) {
             continue;
         }
 
-        // Parse tags
-        const tagMatch = trimmedLine.match(TAG_LINE_REGEX);
-        if (tagMatch) {
-            const tags = tagMatch[1].split(/\s+/).filter(t => t.startsWith('@'));
-            pendingTags.push(...tags);
+        const openedDocstring = docstringDelimiter(trimmedLine);
+        if (openedDocstring) {
+            docstringDelim = openedDocstring;
             continue;
         }
 
-        // Parse Feature:
         const featureMatch = trimmedLine.match(FEATURE_REGEX);
         if (featureMatch) {
             featureName = featureMatch[1].trim();
             featureTags = [...pendingTags];
             pendingTags = [];
+            description = 'swallow';
             continue;
         }
 
-        // Parse Background:
+        if (RULE_REGEX.test(trimmedLine)) {
+            if (currentScenario) {
+                finalizeScenario(currentScenario, scenarios);
+            }
+            inBackground = false;
+            currentScenario = null;
+            currentExamples = null;
+            lastResolvedKeyword = 'Given';
+            pendingTags = [];
+            description = 'swallow';
+            continue;
+        }
+
         const backgroundMatch = trimmedLine.match(BACKGROUND_REGEX);
         if (backgroundMatch) {
             inBackground = true;
@@ -78,45 +98,18 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             currentExamples = null;
             lastResolvedKeyword = 'Given';
             pendingTags = [];
+            description = 'until-step';
             continue;
         }
 
-        // Parse Scenario:
-        const scenarioMatch = trimmedLine.match(SCENARIO_REGEX);
-        if (scenarioMatch) {
-            // Finalize previous scenario
-            if (currentScenario) {
-                finalizeScenario(currentScenario, scenarios);
-            }
-
-            inBackground = false;
-            currentExamples = null;
-            lastResolvedKeyword = 'Given';
-            
-            currentScenario = {
-                type: 'Scenario',
-                name: scenarioMatch[1].trim(),
-                tags: [...pendingTags],
-                steps: [],
-                examples: [],
-                range: new vscode.Range(i, 0, i, line.length),
-            };
-            pendingTags = [];
-            continue;
-        }
-
-        // Parse Scenario Outline:
         const outlineMatch = trimmedLine.match(SCENARIO_OUTLINE_REGEX);
         if (outlineMatch) {
-            // Finalize previous scenario
             if (currentScenario) {
                 finalizeScenario(currentScenario, scenarios);
             }
-
             inBackground = false;
             currentExamples = null;
             lastResolvedKeyword = 'Given';
-            
             currentScenario = {
                 type: 'Scenario Outline',
                 name: outlineMatch[1].trim(),
@@ -126,10 +119,31 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
                 range: new vscode.Range(i, 0, i, line.length),
             };
             pendingTags = [];
+            description = 'until-step';
             continue;
         }
 
-        // Parse Examples: (Scenario Outline or Scenario with Examples table)
+        const scenarioMatch = trimmedLine.match(SCENARIO_REGEX);
+        if (scenarioMatch) {
+            if (currentScenario) {
+                finalizeScenario(currentScenario, scenarios);
+            }
+            inBackground = false;
+            currentExamples = null;
+            lastResolvedKeyword = 'Given';
+            currentScenario = {
+                type: 'Scenario',
+                name: scenarioMatch[1].trim(),
+                tags: [...pendingTags],
+                steps: [],
+                examples: [],
+                range: new vscode.Range(i, 0, i, line.length),
+            };
+            pendingTags = [];
+            description = 'until-step';
+            continue;
+        }
+
         const examplesMatch = trimmedLine.match(EXAMPLES_REGEX);
         if (examplesMatch && currentScenario) {
             currentExamples = {
@@ -139,44 +153,59 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             };
             currentScenario.examples.push(currentExamples);
             pendingTags = [];
+            description = 'until-step';
             continue;
         }
 
-        // Parse table rows (for Examples)
+        const tagMatch = trimmedLine.match(TAG_LINE_REGEX);
+        if (tagMatch) {
+            description = null;
+            const tags = tagMatch[1].split(/\s+/).filter(t => t.startsWith('@'));
+            pendingTags.push(...tags);
+            continue;
+        }
+
         const tableMatch = trimmedLine.match(TABLE_ROW_REGEX);
-        if (tableMatch && currentExamples) {
-            const cells = tableMatch[1].split('|').map(c => c.trim());
-            
-            if (currentExamples.headers.length === 0) {
-                currentExamples.headers = cells;
-            } else if (currentExamples.rows.length < MAX_EXAMPLE_ROWS) {
-                currentExamples.rows.push(cells);
+        if (tableMatch) {
+            if (description === 'swallow') {
+                description = null;
+                continue;
+            }
+            description = null;
+            if (currentExamples) {
+                const cells = tableMatch[1].split('|').map(c => c.trim());
+                if (currentExamples.headers.length === 0) {
+                    currentExamples.headers = cells;
+                } else if (currentExamples.rows.length < MAX_EXAMPLE_ROWS) {
+                    currentExamples.rows.push(cells);
+                }
             }
             continue;
         }
 
-        // Parse step lines
         const stepMatch = trimmedLine.match(STEP_KEYWORD_REGEX);
         if (stepMatch) {
+            if (description === 'swallow') {
+                continue;
+            }
+            description = null;
+
             const keywordOriginal = normalizeKeyword(stepMatch[1]);
             const rawText = stepMatch[2].trim();
 
-            // Resolve And/But to previous keyword
             let keywordResolved: ResolvedKeyword;
-            if (keywordOriginal === 'And' || keywordOriginal === 'But') {
+            if (isConjunction(keywordOriginal)) {
                 keywordResolved = lastResolvedKeyword;
             } else {
                 keywordResolved = keywordOriginal as ResolvedKeyword;
                 lastResolvedKeyword = keywordResolved;
             }
 
-            // Compute effective tags
             const tagsEffective = [...featureTags];
             if (currentScenario) {
                 tagsEffective.push(...currentScenario.tags);
             }
 
-            // Determine if scenario uses outline-style placeholders
             const scenarioExamples = currentScenario?.examples?.filter(
                 (e) => e.headers.length > 0 && e.rows.length > 0
             );
@@ -248,7 +277,26 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
 /**
  * Normalize step keyword to proper case
  */
+type DocstringDelim = '"""' | '```';
+
+function docstringDelimiter(trimmed: string): DocstringDelim | null {
+    if (trimmed.startsWith('"""')) {
+        return '"""';
+    }
+    if (trimmed.startsWith('```')) {
+        return '```';
+    }
+    return null;
+}
+
+function isConjunction(keyword: StepKeyword): boolean {
+    return keyword === 'And' || keyword === 'But' || keyword === '*';
+}
+
 function normalizeKeyword(keyword: string): StepKeyword {
+    if (keyword === '*') {
+        return '*';
+    }
     const lower = keyword.toLowerCase();
     switch (lower) {
         case 'given': return 'Given';

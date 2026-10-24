@@ -7,8 +7,7 @@ import { parseFeatureDocument } from '../parsing/gherkinParser';
 import type { FeatureStep, ResolvedKeyword, StepKeyword, ResolveResult } from '../domain/types';
 import { normalizeWhitespace } from '../matching/normalization';
 import type { createResolver } from '../matching/resolver';
-
-const STEP_LINE_REGEX = /^\s*(Given|When|Then|And|But)\s+(.+)$/i;
+import { STEP_KEYWORD_REGEX } from '../domain/constants';
 
 /** Build a minimal TextDocument for headless / disk-read feature parsing. */
 export function featureTextDocument(uri: vscode.Uri, text: string): vscode.TextDocument {
@@ -50,7 +49,15 @@ function resolveKeyword(keyword: string, previous: ResolvedKeyword): ResolvedKey
     return previous;
 }
 
+function isConjunctionKeyword(keyword: string): boolean {
+    const lower = keyword.toLowerCase();
+    return lower === 'and' || lower === 'but' || keyword === '*';
+}
+
 function normalizeStepKeyword(keyword: string): StepKeyword {
+    if (keyword === '*') {
+        return '*';
+    }
     const lower = keyword.toLowerCase();
     switch (lower) {
         case 'given': return 'Given';
@@ -71,14 +78,11 @@ export function getStepAtPosition(
 ): FeatureStep | undefined {
     const feature = parseFeatureDocument(document);
     if (feature) {
-        const fromIndex = feature.allSteps.find(s => s.lineNumber === position.line);
-        if (fromIndex) {
-            return fromIndex;
-        }
+        return feature.allSteps.find(s => s.lineNumber === position.line);
     }
 
     const line = document.lineAt(position.line).text;
-    const stepMatch = line.match(STEP_LINE_REGEX);
+    const stepMatch = line.match(STEP_KEYWORD_REGEX);
     if (!stepMatch) {
         return undefined;
     }
@@ -87,12 +91,12 @@ export function getStepAtPosition(
     const rawText = stepMatch[2].trim();
 
     let keywordResolved: ResolvedKeyword = 'Given';
-    if (keywordOriginal !== 'And' && keywordOriginal !== 'But') {
+    if (!isConjunctionKeyword(keywordOriginal)) {
         keywordResolved = keywordOriginal as ResolvedKeyword;
     } else {
         for (let i = position.line - 1; i >= 0; i--) {
-            const prev = document.lineAt(i).text.match(STEP_LINE_REGEX);
-            if (prev) {
+            const prev = document.lineAt(i).text.match(STEP_KEYWORD_REGEX);
+            if (prev && !isConjunctionKeyword(prev[1])) {
                 keywordResolved = resolveKeyword(prev[1], 'Given');
                 break;
             }
