@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.19.2** Marketplace 2026-10-23 · GitHub: [v1.19.2](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.19.2)
+> **Current release: v1.20.0** Marketplace 2026-10-23 · GitHub: [v1.20.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.20.0)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.19.2** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.20.0** (Marketplace + GitHub) |
 | 🎯 Next | (dogfood / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -79,6 +79,7 @@
 | **1.19.0** | One-time BDD Gherkin Format hint ✅ |
 | **1.19.1** | Node 22/24 CI, marketplace listing, Open VSX ✅ |
 | **1.19.2** | Gherkin parser fidelity — descriptions, docstrings, `*`, English header synonyms ✅ |
+| **1.20.0** | pytest-bdd provider — `@given` string steps, `{name}` and `{name:converter}` ✅ |
 
 ---
 
@@ -658,4 +659,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-10-23 — v1.19.2 parser fidelity shipped (Marketplace + GitHub + Open VSX).*
+*Last updated: 2026-10-23 — v1.20.0 pytest-bdd provider shipped (Marketplace + GitHub + Open VSX).*
