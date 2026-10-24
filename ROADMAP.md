@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.21.0** Marketplace 2026-10-23 · GitHub: [v1.21.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.21.0)
+> **Current release: v1.21.1** Marketplace 2026-10-23 · GitHub: [v1.21.1](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.21.1)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.21.0** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.21.1** (Marketplace + GitHub) |
 | 🎯 Next | (dogfood / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -81,6 +81,7 @@
 | **1.19.2** | Gherkin parser fidelity — descriptions, docstrings, `*`, English header synonyms ✅ |
 | **1.20.0** | pytest-bdd provider — `@given` string steps, `{name}` and `{name:converter}` ✅ |
 | **1.21.0** | Gherkin `# language:` — official dialect keyword table ✅ |
+| **1.21.1** | Suite map hierarchy — unbound/ambiguous icons use `charts.*`; hole label + dimmed `L{n}` ✅ |
 
 ---
 
@@ -660,4 +661,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-10-23 — v1.21.0 Gherkin languages shipped (Marketplace + GitHub + Open VSX).*
+*Last updated: 2026-10-23 — v1.21.1 suite map hierarchy shipped (Marketplace + GitHub + Open VSX).*
