@@ -32,7 +32,7 @@ npm run guardian:mcp   # MCP stdio server
 JSON with `schemaVersion: 1`.
 
 - **discover** — features (path + stepCount), bindings (path + pattern + providerId), `providersDetected`
-- **analyze** — `counts` (features, steps, bindings, bound, unbound, ambiguous, orphanBindings) plus capped detail lists
+- **analyze** — `counts` (features, steps, bindings, bound, unbound, ambiguous, orphanBindings) plus capped detail lists. `orphanScan` is `complete`: this command always finishes the scan, and `orphanBindings` stays a number (`schemaVersion` remains 1).
 - **resolve-step** — `status` (`bound` / `unbound` / `ambiguous` / `no_step`), `matches[]`, English `why` when unbound or ambiguous
 - **coach-analyze** — `counts.files` / `findings` / `byRuleId`, capped `findings[]` (no quick fixes)
 - **suggest-reuse** — `status` `reuse` or `none`, plus one `suggestion` (path, pattern, humanized text, score) or `null`. Advisory token overlap after the fact; it does not change bound/unbound/ambiguous. `--tags` limits candidates with the same scope filter as the editor.
@@ -80,4 +80,5 @@ Requires a prior `npm run compile` so `out/cli/mcpServer.js` exists. Local paths
 
 - Does **not** run tests (use [BDD Pilot](https://github.com/AngHelll/bdd-pilot) for execution).
 - Does **not** replace Index API `extension.exports` for in-process companions.
-- Scripts live under `scripts/`; they are excluded from the Marketplace VSIX (`.vscodeignore`).
+- CLI and MCP are not part of the Marketplace VSIX. `npm run guardian` and `npm run guardian:mcp` need this repository and a prior `npm run compile` (`out/cli/` and `scripts/` stay out of the package).
+- `analyze` always reports `orphanScan: "complete"` and a numeric `counts.orphanBindings`. The editor map can skip that scan above 2,000 bindings; a reader that ignores `orphanScan` must not treat the leftover `0` as a measured count. `schemaVersion` stays `1`.

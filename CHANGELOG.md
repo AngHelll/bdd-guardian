@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.23.0] - 2026-10-26
+
+**Highlights:** A step matches only its own keyword. Qualified Reqnroll and SpecFlow attributes are indexed. A skipped orphan scan is no longer shown as zero orphans. The VSIX no longer ships development artifacts.
+
+### Fixed
+
+- A step matches only a binding of its effective keyword. `And`, `But`, and `*` still use the keyword the Gherkin parser already resolved. `[StepDefinition]` still matches Given, When, and Then. A `When` no longer binds to a `[Given]` with the same text.
+- C# attributes are recognized as `Reqnroll.Given`, `Reqnroll.GivenAttribute`, `global::Reqnroll.Given`, and the same forms for When, Then, and StepDefinition. `TechTalk.SpecFlow` is accepted the same way. Other namespaces are not. `[Binding]` is still not required to index a method. Qualified SpecFlow names were not run against the SpecFlow runner.
+- The BDD Map no longer shows `0` orphans when the orphan scan did not finish. The count is shown only when `orphanScan` is `complete`. Above 2,000 bindings the scan stays skipped, and the listed orphans stay capped at 500.
+- The VSIX excludes source, tests, fixtures, `bin/`, and `obj/`. CLI and MCP are not inside the distributed VSIX; they run from a compiled checkout.
+
+### CLI
+
+- `analyze` adds `orphanScan: "complete"`. This command always finishes the scan.
+- `schemaVersion` stays `1`.
+- `counts.orphanBindings` stays a number. A reader that looks only at that field still sees `0` when the map skipped the scan; the map does not present that `0` as a measurement.
+
 ## [1.22.0] - 2026-10-24
 
 **Highlights:** Reqnroll `{name}` from a step argument transformation links. `{decimal}`, `{Guid}`, and `{}` compile. An unknown name still does not become `.*`.

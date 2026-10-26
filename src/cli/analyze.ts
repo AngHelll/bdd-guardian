@@ -26,6 +26,11 @@ export interface AnalyzeOrphanRow {
 export interface AnalyzeReport {
     schemaVersion: number;
     projectDir: string;
+    /**
+     * `analyze` always finishes the orphan scan, so `counts.orphanBindings` is a measurement.
+     * Added beside schema 1. Older readers can ignore it.
+     */
+    orphanScan: 'complete';
     counts: {
         features: number;
         steps: number;
@@ -92,6 +97,7 @@ export function buildAnalyzeReport(
     return {
         schemaVersion: CLI_SCHEMA_VERSION,
         projectDir: project.projectDir,
+        orphanScan: 'complete',
         counts: {
             features: project.features.length,
             steps: allSteps.length,

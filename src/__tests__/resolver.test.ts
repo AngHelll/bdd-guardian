@@ -179,21 +179,124 @@ describe('createResolver', () => {
       expect(result.candidates.length).toBe(0);
     });
 
-    it('should use fallback matching when keyword does not match', () => {
-      // The resolver has a fallback mechanism that tries other keywords
-      // when no exact keyword match is found
-      // 'I press' is a When binding - Given keyword will fallback
+    it('does not bind a Given step to a When pattern of the same text', () => {
+      // Previously this Given matched WhenPress through the keyword fallback.
       const step = createStep('Given', 'I press "add"');
       const result = resolve(step);
-      
-      // The resolver finds the When binding via fallback
-      // This is expected behavior - it helps when And/But steps need to find bindings
-      expect(result.candidates.length).toBeGreaterThanOrEqual(0);
-      if (result.candidates.length > 0) {
-        // If found via fallback, it should be the When binding
-        expect(result.candidates[0].binding.methodName).toBe('WhenPress');
-      }
+
+      expect(result.status).toBe('unbound');
+      expect(result.candidates).toHaveLength(0);
+      expect(result.best).toBeUndefined();
     });
+  });
+});
+
+describe('keyword boundary', () => {
+  function binding(keyword: ResolvedKeyword, pattern: string, methodName: string): Binding {
+    return createBinding(keyword, pattern, methodName);
+  }
+
+  function resolveWith(items: readonly Binding[], step: FeatureStep) {
+    return createResolver({
+      getAllBindings: () => items,
+      getBindingsByKeyword: (keyword) => items.filter((item) => item.keyword === keyword),
+      preferSpecificBinding: false,
+    })(step);
+  }
+
+  it('binds each keyword only to its own attribute', () => {
+    const items = [
+      binding('Given', 'the gate is open', 'OpenGiven'),
+      binding('When', 'the gate moves', 'MoveWhen'),
+      binding('Then', 'the gate is closed', 'CloseThen'),
+    ];
+
+    const given = resolveWith(items, createStep('Given', 'the gate is open'));
+    expect(given.status).toBe('bound');
+    expect(given.best?.keywordMatched).toBe(true);
+    expect(given.best?.binding.keyword).toBe('Given');
+
+    const when = resolveWith(items, createStep('When', 'the gate moves'));
+    expect(when.status).toBe('bound');
+    expect(when.best?.keywordMatched).toBe(true);
+    expect(when.best?.binding.keyword).toBe('When');
+
+    const then = resolveWith(items, createStep('Then', 'the gate is closed'));
+    expect(then.status).toBe('bound');
+    expect(then.best?.keywordMatched).toBe(true);
+    expect(then.best?.binding.keyword).toBe('Then');
+  });
+
+  it('leaves a When unbound when the only pattern is Given', () => {
+    const items = [binding('Given', 'the pump is primed', 'Primed')];
+    const result = resolveWith(items, createStep('When', 'the pump is primed'));
+    expect(result.status).toBe('unbound');
+    expect(result.candidates).toHaveLength(0);
+  });
+
+  it('uses the resolved keyword for And, But and star', () => {
+    const items = [
+      binding('Given', 'the anchor is given', 'AnchorGiven'),
+      binding('Given', 'the follow up is given', 'FollowGiven'),
+      binding('When', 'the anchor is when', 'AnchorWhen'),
+      binding('When', 'the follow up is when', 'FollowWhen'),
+      binding('Then', 'the memory stays clear', 'Memory'),
+    ];
+
+    const andGiven = resolveWith(items, createStep('Given', 'the follow up is given', 'And'));
+    expect(andGiven.status).toBe('bound');
+    expect(andGiven.best?.keywordMatched).toBe(true);
+    expect(andGiven.best?.binding.methodName).toBe('FollowGiven');
+
+    const andWhen = resolveWith(items, createStep('When', 'the follow up is when', 'And'));
+    expect(andWhen.status).toBe('bound');
+    expect(andWhen.best?.binding.keyword).toBe('When');
+
+    const andCross = resolveWith(items, createStep('When', 'the follow up is given', 'And'));
+    expect(andCross.status).toBe('unbound');
+    expect(andCross.candidates).toHaveLength(0);
+
+    const but = resolveWith(items, createStep('Then', 'the memory stays clear', 'But'));
+    expect(but.status).toBe('bound');
+    expect(but.best?.keywordMatched).toBe(true);
+    expect(but.best?.binding.keyword).toBe('Then');
+
+    const star = resolveWith(items, createStep('Given', 'the anchor is given', '*'));
+    expect(star.status).toBe('bound');
+    expect(star.best?.keywordMatched).toBe(true);
+    expect(star.step.keywordOriginal).toBe('*');
+  });
+
+  it('matches the StepDefinition copy of the effective keyword and ignores the others', () => {
+    const items = [
+      binding('Given', 'I do a generic step', 'Any'),
+      binding('When', 'I do a generic step', 'Any'),
+      binding('Then', 'I do a generic step', 'Any'),
+    ];
+    const result = resolveWith(items, createStep('When', 'I do a generic step'));
+    expect(result.status).toBe('bound');
+    expect(result.candidates).toHaveLength(1);
+    expect(result.best?.binding.keyword).toBe('When');
+    expect(result.best?.keywordMatched).toBe(true);
+  });
+
+  it('stays ambiguous when two patterns of the same keyword overlap', () => {
+    const items = [
+      binding('Given', 'I have entered (\\d+) into the calculator', 'Numeric'),
+      binding('Given', 'I have entered (.*) into the calculator', 'Anything'),
+    ];
+    const result = resolveWith(items, createStep('Given', 'I have entered 100 into the calculator'));
+    expect(result.status).toBe('ambiguous');
+    expect(result.candidates).toHaveLength(2);
+    expect(result.candidates.every((candidate) => candidate.keywordMatched)).toBe(true);
+  });
+
+  it('stays unbound when the effective keyword has no candidate', () => {
+    const items = [binding('Then', 'the gate is closed', 'CloseThen')];
+    const result = resolveWith(items, createStep('When', 'the gate is closed'));
+    expect(result.status).toBe('unbound');
+    expect(result.candidates).toHaveLength(0);
+    expect(result.best).toBeUndefined();
   });
 });
 

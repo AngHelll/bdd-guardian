@@ -28,7 +28,12 @@ import {
     resolveUnboundMapAuthorAction,
     type AuthorStepRef,
 } from '../author/bindingCodeActionsProvider';
-import { formatSuiteMapHoleDescription, formatSuiteMapHoleLabel } from './suiteMapLabels';
+import {
+    formatSuiteMapHoleDescription,
+    formatSuiteMapHoleLabel,
+    suiteMapOrphanGroupMessage,
+    suiteMapSummaryMessage,
+} from './suiteMapLabels';
 
 export const SUITE_MAP_VIEW_ID = 'bddGuardian.suiteMap';
 export const SUITE_MAP_FOCUS_COMMAND = 'bddGuardian.suiteMap.focus';
@@ -147,15 +152,9 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
                     `suiteMap.more.${element.parent.group}`
                 );
             case 'summary': {
-                const c = element.summary.counts;
+                const message = suiteMapSummaryMessage(element.summary);
                 const item = new vscode.TreeItem(
-                    t(
-                        'suiteMapSummary',
-                        String(c.bound),
-                        String(c.unbound),
-                        String(c.ambiguous),
-                        String(c.orphanBindings)
-                    ),
+                    t(message.key, ...message.args),
                     vscode.TreeItemCollapsibleState.None
                 );
                 item.id = 'suiteMap.summary';
@@ -164,14 +163,13 @@ export class SuiteMapTreeProvider implements vscode.TreeDataProvider<SuiteMapNod
                 return item;
             }
             case 'group': {
+                const orphanGroup = suiteMapOrphanGroupMessage(element.summary);
                 const label =
                     element.group === 'unbound'
                         ? t('suiteMapUnbound', String(element.summary.counts.unbound))
                         : element.group === 'ambiguous'
                           ? t('suiteMapAmbiguous', String(element.summary.counts.ambiguous))
-                          : element.summary.orphansSkipped
-                            ? t('suiteMapOrphansSkipped')
-                            : t('suiteMapOrphans', String(element.summary.counts.orphanBindings));
+                          : t(orphanGroup.key, ...orphanGroup.args);
                 const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Expanded);
                 item.id = `suiteMap.group.${element.group}`;
                 item.iconPath =

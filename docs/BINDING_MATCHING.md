@@ -26,6 +26,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Closed step (v1.18.0+)** — If reuse stays silent and the unbound text differs from one binding by a single word, hover and Problems say to parameterize that word (or to reuse the binding when that position is already a parameter). Coach `coach/literal-cluster` flags the same pattern among steps in one `.feature`. `vocabulary` lists the humanized catalog. None of this changes match status.
 - **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
 - **Star steps** — `*` is a step keyword and resolves like `And` / `But` (the previous strong keyword, or `Given` when it is first in the block).
+- **Keyword boundary (v1.23.0+)** — The resolver considers only bindings of `keywordResolved` (already Given, When, or Then). A binding of another keyword is not a candidate. `[StepDefinition]` is stored once per keyword, so it still matches all three. There is no cross-keyword fallback.
 - **Cucumber Expressions Wave A** — `{int}`, `{float|double}`, `{word}`, `{string}` compile to regex via `cucumberExpression.ts` when `ExpressionType.CucumberExpression` is set or the pattern looks like CE (`{name}` placeholders, not `\d{2}`).
 - **Cucumber Expressions Wave B (v1.10.0+)** —
   - **Optional text** — `(…)` segments are optional (`cucumber(s)` matches `cucumber` and `cucumbers`).
@@ -42,6 +43,9 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 
 ## Documented limitations
 
+- The binding pool is the whole workspace. Guardian does not filter candidates by project or by `ProjectReference`.
+- The C# parser indexes a step method without `[Binding]`. Reqnroll 3.3.4 leaves that method undefined at runtime. The class name is the last `class` before the attribute, so nested and `partial` types can be named incorrectly. A well-formed attribute inside a comment or string can still be indexed. Unknown namespaces, and `SpecFlow` without the `TechTalk.` prefix, are ignored.
+- Keyword matching uses one resolver for every provider. Reqnroll 3.3.4 was the runner compared for the keyword boundary and for qualified `Reqnroll.Given` forms. Qualified SpecFlow, Cucumber, Godog, Behave, and pytest-bdd were not executed against their runners.
 - Lookaheads and complex nested regex groups may differ from the test runner; regex alternation `(a|b)` is covered by the precision corpus.
 - Custom Cucumber parameter types are read from C# `[StepArgumentTransformation(@"regex")]` (`Name`, or a simple return type). `{decimal}`, `{Guid}`, and `{}` are built in. Unknown `{MyType}` stays fail-closed (no `.*`). `{DateTime}`, enums, Cucumber.js `defineParameterType`, and Java `@ParameterType` are not discovered.
 - `Scope(Feature=…)` / `Scope(Scenario=…)` / file-path scopes are not applied (Tag-only MVP).

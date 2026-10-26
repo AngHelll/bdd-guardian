@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName Condition="'$(Configuration)' == 'Debug'">Maybe.Name</AssemblyName>
+  </PropertyGroup>
+</Project>

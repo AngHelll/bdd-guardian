@@ -46,6 +46,43 @@ const SIMPLE_RETURN_TYPE = /^[A-Za-z_][\w]*$/;
 const SCOPE_TAG_IN_ATTR_REGEX = /Scope\s*\(\s*Tag\s*=\s*@?"([^"]*)"\s*\)/gi;
 
 /**
+ * `[Binding]` inventory. Same prefixes as step attributes.
+ * This does not decide whether a method is emitted.
+ */
+const CSHARP_BINDING_MARKER_REGEX =
+    /\[\s*(?:(?:global::\s*)?(?:(Reqnroll)|(TechTalk\s*\.\s*SpecFlow))\s*\.\s*)?Binding(Attribute)?\s*(?:\(\s*\))?\s*\]/g;
+
+export type CSharpAttributeNamespace = 'unqualified' | 'reqnroll' | 'specflow';
+
+export interface CSharpBindingAttributeMatch {
+    readonly text: string;
+    readonly index: number;
+    readonly namespace: CSharpAttributeNamespace;
+    readonly attributeSuffix: boolean;
+}
+
+/** Lists `[Binding]` attributes. Callers must not drop step methods from this list. */
+export function findCSharpBindingAttributes(text: string): CSharpBindingAttributeMatch[] {
+    const found: CSharpBindingAttributeMatch[] = [];
+    const regex = new RegExp(CSHARP_BINDING_MARKER_REGEX.source, 'g');
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+        const namespace: CSharpAttributeNamespace = match[1]
+            ? 'reqnroll'
+            : match[2]
+                ? 'specflow'
+                : 'unqualified';
+        found.push({
+            text: match[0],
+            index: match.index,
+            namespace,
+            attributeSuffix: match[3] !== undefined,
+        });
+    }
+    return found;
+}
+
+/**
  * Parse all step bindings from C# source text (Reqnroll, SpecFlow, etc.).
  */
 export function parseCSharpBindingsFromText(

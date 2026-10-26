@@ -56,9 +56,12 @@ export function createResolver(deps: ResolverDependencies) {
             candidates.push(matchResult);
         };
 
-        // First, try matching with exact keyword
+        // keywordResolved is already Given, When or Then.
+        // And, But and * are resolved by the Gherkin parser before this call.
+        // [StepDefinition] is stored once per keyword, so it matches here.
+        // A binding of another keyword is not a candidate.
         const keywordBindings = deps.getBindingsByKeyword(step.keywordResolved);
-        
+
         for (const binding of keywordBindings) {
             if (!isBindingInScope(binding, step.tagsEffective)) {
                 continue;
@@ -66,22 +69,6 @@ export function createResolver(deps: ResolverDependencies) {
             const matchResult = tryMatch(binding, step.candidateTexts, true);
             if (matchResult) {
                 addCandidate(matchResult);
-            }
-        }
-
-        // If no matches, try fallback to other keywords
-        if (candidates.length === 0) {
-            const allBindings = deps.getAllBindings();
-            for (const binding of allBindings) {
-                if (binding.keyword !== step.keywordResolved) {
-                    if (!isBindingInScope(binding, step.tagsEffective)) {
-                        continue;
-                    }
-                    const matchResult = tryMatch(binding, step.candidateTexts, false);
-                    if (matchResult) {
-                        addCandidate(matchResult);
-                    }
-                }
             }
         }
 

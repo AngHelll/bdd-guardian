@@ -1,7 +1,8 @@
-src/**/*.ts
+src/**
 node_modules/
 *.vsix
 .vscode-test/
+.vscode/**
 **/*.map
 .gitignore
 .editorconfig
@@ -19,3 +20,11 @@ CHANGELOG.md
 ROADMAP.md
 CONTRIBUTING.md
 AGENTS.md
+**/bin/**
+**/obj/**
+**/*.log
+**/.DS_Store
+tmp/**
+temp/**
+coverage/**
+**/TestResults/**

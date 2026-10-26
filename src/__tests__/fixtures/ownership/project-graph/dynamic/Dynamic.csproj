@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>$(CustomAssembly)</AssemblyName>
+    <TargetFramework>$(ConfiguredFramework)</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(LibPath)" />
+  </ItemGroup>
+</Project>

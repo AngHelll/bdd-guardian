@@ -25,6 +25,14 @@ export interface SuiteMapOrphanHole {
     readonly methodName: string;
 }
 
+/**
+ * Whether `counts.orphanBindings` is a measurement.
+ * `complete` — the scan finished.
+ * `skipped` — the binding count is above the scan limit.
+ * `unavailable` — the scan did not run.
+ */
+export type OrphanScanStatus = 'complete' | 'skipped' | 'unavailable';
+
 export interface SuiteMapCounts {
     readonly features: number;
     readonly steps: number;
@@ -32,6 +40,10 @@ export interface SuiteMapCounts {
     readonly bound: number;
     readonly unbound: number;
     readonly ambiguous: number;
+    /**
+     * Legacy count. It is a measurement only when `orphanScan` is `complete`.
+     * Skipped and unavailable scans leave this at 0. That 0 must not be shown as a result.
+     */
     readonly orphanBindings: number;
 }
 
@@ -43,7 +55,28 @@ export interface SuiteMapSummary {
     readonly unboundTruncated: number;
     readonly ambiguousTruncated: number;
     readonly orphansTruncated: number;
+    /** True only when `orphanScan` is `skipped`. */
     readonly orphansSkipped: boolean;
+    readonly orphanScan: OrphanScanStatus;
+}
+
+export interface OrphanScanPresentation {
+    readonly status: OrphanScanStatus;
+    /** Present only for a completed scan. */
+    readonly orphanBindings?: number;
+}
+
+/** Count to display. Omitted when the scan did not produce a measurement. */
+export function presentOrphanScan(
+    summary: Pick<SuiteMapSummary, 'orphanScan' | 'counts'>
+): OrphanScanPresentation {
+    if (summary.orphanScan !== 'complete') {
+        return { status: summary.orphanScan };
+    }
+    return {
+        status: 'complete',
+        orphanBindings: summary.counts.orphanBindings,
+    };
 }
 
 export interface SummarizeSuiteMapInput {
@@ -53,6 +86,8 @@ export interface SummarizeSuiteMapInput {
     readonly featureCount: number;
     readonly listCap?: number;
     readonly orphanScanMax?: number;
+    /** The caller cannot scan. No orphan count is produced. */
+    readonly orphanScan?: 'unavailable';
 }
 
 export interface SuiteMapFileGroup<T extends { readonly uri: { readonly fsPath: string } }> {
@@ -153,8 +188,12 @@ function compareOrphanHoles(a: SuiteMapOrphanHole, b: SuiteMapOrphanHole): numbe
 }
 
 export function isSuiteMapHealthy(summary: SuiteMapSummary): boolean {
-    const { unbound, ambiguous, orphanBindings } = summary.counts;
-    return unbound === 0 && ambiguous === 0 && orphanBindings === 0 && !summary.orphansSkipped;
+    const presented = presentOrphanScan(summary);
+    const { unbound, ambiguous } = summary.counts;
+    return unbound === 0
+        && ambiguous === 0
+        && presented.status === 'complete'
+        && presented.orphanBindings === 0;
 }
 
 export function summarizeSuiteMap(input: SummarizeSuiteMapInput): SuiteMapSummary {
@@ -187,9 +226,14 @@ export function summarizeSuiteMap(input: SummarizeSuiteMapInput): SuiteMapSummar
     unbound.sort(compareStepHoles);
     ambiguous.sort(compareStepHoles);
 
-    const orphansSkipped = input.bindings.length > orphanScanMax;
+    const orphanScan: OrphanScanStatus = input.orphanScan === 'unavailable'
+        ? 'unavailable'
+        : input.bindings.length > orphanScanMax
+            ? 'skipped'
+            : 'complete';
+    const orphansSkipped = orphanScan === 'skipped';
     let orphanHoles: SuiteMapOrphanHole[] = [];
-    if (!orphansSkipped) {
+    if (orphanScan === 'complete') {
         orphanHoles = listOrphanBindings(input.bindings, input.steps, input.resolve)
             .map((b) => ({
                 uri: b.uri,
@@ -221,5 +265,6 @@ export function summarizeSuiteMap(input: SummarizeSuiteMapInput): SuiteMapSummar
         ambiguousTruncated: ambiguousCap.truncated,
         orphansTruncated: orphansCap.truncated,
         orphansSkipped,
+        orphanScan,
     };
 }

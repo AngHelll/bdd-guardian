@@ -1,0 +1,6 @@
+{
+  "bindingAssemblies": [
+    { "path": "somewhere" },
+    { "assembly": "Loaded.Lib" }
+  ]
+}

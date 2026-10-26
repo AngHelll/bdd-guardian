@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <SharedFramework>net8.0</SharedFramework>
+    <TargetFramework>$(SharedFramework)</TargetFramework>
+  </PropertyGroup>
+</Project>

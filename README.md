@@ -36,7 +36,7 @@ No project yet? Open [`samples/binding-demo/`](./samples/binding-demo/) from thi
 
 | Stack | Bindings |
 |-------|----------|
-| C# — **Reqnroll** and **SpecFlow** | `[Binding]`, `[Given(@"...")]`, verbatim patterns with quotes |
+| C# — **Reqnroll** and **SpecFlow** | `[Given(@"...")]`, `[When]`, `[Then]`, and `[StepDefinition]`, including `Reqnroll.` and `TechTalk.SpecFlow.` names |
 | JavaScript / TypeScript — **Cucumber.js** | `Given('...')`, Cucumber Expressions |
 | Java — **Cucumber-JVM** | `@Given("...")` |
 | Go — **Godog** | `ctx.Step(...)` |
@@ -193,6 +193,9 @@ VS Code 1.85 or later, on Windows, macOS, or Linux. Works over Remote SSH, Dev C
 
 - Very large projects take a moment to index the first time.
 - Advanced regex in bindings (lookaheads, complex nested groups) may resolve differently than the test runner. Plain alternation `(a|b)` is covered. See [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
+- Matching is workspace-wide. The same step text in two projects is reported ambiguous; there is no per-project filter.
+- A C# method is indexed even without `[Binding]`. Nested and `partial` classes can be attributed to the wrong type, and an attribute written inside a comment or string can be indexed. Details are in [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
+- Orphan counts appear only after a finished scan. Above 2,000 bindings the BDD Map says the scan was skipped instead of showing zero.
 
 ## Learn more
 

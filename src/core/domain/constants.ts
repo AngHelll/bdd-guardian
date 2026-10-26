@@ -97,18 +97,23 @@ export const EXAMPLES_REGEX = englishGherkinPatterns.examples;
 export const TABLE_ROW_REGEX = /^\s*\|(.+)\|\s*$/;
 
 /**
- * Matches C# binding attributes (Reqnroll/SpecFlow):
- * - [Given(@"pattern")], [When("pattern")], [Then("pattern")]
- * - [StepDefinition("pattern")] (Reqnroll)
- * - Extra args inside the call: ExpressionType=…
- * - Sibling attrs in the same brackets: [Given("…"), Scope(Tag = "web")]
+ * Matches C# step attributes.
+ *
+ * Unqualified `[Given]` / `[When]` / `[Then]` / `[StepDefinition]` stay valid.
+ * The only qualified prefixes accepted are `Reqnroll` and `TechTalk.SpecFlow`
+ * (optional `global::`). SpecFlow uses this same parser; its attribute types
+ * live in that namespace. Any other prefix is left unrecognized.
+ * `Attribute` is the C# suffix on the same type (`GivenAttribute`).
+ *
+ * Also: extra args (`ExpressionType=…`) and sibling attrs
+ * (`[Given("…"), Scope(Tag = "web")]`).
  *
  * Captures:
- * 1) attribute name (Given|When|Then|StepDefinition)
+ * 1) keyword (Given|When|Then|StepDefinition)
  * 2) first string literal argument (verbatim @"..." or regular "...")
  */
 export const BINDING_ATTRIBUTE_REGEX =
-    /\[(Given|When|Then|StepDefinition)\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*(?:,[^)]*)?\)(?:\s*,\s*[^[\]]+)?\s*\]/g;
+    /\[\s*(?:(?:global::\s*)?(?:Reqnroll|TechTalk\s*\.\s*SpecFlow)\s*\.\s*)?(Given|When|Then|StepDefinition)(?:Attribute)?\s*\(\s*(@?"(?:[^"\\]|\\.|"")*")\s*(?:,[^)]*)?\)(?:\s*,\s*[^[\]]+)?\s*\]/g;
 
 /** Matches C# class declaration */
 export const CLASS_DECLARATION_REGEX = /(?:public|internal|private)?\s*(?:partial\s+)?class\s+(\w+)/g;

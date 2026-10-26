@@ -87,6 +87,8 @@
   "formatHintInstall": "Install BDD Gherkin Format",
   "diagnosticOrphanBinding": "Unused binding: no feature steps resolve to \"{0}\"",
   "suiteMapSummary": "{0} bound · {1} unbound · {2} ambiguous · {3} orphan",
+  "suiteMapSummaryOrphansSkipped": "{0} bound · {1} unbound · {2} ambiguous · orphan scan skipped",
+  "suiteMapSummaryOrphansUnavailable": "{0} bound · {1} unbound · {2} ambiguous · orphans unavailable",
   "suiteMapUnbound": "Unbound ({0})",
   "suiteMapAmbiguous": "Ambiguous ({0})",
   "suiteMapOrphans": "Orphans ({0})",
@@ -96,6 +98,7 @@
   "suiteMapDisabled": "BDD Map is disabled (bddGuardian.suiteMap.enabled)",
   "suiteMapMore": "…and {0} more",
   "suiteMapOrphansSkipped": "Orphan scan skipped (too many bindings)",
+  "suiteMapOrphansUnavailable": "Orphans unavailable",
   "suiteMapOpen": "Open",
   "suiteMapExplainStale": "This step is no longer ambiguous",
   "suiteMapExplainUnboundStale": "This step is no longer unbound"

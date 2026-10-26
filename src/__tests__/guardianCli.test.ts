@@ -26,6 +26,8 @@ describe('guardian-cli', () => {
     it('buildAnalyzeReport counts bound steps in binding-demo', () => {
         const report = buildAnalyzeReport(loadProject(BINDING_DEMO), { maxItems: 10 });
         expect(report.schemaVersion).toBe(1);
+        expect(report.orphanScan).toBe('complete');
+        expect(typeof report.counts.orphanBindings).toBe('number');
         expect(report.counts.features).toBeGreaterThan(0);
         expect(report.counts.bindings).toBeGreaterThan(0);
         expect(report.counts.bound).toBeGreaterThan(0);

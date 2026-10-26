@@ -87,6 +87,8 @@
   "formatHintInstall": "Instalar BDD Gherkin Format",
   "diagnosticOrphanBinding": "Binding sin uso: ningún step de feature resuelve a \"{0}\"",
   "suiteMapSummary": "{0} enlazados · {1} sin enlazar · {2} ambiguos · {3} huérfanos",
+  "suiteMapSummaryOrphansSkipped": "{0} enlazados · {1} sin enlazar · {2} ambiguos · escaneo de huérfanos omitido",
+  "suiteMapSummaryOrphansUnavailable": "{0} enlazados · {1} sin enlazar · {2} ambiguos · huérfanos no disponibles",
   "suiteMapUnbound": "Sin enlazar ({0})",
   "suiteMapAmbiguous": "Ambiguos ({0})",
   "suiteMapOrphans": "Huérfanos ({0})",
@@ -96,6 +98,7 @@
   "suiteMapDisabled": "El mapa BDD está desactivado (bddGuardian.suiteMap.enabled)",
   "suiteMapMore": "…y {0} más",
   "suiteMapOrphansSkipped": "Escaneo de huérfanos omitido (demasiados bindings)",
+  "suiteMapOrphansUnavailable": "Huérfanos no disponibles",
   "suiteMapOpen": "Abrir",
   "suiteMapExplainStale": "Este paso ya no es ambiguo",
   "suiteMapExplainUnboundStale": "Este paso ya no está sin enlazar"

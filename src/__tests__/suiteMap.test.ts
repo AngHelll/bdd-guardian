@@ -107,6 +107,7 @@ describe('summarizeSuiteMap', () => {
         expect(summary.ambiguous[0].matchCount).toBe(2);
         expect(summary.orphans[0].methodName).toBe('OrphanMethod');
         expect(summary.orphansSkipped).toBe(false);
+        expect(summary.orphanScan).toBe('complete');
         expect(isSuiteMapHealthy(summary)).toBe(false);
     });
 
@@ -121,6 +122,8 @@ describe('summarizeSuiteMap', () => {
         });
         expect(summary.counts.bound).toBe(1);
         expect(summary.counts.unbound).toBe(0);
+        expect(summary.orphanScan).toBe('complete');
+        expect(summary.counts.orphanBindings).toBe(0);
         expect(isSuiteMapHealthy(summary)).toBe(true);
     });
 
@@ -156,6 +159,7 @@ describe('summarizeSuiteMap', () => {
             orphanScanMax: 0,
         });
         expect(summary.orphansSkipped).toBe(true);
+        expect(summary.orphanScan).toBe('skipped');
         expect(summary.orphans).toHaveLength(0);
         expect(summary.counts.orphanBindings).toBe(0);
         expect(isSuiteMapHealthy(summary)).toBe(false);
