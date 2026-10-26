@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.22.0** Marketplace 2026-10-24 · GitHub: [v1.22.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.22.0)
+> **Current release: v1.23.0** Marketplace 2026-10-26 · GitHub: [v1.23.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.23.0)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.22.0** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.23.0** (Marketplace + GitHub) |
 | 🎯 Next | (dogfood / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -83,6 +83,7 @@
 | **1.21.0** | Gherkin `# language:` — official dialect keyword table ✅ |
 | **1.21.1** | Suite map hierarchy — unbound/ambiguous icons use `charts.*`; hole label + dimmed `L{n}` ✅ |
 | **1.22.0** | Reqnroll parameter types — step-argument regex, `{decimal}`, `{Guid}`, `{}` ✅ |
+| **1.23.0** | Keyword boundary, qualified Reqnroll/SpecFlow attributes, orphan scan status, VSIX without dev artifacts ✅ |
 
 ---
 
@@ -662,4 +663,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-10-24 — v1.22.0 Reqnroll parameter types shipped (Marketplace + GitHub + Open VSX).*
+*Last updated: 2026-10-26 — v1.23.0 keyword boundary and orphan scan shipped (Marketplace + GitHub + Open VSX).*
