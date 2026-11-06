@@ -19,7 +19,7 @@ import {
     PLACEHOLDER_REGEX,
 } from '../domain/constants';
 import { gherkinPatternsForText } from './gherkinDialect';
-import { normalizeWhitespace, generateCandidateTexts } from '../matching/normalization';
+import { buildOutlineExpansions, generateCandidateTexts, normalizeWhitespace } from '../matching/normalization';
 
 /**
  * Parse a feature document into a structured FeatureDocument
@@ -38,6 +38,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
     let pendingTags: string[] = [];
     let currentScenario: MutableScenario | null = null;
     let currentExamples: MutableExampleTable | null = null;
+    let lastStep: FeatureStep | null = null;
     let inBackground = false;
     let lastResolvedKeyword: ResolvedKeyword = 'Given';
     /** Feature/Rule prose swallows step-like lines. Other blocks end at the first step. */
@@ -62,6 +63,9 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
         const openedDocstring = docstringDelimiter(trimmedLine);
         if (openedDocstring) {
             docstringDelim = openedDocstring;
+            if (lastStep) {
+                markArgumentTail(lastStep, 'docstring');
+            }
             continue;
         }
 
@@ -174,7 +178,11 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
                     currentExamples.headers = cells;
                 } else if (currentExamples.rows.length < MAX_EXAMPLE_ROWS) {
                     currentExamples.rows.push(cells);
+                } else {
+                    currentExamples.truncated = true;
                 }
+            } else if (lastStep) {
+                markArgumentTail(lastStep, 'table');
             }
             continue;
         }
@@ -185,6 +193,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
                 continue;
             }
             description = null;
+            currentExamples = null;
 
             const keywordOriginal = patterns.roleOf(stepMatch[1]);
             const rawText = stepMatch[2].trim();
@@ -228,6 +237,8 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
                 normalizedText: normalizeWhitespace(rawText),
                 fullText: trimmedLine,
                 tagsEffective,
+                featureName: featureName || undefined,
+                argumentTail: 'none',
                 uri: document.uri,
                 range: new vscode.Range(i, 0, i, line.length),
                 lineNumber: i,
@@ -243,6 +254,7 @@ export function parseFeatureDocument(document: vscode.TextDocument): FeatureDocu
             }
 
             allSteps.push(step);
+            lastStep = step;
         }
     }
 
@@ -301,19 +313,35 @@ function refreshScenarioStepCandidates(scenario: MutableScenario): void {
     }
 
     for (const step of scenario.steps) {
+        const built = buildOutlineExpansions(step.rawText, examples as ExampleTable[], step.tagsEffective);
+        const mutableStep = step as FeatureStep & {
+            candidateTexts: string[];
+            isOutline: boolean;
+            outlineExpansions: typeof built.expansions;
+            outlineTruncated: boolean;
+        };
+        mutableStep.outlineExpansions = built.expansions;
+        mutableStep.outlineTruncated = built.truncated;
+
         PLACEHOLDER_REGEX.lastIndex = 0;
         const hasPlaceholders = PLACEHOLDER_REGEX.test(step.rawText);
         PLACEHOLDER_REGEX.lastIndex = 0;
         if (!hasPlaceholders) {
             continue;
         }
-        const mutableStep = step as FeatureStep & { candidateTexts: string[]; isOutline: boolean };
         mutableStep.candidateTexts = generateCandidateTexts(
             step.rawText,
             examples as ExampleTable[]
         );
         mutableStep.isOutline =
             scenario.type === 'Scenario Outline' || hasPlaceholders;
+    }
+}
+
+function markArgumentTail(step: FeatureStep, tail: 'table' | 'docstring'): void {
+    const mutable = step as FeatureStep & { argumentTail?: 'none' | 'table' | 'docstring' };
+    if (!mutable.argumentTail || mutable.argumentTail === 'none') {
+        mutable.argumentTail = tail;
     }
 }
 
@@ -349,4 +377,5 @@ interface MutableExampleTable {
     headers: string[];
     rows: string[][];
     tags: string[];
+    truncated?: boolean;
 }

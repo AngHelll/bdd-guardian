@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-11-06
+
+**Highlights:** Scope follows Reqnroll feature, scenario, and tag rules. Each Examples row is judged on its own. Several attributes on one method count as one destination.
+
+### Fixed
+
+- `[Scope(Feature=…)]` and `[Scope(Scenario=…)]` are applied. Criteria inside one `[Scope]` must all match. Several `[Scope]` attributes, including class and method, are combined with OR. The binding with the most matching criteria wins, so an applicable scope is chosen over a global one.
+- A Scenario Outline step is bound only when every evaluated Examples row has one winner. Two methods that each match a different row stay bound. A row with no binding, or a row skipped by the example limit, is not reported as a fully bound step. The `X` placeholder fallback is not treated as coverage when real rows exist.
+- Several step attributes on the same method are one match. A step with a DataTable selects the `Table` / `DataTable` overload; a step without one does not. .NET type conversion is not checked. A parameter list that cannot be read is not rejected.
+
 ## [1.23.0] - 2026-10-26
 
 **Highlights:** A step matches only its own keyword. Qualified Reqnroll and SpecFlow attributes are indexed. A skipped orphan scan is no longer shown as zero orphans. The VSIX no longer ships development artifacts.

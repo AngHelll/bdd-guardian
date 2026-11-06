@@ -51,6 +51,10 @@ const UNBOUND_WHY_EN: Record<UnboundI18nKey, string> = {
     unboundEmptyIndex: 'No step bindings are indexed',
     unboundScopeExcluded:
         'Pattern matches {0} scoped binding(s); none apply to this step\'s tags (need {1})',
+    unboundScopeDetail: 'Pattern matches {0} scoped binding(s); none apply to this step (need {1})',
+    unboundSignature: 'The text matches {0}, but the method signature does not accept this step',
+    unboundOutlineRow: 'Example row {0} has no matching binding',
+    unboundOutlineLimited: 'Some Examples rows were not checked because of the row limit, so this step is not fully bound',
     unboundGeneric: '{0} bindings indexed; none match this step',
 };
 

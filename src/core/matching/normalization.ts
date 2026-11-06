@@ -3,7 +3,7 @@
  * Handles whitespace normalization and placeholder expansion for step matching
  */
 
-import { ExampleTable } from '../domain/types';
+import { ExampleTable, OutlineExpansion } from '../domain/types';
 import { MAX_CANDIDATES_PER_STEP, PLACEHOLDER_REGEX } from '../domain/constants';
 
 /**
@@ -77,6 +77,65 @@ export function generateCandidateTexts(rawText: string, examples?: readonly Exam
     }
 
     return candidates;
+}
+
+/**
+ * One expansion per Examples row. Does not insert the `X` fallback.
+ * Rows past MAX_CANDIDATES_PER_STEP, and tables flagged truncated, set `truncated`.
+ */
+export function buildOutlineExpansions(
+    rawText: string,
+    examples: readonly ExampleTable[],
+    baseTags: readonly string[]
+): { expansions: OutlineExpansion[]; truncated: boolean } {
+    const normalizedText = normalizeWhitespace(rawText);
+    const expansions: OutlineExpansion[] = [];
+    let truncated = false;
+    let rowNumber = 0;
+
+    for (const example of examples) {
+        if (example.truncated) {
+            truncated = true;
+        }
+        if (example.headers.length === 0) {
+            continue;
+        }
+        for (const row of example.rows) {
+            rowNumber++;
+            if (expansions.length >= MAX_CANDIDATES_PER_STEP) {
+                truncated = true;
+                continue;
+            }
+            let expanded = normalizedText;
+            for (let colIdx = 0; colIdx < example.headers.length; colIdx++) {
+                const placeholder = `<${example.headers[colIdx]}>`;
+                const value = row[colIdx] ?? 'X';
+                expanded = expanded.split(placeholder).join(value);
+            }
+            const label = row[0]?.trim() || `#${rowNumber}`;
+            expansions.push({
+                text: normalizeWhitespace(expanded),
+                tags: uniqueTags([...baseTags, ...example.tags]),
+                rowLabel: label,
+            });
+        }
+    }
+
+    return { expansions, truncated };
+}
+
+function uniqueTags(tags: readonly string[]): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const tag of tags) {
+        const key = tag.trim().toLowerCase();
+        if (key.length === 0 || seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        out.push(tag);
+    }
+    return out;
 }
 
 /**

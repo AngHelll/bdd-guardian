@@ -211,6 +211,8 @@ describe('gherkinParser sample regression', () => {
     const expectedSteps: Record<string, number> = {
         'behave-demo/features/search.feature': 3,
         'binding-demo/Features/sample.feature': 38,
+        'binding-demo/Features/fidelity-v124.feature': 5,
+        'binding-demo/Features/fidelity-allowed.feature': 1,
         'cucumber-demo/features/home.feature': 3,
         'cucumber-demo/features/search.feature': 3,
         'godog-demo/features/godogs.feature': 3,

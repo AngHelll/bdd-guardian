@@ -15,9 +15,8 @@ import {
     ResolveDebugInfo,
     ResolvedKeyword,
 } from '../domain/types';
-import { calculateScore, compareScores } from './scoring';
 import { getBindingIdentity } from './bindingIdentity';
-import { isBindingInScope } from './scopeFilter';
+import { selectMatches } from './selectMatches';
 
 /**
  * Resolver options
@@ -42,114 +41,131 @@ export interface ResolverOptions {
  * Create a resolver function with injected dependencies
  */
 export function createResolver(deps: ResolverDependencies) {
-    return function resolve(step: FeatureStep, options: ResolverOptions = {}): ResolveResult {
-        const candidates: MatchCandidate[] = [];
-        const seenBindings = new Set<string>();
-        const { debug = false } = options;
+    function preferSpecific(options: ResolverOptions): boolean {
+        return options.preferSpecificBinding ?? deps.preferSpecificBinding ?? false;
+    }
 
-        const addCandidate = (matchResult: MatchCandidate): void => {
-            const key = getBindingIdentity(matchResult.binding);
-            if (seenBindings.has(key)) {
-                return;
-            }
-            seenBindings.add(key);
-            candidates.push(matchResult);
-        };
-
-        // keywordResolved is already Given, When or Then.
-        // And, But and * are resolved by the Gherkin parser before this call.
-        // [StepDefinition] is stored once per keyword, so it matches here.
-        // A binding of another keyword is not a candidate.
+    function resolveText(
+        step: FeatureStep,
+        text: string,
+        tags: readonly string[],
+        options: ResolverOptions
+    ): ResolveResult {
         const keywordBindings = deps.getBindingsByKeyword(step.keywordResolved);
+        const selected = selectMatches(
+            keywordBindings,
+            step.keywordResolved,
+            text,
+            {
+                tags,
+                featureTitle: step.featureName,
+                scenarioTitle: step.scenarioName,
+            },
+            step.argumentTail
+        );
+        return statusFromMatches(step, selected.matches, preferSpecific(options));
+    }
 
-        for (const binding of keywordBindings) {
-            if (!isBindingInScope(binding, step.tagsEffective)) {
-                continue;
-            }
-            const matchResult = tryMatch(binding, step.candidateTexts, true);
-            if (matchResult) {
-                addCandidate(matchResult);
-            }
-        }
+    return function resolve(step: FeatureStep, options: ResolverOptions = {}): ResolveResult {
+        const { debug = false } = options;
+        const expansions = step.outlineExpansions;
+        let result: ResolveResult;
 
-        // Sort by score descending
-        candidates.sort((a, b) => compareScores(a.score, b.score));
-
-        // Determine status
-        let status: MatchStatus;
-        let best: MatchCandidate | undefined;
-
-        if (candidates.length === 0) {
-            status = 'unbound';
-        } else if (candidates.length === 1) {
-            status = 'bound';
-            best = candidates[0];
+        if (expansions && expansions.length > 0) {
+            result = resolveOutline(step, expansions, options, resolveText);
         } else {
-            const preferSpecific =
-                options.preferSpecificBinding ?? deps.preferSpecificBinding ?? false;
-            if (preferSpecific && candidates[0].score > candidates[1].score) {
-                status = 'bound';
-            } else {
-                status = 'ambiguous';
-            }
-            best = candidates[0];
+            const texts = step.candidateTexts.length > 0 ? step.candidateTexts : [step.normalizedText];
+            result = resolveAnyCandidate(step, texts, step.tagsEffective, options, resolveText);
         }
 
-        // Build result
-        const result: ResolveResult = {
-            step,
-            status,
-            best,
-            candidates,
+        if (!debug) {
+            return result;
+        }
+        const debugInfo: ResolveDebugInfo = {
+            stepText: step.rawText,
+            candidateTextCount: step.candidateTexts.length,
+            sampleCandidates: step.candidateTexts.slice(0, 3),
+            bindingsChecked: deps.getAllBindings().length,
         };
-
-        // Add debug info if requested
-        if (debug) {
-            const debugInfo: ResolveDebugInfo = {
-                stepText: step.rawText,
-                candidateTextCount: step.candidateTexts.length,
-                sampleCandidates: step.candidateTexts.slice(0, 3),
-                bindingsChecked: deps.getAllBindings().length,
-            };
-            return { ...result, debug: debugInfo };
-        }
-
-        return result;
+        return { ...result, debug: debugInfo };
     };
 }
 
 /**
- * Try to match a binding against candidate texts
+ * Steps without per-row expansions: the first candidate text that produces
+ * any in-scope match wins, then that text is judged on its own.
+ * Outline rows do not use this path.
  */
-function tryMatch(
-    binding: Binding,
-    candidateTexts: readonly string[],
-    keywordMatched: boolean
-): MatchCandidate | null {
-    let matchedCandidate: string | undefined;
-
-    // Test regex against each candidate
-    for (const candidate of candidateTexts) {
-        // Reset regex state for multiple tests
-        binding.regex.lastIndex = 0;
-        if (binding.regex.test(candidate)) {
-            matchedCandidate = candidate;
+function resolveAnyCandidate(
+    step: FeatureStep,
+    texts: readonly string[],
+    tags: readonly string[],
+    options: ResolverOptions,
+    resolveText: (step: FeatureStep, text: string, tags: readonly string[], options: ResolverOptions) => ResolveResult
+): ResolveResult {
+    let firstHit: ResolveResult | undefined;
+    for (const text of texts) {
+        const result = resolveText(step, text, tags, options);
+        if (result.status !== 'unbound') {
+            firstHit = result;
             break;
         }
     }
+    return firstHit ?? resolveText(step, texts[0] ?? step.normalizedText, tags, options);
+}
 
-    if (!matchedCandidate) {
-        return null;
+function resolveOutline(
+    step: FeatureStep,
+    expansions: readonly { text: string; tags: readonly string[] }[],
+    options: ResolverOptions,
+    resolveText: (step: FeatureStep, text: string, tags: readonly string[], options: ResolverOptions) => ResolveResult
+): ResolveResult {
+    const rowResults = expansions.map((row) => resolveText(step, row.text, row.tags, options));
+    const ambiguous = rowResults.find((row) => row.status === 'ambiguous');
+    if (ambiguous) {
+        return { step, status: 'ambiguous', best: ambiguous.best, candidates: ambiguous.candidates };
+    }
+    if (step.outlineTruncated || rowResults.some((row) => row.status === 'unbound')) {
+        return { step, status: 'unbound', candidates: [] };
     }
 
-    const score = calculateScore(binding, keywordMatched);
-
+    const candidates: MatchCandidate[] = [];
+    const seen = new Set<string>();
+    for (const row of rowResults) {
+        const best = row.best;
+        if (!best) {
+            continue;
+        }
+        const id = getBindingIdentity(best.binding);
+        if (seen.has(id)) {
+            continue;
+        }
+        seen.add(id);
+        candidates.push(best);
+    }
     return {
-        binding,
-        score,
-        keywordMatched,
-        matchedCandidate,
+        step,
+        status: 'bound',
+        best: candidates[0],
+        candidates,
     };
+}
+
+function statusFromMatches(
+    step: FeatureStep,
+    matches: readonly MatchCandidate[],
+    preferSpecificBinding: boolean
+): ResolveResult {
+    if (matches.length === 0) {
+        return { step, status: 'unbound', candidates: [] };
+    }
+    if (matches.length === 1) {
+        return { step, status: 'bound', best: matches[0], candidates: matches };
+    }
+    const status: MatchStatus = preferSpecificBinding && matches[0].score > matches[1].score
+        ? 'bound'
+        : 'ambiguous';
+    return { step, status, best: matches[0], candidates: matches };
 }
 
 /**

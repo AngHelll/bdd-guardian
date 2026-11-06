@@ -84,6 +84,7 @@
 | **1.21.1** | Suite map hierarchy — unbound/ambiguous icons use `charts.*`; hole label + dimmed `L{n}` ✅ |
 | **1.22.0** | Reqnroll parameter types — step-argument regex, `{decimal}`, `{Guid}`, `{}` ✅ |
 | **1.23.0** | Keyword boundary, qualified Reqnroll/SpecFlow attributes, orphan scan status, VSIX without dev artifacts ✅ |
+| **1.24.0** | Reqnroll scope precedence, per-row Outline matching, method signature identity ✅ |
 
 ---
 

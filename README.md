@@ -196,6 +196,7 @@ VS Code 1.85 or later, on Windows, macOS, or Linux. Works over Remote SSH, Dev C
 - Matching is workspace-wide. The same step text in two projects is reported ambiguous; there is no per-project filter.
 - A C# method is indexed even without `[Binding]`. Nested and `partial` classes can be attributed to the wrong type, and an attribute written inside a comment or string can be indexed. Details are in [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
 - Orphan counts appear only after a finished scan. Above 2,000 bindings the BDD Map says the scan was skipped instead of showing zero.
+- `[Scope]` follows Reqnroll tag, feature, and scenario rules. File-path scopes and .NET type conversion are not applied. An Outline step is bound only when every evaluated Examples row has a winner. See [docs/BINDING_MATCHING.md](docs/BINDING_MATCHING.md).
 
 ## Learn more
 

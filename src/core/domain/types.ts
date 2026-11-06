@@ -75,6 +75,31 @@ export interface ExampleTable {
     readonly rows: readonly (readonly string[])[];
     /** Tags on the Examples block */
     readonly tags: readonly string[];
+    /** A row was dropped because it passed MAX_EXAMPLE_ROWS. */
+    readonly truncated?: boolean;
+}
+
+/** One Examples row expanded for matching. */
+export interface OutlineExpansion {
+    /** Step text with this row's placeholders replaced. */
+    readonly text: string;
+    /** Feature + scenario tags, plus this Examples block's tags. */
+    readonly tags: readonly string[];
+    /** First cell, or a 1-based index when the cell is empty. */
+    readonly rowLabel: string;
+}
+
+/** What follows the step in the feature file. */
+export type StepArgumentTail = 'none' | 'table' | 'docstring';
+
+/**
+ * One Reqnroll `[Scope]` attribute.
+ * Criteria inside the same attribute are AND. Several attributes are OR.
+ */
+export interface BindingScopeRule {
+    readonly tag?: string;
+    readonly feature?: string;
+    readonly scenario?: string;
 }
 
 /**
@@ -93,6 +118,17 @@ export interface FeatureStep {
     readonly fullText: string;
     /** Effective tags (feature + scenario tags) */
     readonly tagsEffective: readonly string[];
+    /** Feature title, for `[Scope(Feature=…)]`. */
+    readonly featureName?: string;
+    /** DataTable or DocString directly under this step. */
+    readonly argumentTail?: StepArgumentTail;
+    /**
+     * One entry per Examples row. When this is non-empty, the resolver
+     * judges each row on its own and does not treat the `X` fallback as coverage.
+     */
+    readonly outlineExpansions?: readonly OutlineExpansion[];
+    /** True when at least one Examples row was not expanded. */
+    readonly outlineTruncated?: boolean;
     /** File URI */
     readonly uri: vscode.Uri;
     /** Range in document */
@@ -150,9 +186,23 @@ export interface Binding {
     readonly signature: string;
     /**
      * Reqnroll/SpecFlow `[Scope(Tag=…)]` tags for this binding (method ∪ class).
-     * Empty = global (no Tag scope). Stored without requiring a leading `@`.
+     * Empty = no Tag criterion. A Feature/Scenario scope can leave this empty.
+     * Stored without requiring a leading `@`.
      */
     readonly scopeTags: readonly string[];
+    /**
+     * Scope attributes on the class and the method (OR).
+     * Empty or omitted, with empty `scopeTags`, means global.
+     * Omitted with non-empty `scopeTags` is read as one tag rule per tag.
+     */
+    readonly scopes?: readonly BindingScopeRule[];
+    /**
+     * Parameter type names, in order.
+     * `[]` is a known empty list. Omitted means the list could not be read.
+     */
+    readonly parameterTypes?: readonly string[];
+    /** 0-based line of the method declaration. Attributes on one method share it. */
+    readonly methodLine?: number;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

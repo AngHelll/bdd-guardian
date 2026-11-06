@@ -11,7 +11,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
    - Full-step match is enforced (`^...$`).
    - Unicode flag `u` is used.
    - On compile error, fallback to exact literal match so the binding is not dropped.
-3. **Resolver** tests each binding’s regex against the step’s candidate texts. If **two or more** bindings match, status is **`ambiguous`** by default (Reqnroll runtime and BDD Pilot `AMBIGUOUS_STEPS` behave similarly). Optional setting `bddGuardian.matching.preferSpecificBinding` (`true`) restores legacy behavior: pick the highest-scoring match as **bound**.
+3. **Resolver** tests each binding’s regex against one step text at a time. Scope precedence runs before the ambiguous check. If **two or more** methods still match that text, status is **`ambiguous`** by default. Optional setting `bddGuardian.matching.preferSpecificBinding` (`true`) picks the highest-scoring match as **bound** only after scope precedence. It does not replace scope precedence.
 
 ## Implemented (reduces false unbound)
 
@@ -24,7 +24,7 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - **Unbound explained (v1.15.0+)** — Hover, Problems, BDD Map Explain, and CLI `resolve-step` `why` classify unbound as empty index, scope-excluded (`[Scope(Tag=…)]` matched the text but not the step tags), or generic (bindings indexed, none match). Uses the same compiled `binding.regex` and `isBindingInScope`; **does not** change status and **does not** add a second matcher.
 - **Reuse hint (v1.17.0+)** — After a step is already unbound, hover, Problems, and CLI/MCP `suggest-reuse` may name **one** existing binding the text resembles (token overlap). Advisory only: it does not change bound/unbound/ambiguous and it is not a second matcher or a literal fallback. Silence when nothing clears the threshold or the top score ties. Out-of-scope bindings are not suggested.
 - **Closed step (v1.18.0+)** — If reuse stays silent and the unbound text differs from one binding by a single word, hover and Problems say to parameterize that word (or to reuse the binding when that position is already a parameter). Coach `coach/literal-cluster` flags the same pattern among steps in one `.feature`. `vocabulary` lists the humanized catalog. None of this changes match status.
-- **Scenario Outline candidates** — Placeholders expanded from Examples rows (including Examples on plain `Scenario`); bound if any expanded candidate matches.
+- **Scenario Outline rows (v1.24.0+)** — Each Examples row is resolved on its own, with that block's tags. The step is **bound** only when every evaluated row has one winner. Two methods that each own a different row stay **bound**. One row with no binding, a real collision on one row, or a row dropped by the example cap keeps the step off **bound** (`ambiguous` if any evaluated row is ambiguous, otherwise **unbound**). The `<placeholder>` → `X` fallback is still stored in `candidateTexts` and is not used as coverage when real rows exist.
 - **Star steps** — `*` is a step keyword and resolves like `And` / `But` (the previous strong keyword, or `Given` when it is first in the block).
 - **Keyword boundary (v1.23.0+)** — The resolver considers only bindings of `keywordResolved` (already Given, When, or Then). A binding of another keyword is not a candidate. `[StepDefinition]` is stored once per keyword, so it still matches all three. There is no cross-keyword fallback.
 - **Cucumber Expressions Wave A** — `{int}`, `{float|double}`, `{word}`, `{string}` compile to regex via `cucumberExpression.ts` when `ExpressionType.CucumberExpression` is set or the pattern looks like CE (`{name}` placeholders, not `\d{2}`).
@@ -34,7 +34,8 @@ How step text is matched to binding patterns, and how we reduce false "binding n
   - **Built-in type extras** — `long`, `short`, `byte`, `biginteger` (int-like) and `bigdecimal` (decimal-like), case-insensitive. `{decimal}` also allows a comma fraction. `{Guid}` is the hyphenated form. `{}` is `(.*)`.
   - **Reqnroll / SpecFlow transformations** — `[StepArgumentTransformation(@"regex")]` (with `Name` or a simple return type) supplies the capture for that placeholder. The regex is not executed. A name defined twice is ignored.
   - **Unknown `{CustomType}`** — CE compile fails closed (no silent `.*`); existing regex/literal path may apply, but never a CE wildcard.
-- **Scope-aware matching (v1.11.0+)** — After regex match, bindings with `[Scope(Tag=…)]` (method and/or class, OR) are kept only if `step.tagsEffective` contains a matching tag (case-insensitive; `@` optional). Bindings with empty `scopeTags` stay global. Steps with no tags exclude all Tag-scoped bindings. UI `tagFilter` is unchanged (display only).
+- **Scope-aware matching (v1.11.0+, Feature/Scenario v1.24.0+)** — `[Scope]` on the class and the method. Criteria inside one attribute are AND (`Tag` + `Feature` + `Scenario`). Several attributes, including class and method, are OR. Tags compare case-insensitive (`@` optional). Feature and scenario titles compare trimmed and case-insensitive. A binding with no scope is global. Among regex-and-shape matches, the highest number of matched criteria wins, so an applicable scope beats a global without `preferSpecificBinding`. A tie at that maximum stays **ambiguous**. Steps with no tags exclude Tag-scoped bindings. UI `tagFilter` is unchanged (display only).
+- **Argument shape (v1.24.0+)** — Several attributes on one method are one destination. A known parameter list must equal capturing groups that participated in the match, plus one for a DataTable and one for a DocString. A DataTable requires a `Table` or `DataTable` parameter. Type conversion (`int`, `DateTime`, enums) is not checked. An unreadable parameter list is not rejected.
 
 ## Optional improvements (good practice, no relaxation of BDD)
 
@@ -48,13 +49,14 @@ How step text is matched to binding patterns, and how we reduce false "binding n
 - Keyword matching uses one resolver for every provider. Reqnroll 3.3.4 was the runner compared for the keyword boundary and for qualified `Reqnroll.Given` forms. Qualified SpecFlow, Cucumber, Godog, Behave, and pytest-bdd were not executed against their runners.
 - Lookaheads and complex nested regex groups may differ from the test runner; regex alternation `(a|b)` is covered by the precision corpus.
 - Custom Cucumber parameter types are read from C# `[StepArgumentTransformation(@"regex")]` (`Name`, or a simple return type). `{decimal}`, `{Guid}`, and `{}` are built in. Unknown `{MyType}` stays fail-closed (no `.*`). `{DateTime}`, enums, Cucumber.js `defineParameterType`, and Java `@ParameterType` are not discovered.
-- `Scope(Feature=…)` / `Scope(Scenario=…)` / file-path scopes are not applied (Tag-only MVP).
+- File-path scopes are not applied. .NET type conversion is not applied. Parameter lists with generics, default values, or a line break are not used for arity.
 
 ## Where the code lives
 
 - **Compile pattern:** `src/core/parsing/bindingRegex.ts` (`compileBindingRegex`, `normalizePatternWhitespace`, `escapeLiteralAnchors`).
 - **Cucumber Expressions:** `src/core/parsing/cucumberExpression.ts` (`compileCucumberExpressionToRegex`, `looksLikeCucumberExpression`).
-- **Scope filter:** `src/core/matching/scopeFilter.ts` (`isBindingInScope`); wired in `resolver.ts`.
-- **C# Scope parse:** `src/core/parsing/csharpBindingParser.ts` → `Binding.scopeTags`.
+- **Scope filter:** `src/core/matching/scopeFilter.ts` (`matchBindingScope`, `isBindingInScope`); wired in `selectMatches.ts`.
+- **Argument shape:** `src/core/matching/argumentShape.ts`.
+- **C# Scope parse:** `src/core/parsing/csharpBindingParser.ts` → `Binding.scopes` and `Binding.scopeTags`.
 - **Step candidates:** `src/core/matching/normalization.ts` (`generateCandidateTexts`, `normalizeWhitespace`).
 - **Match and resolve:** `src/core/matching/resolver.ts`, `scoring.ts`.

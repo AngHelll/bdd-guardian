@@ -4,7 +4,7 @@
  */
 
 import * as vscode from 'vscode';
-import { Binding, ResolvedKeyword } from '../domain/types';
+import { Binding, BindingScopeRule, ResolvedKeyword } from '../domain/types';
 import {
     BINDING_ATTRIBUTE_REGEX,
     CLASS_DECLARATION_REGEX,
@@ -42,8 +42,10 @@ const BUILT_IN_PARAMETER_TYPES = new Set([
 const PLACEHOLDER_NAME = /^[A-Za-z][\w-]*$/;
 const SIMPLE_RETURN_TYPE = /^[A-Za-z_][\w]*$/;
 
-/** Matches Scope(Tag = "…") / Scope(Tag = @"…") inside or as attributes. */
-const SCOPE_TAG_IN_ATTR_REGEX = /Scope\s*\(\s*Tag\s*=\s*@?"([^"]*)"\s*\)/gi;
+/** One `[Scope(…)]` call. Arguments are parsed separately so order does not matter. */
+const SCOPE_CALL_REGEX = /Scope\s*\(([^)]*)\)/gi;
+
+const SCOPE_NAMED_ARG_REGEX = /(Tag|Feature|Scenario)\s*=\s*(@?"(?:[^"\\]|\\.|"")*")/gi;
 
 /**
  * `[Binding]` inventory. Same prefixes as step attributes.
@@ -93,7 +95,7 @@ export function parseCSharpBindingsFromText(
     const bindings: Binding[] = [];
     const lines = text.split('\n');
     const classNames = findClassNames(text);
-    const classScopeTags = buildClassScopeTagMap(text, classNames);
+    const classScopeRules = buildClassScopeRuleMap(text, classNames);
     const parameterTypes = options.parameterTypes ?? mergeCSharpParameterTypes([
         collectCSharpParameterTypes(text),
     ]);
@@ -111,19 +113,26 @@ export function parseCSharpBindingsFromText(
         const lineNumber = beforeMatch.split('\n').length - 1;
         const className = findEnclosingClassName(text, match.index, classNames);
 
-        const afterAttribute = text.substring(match.index + match[0].length);
-        const methodRegex = new RegExp(METHOD_DECLARATION_REGEX.source, 'g');
-        const methodMatch = methodRegex.exec(afterAttribute);
-        const methodName = methodMatch ? methodMatch[1] : 'Unknown';
+        const afterStart = match.index + match[0].length;
+        const afterAttribute = text.substring(afterStart);
+        const methodInfo = readFollowingMethod(afterAttribute);
+        const methodName = methodInfo?.name ?? 'Unknown';
+        const methodLine = methodInfo
+            ? text.slice(0, afterStart + methodInfo.index).split('\n').length - 1
+            : lineNumber;
 
         const expressionType = inferExpressionTypeOverride(fullAttributeText);
-        const methodScopeTags = extractScopeTagsFromText(
-            findMethodAttributeBlock(text, match.index, methodMatch ? match.index + match[0].length + methodMatch.index : match.index + match[0].length)
+        const blockEnd = methodInfo
+            ? afterStart + methodInfo.index
+            : afterStart;
+        const methodRules = extractScopeRulesFromText(
+            findMethodAttributeBlock(text, match.index, blockEnd)
         );
-        const scopeTags = uniqueTags([
-            ...(classScopeTags.get(className) ?? []),
-            ...methodScopeTags,
-        ]);
+        const scopes = [
+            ...(classScopeRules.get(className) ?? []),
+            ...methodRules,
+        ];
+        const scopeTags = uniqueTags(scopes.flatMap((rule) => (rule.tag ? [rule.tag] : [])));
 
         const keywords: ResolvedKeyword[] =
             attrName === 'StepDefinition' ? ['Given', 'When', 'Then'] : [attrName as ResolvedKeyword];
@@ -149,6 +158,9 @@ export function parseCSharpBindingsFromText(
                 lineNumber,
                 signature: `${className}.${methodName}`,
                 scopeTags,
+                scopes,
+                parameterTypes: methodInfo?.parameterTypes,
+                methodLine,
             });
         }
     }
@@ -184,18 +196,52 @@ export function extractCSharpPatternString(raw: string): string {
         .replace(/\x00BACKSLASH\x00/g, '\\');
 }
 
-/** Exported for unit tests. */
-export function extractScopeTagsFromText(text: string): string[] {
-    const tags: string[] = [];
-    const re = new RegExp(SCOPE_TAG_IN_ATTR_REGEX.source, 'gi');
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(text)) !== null) {
-        const raw = m[1].trim().replace(/^@+/, '');
-        if (raw.length > 0) {
-            tags.push(raw);
+/** Exported for unit tests. Scope attributes with no named criterion are dropped. */
+export function extractScopeRulesFromText(text: string): BindingScopeRule[] {
+    const rules: BindingScopeRule[] = [];
+    const re = new RegExp(SCOPE_CALL_REGEX.source, 'gi');
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(text)) !== null) {
+        const rule = parseScopeArguments(match[1]);
+        if (rule) {
+            rules.push(rule);
         }
     }
-    return uniqueTags(tags);
+    return rules;
+}
+
+/** Exported for unit tests. Tags only; Feature and Scenario criteria are ignored here. */
+export function extractScopeTagsFromText(text: string): string[] {
+    return uniqueTags(
+        extractScopeRulesFromText(text).flatMap((rule) => (rule.tag ? [rule.tag] : []))
+    );
+}
+
+function parseScopeArguments(inner: string): BindingScopeRule | null {
+    const rule: { tag?: string; feature?: string; scenario?: string } = {};
+    const re = new RegExp(SCOPE_NAMED_ARG_REGEX.source, 'gi');
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(inner)) !== null) {
+        const key = match[1].toLowerCase();
+        let value = extractCSharpPatternString(match[2]).trim();
+        if (key === 'tag') {
+            value = value.replace(/^@+/, '');
+        }
+        if (value.length === 0) {
+            continue;
+        }
+        if (key === 'tag') {
+            rule.tag = value;
+        } else if (key === 'feature') {
+            rule.feature = value;
+        } else if (key === 'scenario') {
+            rule.scenario = value;
+        }
+    }
+    if (!rule.tag && !rule.feature && !rule.scenario) {
+        return null;
+    }
+    return rule;
 }
 
 function uniqueTags(tags: readonly string[]): string[] {
@@ -221,18 +267,96 @@ function findClassNames(text: string): Array<{ name: string; index: number }> {
     return classes;
 }
 
-function buildClassScopeTagMap(
+function buildClassScopeRuleMap(
     text: string,
     classes: Array<{ name: string; index: number }>
-): Map<string, string[]> {
-    const map = new Map<string, string[]>();
+): Map<string, BindingScopeRule[]> {
+    const map = new Map<string, BindingScopeRule[]>();
     for (let i = 0; i < classes.length; i++) {
         const cls = classes[i];
         const prevEnd = i > 0 ? classes[i - 1].index : 0;
         const regionStart = Math.max(prevEnd, cls.index - 800);
-        map.set(cls.name, extractScopeTagsFromText(text.slice(regionStart, cls.index)));
+        map.set(cls.name, extractScopeRulesFromText(text.slice(regionStart, cls.index)));
     }
     return map;
+}
+
+function readFollowingMethod(after: string): {
+    name: string;
+    parameterTypes?: readonly string[];
+    index: number;
+} | null {
+    let cursor = 0;
+    while (cursor < after.length) {
+        while (cursor < after.length && /\s/.test(after[cursor])) {
+            cursor++;
+        }
+        if (after[cursor] !== '[') {
+            break;
+        }
+        const end = indexAfterAttribute(after, cursor);
+        if (end <= cursor) {
+            break;
+        }
+        cursor = end;
+    }
+
+    const rest = after.slice(cursor);
+    const header = /^(?:(?:public|private|protected|internal|static|async|virtual|override|sealed|new)\s+)*(?:[\w.<>,[\]?]+\s+)+(\w+)\s*\(([^)]*)\)/.exec(rest);
+    if (header) {
+        return {
+            name: header[1],
+            parameterTypes: parseParameterTypes(header[2]),
+            index: cursor + header.index,
+        };
+    }
+
+    const fallback = new RegExp(METHOD_DECLARATION_REGEX.source).exec(after);
+    if (!fallback) {
+        return null;
+    }
+    return {
+        name: fallback[1],
+        parameterTypes: undefined,
+        index: fallback.index,
+    };
+}
+
+function indexAfterAttribute(text: string, openBracket: number): number {
+    let depth = 0;
+    for (let i = openBracket; i < text.length; i++) {
+        if (text[i] === '[') {
+            depth++;
+        } else if (text[i] === ']') {
+            depth--;
+            if (depth === 0) {
+                return i + 1;
+            }
+        }
+    }
+    return -1;
+}
+
+/** `[]` when the list is empty or simple. `undefined` when it is not safe to judge arity. */
+function parseParameterTypes(raw: string): string[] | undefined {
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) {
+        return [];
+    }
+    if (/[=<>()\n]/.test(trimmed)) {
+        return undefined;
+    }
+    const types: string[] = [];
+    for (const part of trimmed.split(',')) {
+        const tokens = part.trim().split(/\s+/).filter((token) =>
+            token !== 'ref' && token !== 'out' && token !== 'in' && token !== 'params' && token !== 'this'
+        );
+        if (tokens.length < 2) {
+            return undefined;
+        }
+        types.push(tokens[0]);
+    }
+    return types;
 }
 
 /**

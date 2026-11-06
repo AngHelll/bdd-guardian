@@ -15,7 +15,10 @@ export type UnboundAdvice =
 
 function sourcesFor(step: FeatureStep, bindings: readonly Binding[]): ReuseBindingSource[] {
     return bindings
-        .filter((binding) => isBindingInScope(binding, step.tagsEffective))
+        .filter((binding) => isBindingInScope(binding, step.tagsEffective, {
+            featureTitle: step.featureName,
+            scenarioTitle: step.scenarioName,
+        }))
         .map((binding) => ({
             patternRaw: binding.patternRaw,
             methodName: binding.methodName,
