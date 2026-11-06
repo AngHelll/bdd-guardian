@@ -1,7 +1,7 @@
 # BDD Guardian — Roadmap
 
 > Living document: what shipped, what is in progress, and what comes next.  
-> **Current release: v1.23.0** Marketplace 2026-10-26 · GitHub: [v1.23.0](https://github.com/AngHelll/bdd-guardian/releases/tag/v1.23.0)
+> **Current release: v1.24.0** Marketplace + Open VSX 2026-11-06
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Status | Item |
 |--------|------|
-| ✅ Shipped | v0.1.0 → **v1.23.0** (Marketplace + GitHub) |
+| ✅ Shipped | v0.1.0 → **v1.24.0** (Marketplace + Open VSX) |
 | 🎯 Next | (dogfood / next align) |
 | 📋 Gate | *alineado, pasa a spec* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
@@ -664,4 +664,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-10-26 — v1.23.0 keyword boundary and orphan scan shipped (Marketplace + GitHub + Open VSX).*
+*Last updated: 2026-11-06 — v1.24.0 Reqnroll scope, outline rows, and method shape shipped (Marketplace + Open VSX).*
