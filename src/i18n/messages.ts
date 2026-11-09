@@ -139,6 +139,17 @@ export const en: Record<string, string> = {
   suiteMapOpen: 'Open',
   suiteMapExplainStale: 'This step is no longer ambiguous',
   suiteMapExplainUnboundStale: 'This step is no longer unbound',
+  lexiconSummary: '{0} words · {1} usages · {2} unused · {3} with several implementations',
+  lexiconSummarySkipped: '{0} words · usage scan skipped',
+  lexiconIndexing: 'Indexing…',
+  lexiconNoBindings: 'No bindings indexed',
+  lexiconNoUsages: 'No usages',
+  lexiconUsageOne: '1 usage',
+  lexiconUsages: '{0} usages',
+  lexiconImplementations: '{0} implementations',
+  lexiconMore: '…and {0} more',
+  lexiconDisabled: 'Step lexicon is off (bddGuardian.lexicon.enabled)',
+  lexiconOpen: 'Open',
 };
 
 export const es: Record<string, string> = {
@@ -277,4 +288,15 @@ export const es: Record<string, string> = {
   suiteMapOpen: 'Abrir',
   suiteMapExplainStale: 'Este paso ya no es ambiguo',
   suiteMapExplainUnboundStale: 'Este paso ya no está sin enlazar',
+  lexiconSummary: '{0} palabras · {1} usos · {2} sin hablantes · {3} con varias implementaciones',
+  lexiconSummarySkipped: '{0} palabras · escaneo de usos omitido',
+  lexiconIndexing: 'Indexando…',
+  lexiconNoBindings: 'No hay bindings indexados',
+  lexiconNoUsages: 'Sin usos',
+  lexiconUsageOne: '1 uso',
+  lexiconUsages: '{0} usos',
+  lexiconImplementations: '{0} implementaciones',
+  lexiconMore: '…y {0} más',
+  lexiconDisabled: 'El léxico de pasos está desactivado (bddGuardian.lexicon.enabled)',
+  lexiconOpen: 'Abrir',
 };

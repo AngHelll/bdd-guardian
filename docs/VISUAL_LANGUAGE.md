@@ -66,6 +66,8 @@ Granular toggles (`gutterIcons.enabled`, `gutterIcons.showBound`, `reqnrollNavig
 
 **Suite map (v1.12.0+):** Explorer **BDD Map** lists workspace holes (unbound / ambiguous / orphan) with the same status semantics. It is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.suiteMap.enabled`. **v1.13.0+:** holes nested by file; unbound leaves offer Generate/Copy (same author commands as the lightbulb). **v1.14.0+:** ambiguous leaves offer Explain (same why as hover + QuickPick of colliding bindings). **v1.15.0+:** unbound leaves also offer Explain (why + QuickPick of scoped-out bindings when that is the reason); Generate/Copy stay. **v1.21.1:** unbound and ambiguous icons use `charts.red` / `charts.yellow` via `getStatusIcon`. A hole’s label is the step or pattern text; the line number is the dimmed description (`L{n}`, ambiguous also ` · {count}`). Orphan stays `info` without a chart color. **v1.23.0:** the orphan count is shown only when the scan completed. Above 2,000 bindings the summary says the scan was skipped.
 
+**Step lexicon (v1.25.0+):** Explorer **Step lexicon** lists one row per phrase (slots kept as `{name}`), with usages, implementations, and one-word dialects. It is not a bound/unbound status channel and it is **not** gated by `feedbackLevel`. Toggle: `bddGuardian.lexicon.enabled` (default off). Above 2,000 bindings the summary says the usage scan was skipped. A second CodeLens with the usage count appears on bound steps only while the setting is on.
+
 ## Hover emojis
 
 Markdown hovers intentionally use emojis (native, readable in VS Code hovers). Labels use i18n (`hoverBound`, etc.).
@@ -88,5 +90,6 @@ Binding step diagnostics and orphan bindings: **`BDD Guardian`** (`bddGuardian/u
 | `bddGuardian.displayLanguage` | EN/ES labels |
 | `bddGuardian.orphanBindings.enabled` | Unused binding Problems (Information) |
 | `bddGuardian.suiteMap.enabled` | Explorer BDD Map (workspace holes) |
+| `bddGuardian.lexicon.enabled` | Explorer Step lexicon (phrases, usages, dialects). Default off. Not gated by `feedbackLevel` |
 
 See [README.md](../README.md) settings map for legacy vs branding keys.

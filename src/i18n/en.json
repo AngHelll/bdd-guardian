@@ -105,5 +105,16 @@
   "suiteMapOrphansUnavailable": "Orphans unavailable",
   "suiteMapOpen": "Open",
   "suiteMapExplainStale": "This step is no longer ambiguous",
-  "suiteMapExplainUnboundStale": "This step is no longer unbound"
+  "suiteMapExplainUnboundStale": "This step is no longer unbound",
+  "lexiconSummary": "{0} words · {1} usages · {2} unused · {3} with several implementations",
+  "lexiconSummarySkipped": "{0} words · usage scan skipped",
+  "lexiconIndexing": "Indexing…",
+  "lexiconNoBindings": "No bindings indexed",
+  "lexiconNoUsages": "No usages",
+  "lexiconUsageOne": "1 usage",
+  "lexiconUsages": "{0} usages",
+  "lexiconImplementations": "{0} implementations",
+  "lexiconMore": "…and {0} more",
+  "lexiconDisabled": "Step lexicon is off (bddGuardian.lexicon.enabled)",
+  "lexiconOpen": "Open"
 }

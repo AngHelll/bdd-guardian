@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.25.0] - 2026-11-09
+
+**Highlights:** The step lexicon lists each phrase once — slots, usages, and one-word dialects — instead of one row per line. It is off until you turn it on.
+
+### Added
+
+- Explorer view **Step lexicon** (`bddGuardian.lexicon.enabled`, default off). One row per phrase, with usages, implementations, and dialects a single word apart. `{name}` stays `{name}`. Unbound and ambiguous steps stay in the BDD Map.
+- With the view on, a bound step gets a second CodeLens with the phrase's usage count. It opens that phrase. The CodeLens that opens the binding is unchanged.
+- Above 2,000 bindings the lexicon says the usage scan was skipped instead of showing zero usages.
+
 ## [1.24.0] - 2026-11-06
 
 **Highlights:** Scope follows Reqnroll feature, scenario, and tag rules. Each Examples row is judged on its own. Several attributes on one method count as one destination.

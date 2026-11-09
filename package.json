@@ -2,7 +2,7 @@
   "name": "bdd-guardian",
   "displayName": "BDD Guardian",
   "description": "Go to Definition, CodeLens and live diagnostics for Gherkin steps. Find unbound and ambiguous steps in Reqnroll, SpecFlow, Cucumber, Godog and Behave before you run tests.",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "publisher": "anghelll",
   "icon": "icon.png",
   "galleryBanner": {
@@ -146,6 +146,10 @@
         "title": "%command.suiteMap.focus%"
       },
       {
+        "command": "bddGuardian.lexicon.focus",
+        "title": "%command.lexicon.focus%"
+      },
+      {
         "command": "bddGuardian.suiteMap.generateBinding",
         "title": "%command.suiteMap.generateBinding%",
         "icon": "$(add)"
@@ -215,6 +219,12 @@
           "name": "%view.suiteMap.name%",
           "icon": "$(map)",
           "when": "config.bddGuardian.suiteMap.enabled"
+        },
+        {
+          "id": "bddGuardian.lexicon",
+          "name": "%view.lexicon.name%",
+          "icon": "$(library)",
+          "when": "config.bddGuardian.lexicon.enabled"
         }
       ]
     },
@@ -309,6 +319,11 @@
           "type": "boolean",
           "default": true,
           "description": "%config.suiteMap.enabled%"
+        },
+        "bddGuardian.lexicon.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.lexicon.enabled%"
         },
         "bddGuardian.pilotHandoff.enabled": {
           "type": "boolean",

@@ -73,6 +73,10 @@ The Problems panel flags **unbound** and **ambiguous** steps as you edit, plus *
 
 An Explorer view with every hole in the step ↔ binding map, grouped by `.feature`. Each row offers **Explain** (why it's unbound or which bindings collide) and **Generate binding**. Run **BDD Guardian: Show suite map**.
 
+### Step lexicon
+
+An Explorer view of the phrases the suite already uses: one row per phrase, with `{slots}` kept visible, the scenarios that say it, and phrases one word away. It stays off until `bddGuardian.lexicon.enabled` is on. Then a bound step also shows a usage count that opens that phrase. Run **BDD Guardian: Show step lexicon**.
+
 ### Hover with context
 
 - **Bound:** binding class and method, pattern, captured parameters, code preview.
@@ -154,6 +158,7 @@ Keys under `reqnrollNavigator.*` are legacy IDs kept for backward compatibility.
 | `bddGuardian.autocomplete.enabled` | `true` | Step suggestions from indexed bindings |
 | `bddGuardian.orphanBindings.enabled` | `true` | Information diagnostics on unused bindings (skipped above 2,000 bindings) |
 | `bddGuardian.suiteMap.enabled` | `true` | Show the BDD Map view |
+| `bddGuardian.lexicon.enabled` | `false` | Show the Step lexicon (one row per phrase). Adds a usage CodeLens while on |
 | `bddGuardian.pilotHandoff.enabled` | `true` | Offer Open / Install BDD Pilot and Run with Pilot |
 | `bddGuardian.formatHint.enabled` | `true` | Suggest BDD Gherkin Format for `.feature` layout |
 | `bddGuardian.coach.statusBar.enabled` | `true` | Health score in the status bar when Coach is on |

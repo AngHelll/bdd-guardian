@@ -13,6 +13,12 @@ import { ResolvedKeyword, FeatureStep } from '../../core/domain';
 import { getUIConfig, formatBoundCodeLensTitle, formatBoundCodeLensTooltip, getCodeLensIcon, withCodeLensIcon, stepStatusFromResolve, StepStatus } from '../../ui/stepStatus';
 import { t } from '../../i18n';
 import { FEATURE_DOCUMENT_SELECTORS } from './documentSelectors';
+import { formatLexiconUsageCount } from '../lexicon/lexiconLabels';
+import type { LexiconUsage } from '../lexicon/lexiconSnapshot';
+
+interface LexiconSource {
+    usageAt(uri: vscode.Uri, line: number): LexiconUsage | undefined;
+}
 
 interface StepCodeLens extends vscode.CodeLens {
     stepText: string;
@@ -21,13 +27,19 @@ interface StepCodeLens extends vscode.CodeLens {
     documentUri: vscode.Uri;
     indexedStep?: FeatureStep;
     result?: ResolveResult;
+    kind?: 'binding' | 'usage';
 }
 
 export class CodeLensProvider implements vscode.CodeLensProvider {
     private _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
+    private lexiconSource: LexiconSource | undefined;
     
     constructor(private indexManager: IndexManager) {}
+
+    setLexiconSource(source: LexiconSource): void {
+        this.lexiconSource = source;
+    }
     
     refresh(): void {
         this._onDidChangeCodeLenses.fire();
@@ -97,6 +109,24 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             );
                 
             codeLenses.push(lens);
+
+            const usage = this.lexiconSource?.usageAt(document.uri, i);
+            if (usage) {
+                const usageLens: StepCodeLens = Object.assign(new vscode.CodeLens(range), {
+                    stepText: text,
+                    keyword,
+                    lineIndex: i,
+                    documentUri: document.uri,
+                    indexedStep,
+                    kind: 'usage' as const,
+                });
+                usageLens.command = {
+                    title: withCodeLensIcon('$(references)', formatLexiconUsageCount(usage.count)),
+                    command: 'bddGuardian.lexicon.reveal',
+                    arguments: [usage.key],
+                };
+                codeLenses.push(usageLens);
+            }
         }
         
         return codeLenses;
@@ -111,6 +141,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
     private async resolveCodeLensAsync(codeLens: vscode.CodeLens): Promise<vscode.CodeLens> {
         const stepLens = codeLens as StepCodeLens;
+        if (stepLens.kind === 'usage') {
+            return codeLens;
+        }
         const index = this.indexManager.getIndex();
         const allBindings = index.getAllBindings();
         

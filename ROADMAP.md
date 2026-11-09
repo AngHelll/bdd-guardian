@@ -10,8 +10,8 @@
 | Status | Item |
 |--------|------|
 | ✅ Shipped | v0.1.0 → **v1.24.0** (Marketplace + Open VSX) |
-| 🎯 Next | (dogfood / next align) |
-| 📋 Gate | *alineado, pasa a spec* |
+| 🎯 Next | **v1.25.0** Step lexicon atlas (Capa B ok, pendiente ship) |
+| 📋 Gate | *commit* / *tag* / *publish* |
 | 🏁 Goal | **v1.x** — mapa + Coach ✅ → suite glue ✅ → platform ✅ → claridad de señal → **mapa como objeto** |
 
 **Companion extensions:** [BDD Pilot](https://github.com/AngHelll/bdd-pilot) (execution). Guardian = navigation, bindings & index API.
@@ -85,6 +85,23 @@
 | **1.22.0** | Reqnroll parameter types — step-argument regex, `{decimal}`, `{Guid}`, `{}` ✅ |
 | **1.23.0** | Keyword boundary, qualified Reqnroll/SpecFlow attributes, orphan scan status, VSIX without dev artifacts ✅ |
 | **1.24.0** | Reqnroll scope precedence, per-row Outline matching, method signature identity ✅ |
+| **1.25.0** | Step lexicon atlas — frase única, usos y dialectos (solo lectura) · Capa B ok, pendiente ship |
+
+---
+
+## Plan v1.25.0 — alineado (2026-11-09)
+
+| # | Status |
+|---|--------|
+| **1.25.0-A** `buildLexicon` puro (frase con slots, speakers bound-only, dialectos a una palabra, cap) | ✅ |
+| **1.25.0-B** TreeView Explorer opt-in + segundo CodeLens de usos | ✅ |
+| **1.25.0-C** i18n / VISUAL_LANGUAGE / README | ✅ |
+| **1.25.0-4** VSIX | ✅ Capa B ok · pendiente ship |
+
+Spec: `docs-internal/specs/step-lexicon-atlas-v1.25.0.md` (local).  
+**Anti-scope:** matching, pronunciar/acuñar, rename, merge, export, CLI/MCP nuevo, BDD Map, CodeLens primario, default on.
+
+**Gate:** ☑ Capa B ok (2026-11-09). Pendiente *commit* / *tag* / *publish*.
 
 ---
 
@@ -664,4 +681,4 @@ Spec: `docs-internal/specs/guardian-cli-mcp-v1.8.0.md` (local).
 
 ---
 
-*Last updated: 2026-11-06 — v1.24.0 Reqnroll scope, outline rows, and method shape shipped (Marketplace + Open VSX).*
+*Last updated: 2026-11-09 — v1.25.0 Step lexicon atlas verified, release in progress.*

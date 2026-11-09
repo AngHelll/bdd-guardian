@@ -7,11 +7,14 @@
   "config.gutterIcons.enabled": "Mostrar iconos en el gutter del estado del step (problemas por defecto; bound opcional con showBound)",
   "config.gutterIcons.showBound": "Mostrar checks verdes en steps bound (apagado por defecto — el CodeLens es la señal de bound)",
   "view.suiteMap.name": "Mapa BDD",
+  "view.lexicon.name": "Léxico de pasos",
   "command.showBindings.title": "BDD Guardian: Vocabulario de pasos",
   "command.suiteMap.focus": "BDD Guardian: Mostrar mapa de la suite",
+  "command.lexicon.focus": "BDD Guardian: Mostrar léxico de pasos",
   "command.suiteMap.generateBinding": "Generar binding",
   "command.suiteMap.copySnippet": "Copiar snippet",
   "command.suiteMap.explainAmbiguity": "Explicar",
   "command.suiteMap.explainUnbound": "Explicar",
-  "config.suiteMap.enabled": "Mostrar la vista Mapa BDD en Explorer (huecos unbound / ambiguous / orphan del workspace). Independiente de feedbackLevel."
+  "config.suiteMap.enabled": "Mostrar la vista Mapa BDD en Explorer (huecos unbound / ambiguous / orphan del workspace). Independiente de feedbackLevel.",
+  "config.lexicon.enabled": "Mostrar la vista Léxico de pasos en Explorer (una fila por frase, con usos y dialectos). Apagada por defecto. Independiente de feedbackLevel."
 }
